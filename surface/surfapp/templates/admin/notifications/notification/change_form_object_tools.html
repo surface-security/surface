@@ -1,0 +1,12 @@
+{% extends "admin/change_form_object_tools.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+<li>
+    {% url opts|admin_urlname:'preview' original.pk|admin_urlquote as preview_url %}
+    <a href="{% add_preserved_filters preview_url %}" class="historylink">{% translate "Preview" %}</a>
+</li>
+{# this is the only reason for overriding this template -> blank item for now to separate - FIXME: fix CSS in surface-theme to handle multiple buttons correctly #}
+<li></li>
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,7 @@
+# dockerignore to avoid invalidating cache on anything other than requirements changes
+**
+!surface/requirements*.txt
+!surface/scanners
+!surface/dns_ips
+!.surface/surface/scanners/requirements*.txt
+!.surface/surface/dns_ips/requirements*.txt

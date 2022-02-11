@@ -1,0 +1,23 @@
+{% extends "admin/change_list_object_tools.html" %}
+{% load i18n admin_urls dkron %}
+
+{% block object-tools-items %}
+{% if has_dashboard_permission %}
+<li class="d-inline-block">
+    <a href="{% dkron_path %}" target="_blank">
+        <button class="btn btn-primary-outline btn-round ml-1">
+            <i class="fas fa-th-large mr-1"></i>
+            Open dashboard
+        </button>
+    </a>
+    {% url cl.opts|admin_urlname:'resync' as resync_url %}
+    <a href="{% add_preserved_filters resync_url is_popup to_field %}">
+        <button class="btn btn-primary-outline btn-round ml-1">
+            <i class="fas fa-sync mr-1"></i>
+            Resync jobs
+        </button>
+    </a>
+</li>
+{% endif %}
+{{ block.super }}
+{% endblock %}

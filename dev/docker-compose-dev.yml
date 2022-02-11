@@ -1,0 +1,29 @@
+version: '3.1'
+
+# to make use of this compose, make sure your local.env has these settings:
+#
+# SURF_DATABASE_URL=mysql://root:@127.0.0.1:23306/surface
+# SURF_ALLOWED_HOSTS=*
+# SURF_DKRON_WEB_PORT=8888
+# SURF_DKRON_URL=http://localhost:8888/
+# SURF_DKRON_SERVER=true
+#
+
+services:
+  mysql:
+    image: mysql:8.0.23
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --skip-character-set-client-handshake
+    ports:
+      - 33306:3306
+    environment:
+      MYSQL_INNODB_BUFFER_POOL_SIZE: 512M
+      MYSQL_DATABASE: surface
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data: {}

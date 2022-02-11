@@ -1,0 +1,104 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+
+/* Window */
+.window-container {
+  width: 700px;
+  height: 400px;
+  border: 1px solid #bbb;
+  border-radius: 7px;
+  box-shadow: 0 22px 70px 4px rgba(0, 0, 0, 0.56);
+  background: rgb(233, 233, 233);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 19px;
+  font-family: 'Source Code Pro', monospace;
+}
+
+.window-controls {
+  display: flex;
+  padding: 5px;
+  background: linear-gradient(rgb(226, 224, 226), rgb(199, 198, 200));
+}
+
+.window-controls-btn {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0;
+}
+
+.close-btn {
+  background: rgb(227, 69, 69);
+}
+
+.minimize-btn {
+  background: rgb(224, 178, 40);
+}
+
+.expand-btn {
+  background: rgb(0, 216, 67);
+}
+
+.window-content {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 95%;
+  background: #000;
+  overflow-y: scroll;
+}
+
+.line {
+  color: #fff;
+  margin: 0;
+  padding: 3px 5px;
+}
+
+table {
+    border-collapse: unset;
+    background: #000;
+    margin-bottom: 0px;
+    border-radius: 0px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% for out in output %}
+<div class="window-container is-visible">
+  <div class="window-controls">
+    <button class="window-controls-btn close-btn"></button>
+    <button class="window-controls-btn minimize-btn"></button>
+    <button class="window-controls-btn expand-btn"></button>
+      rootbox: {{ out.0 }}
+  </div>
+  <div class="window-content">
+    <p class="line">~ docker ps</p>
+    <table border="0">
+      <tr class="line">
+        <td>CONTAINER ID</td>
+        <td>IMAGE</td>
+        <td>STATUS</td>
+        <td>NAME</td>
+      </tr>
+      {% for c in out.1 %}
+      <tr class="line">
+        <td>{{ c.id }}</td>
+        <td>{{ c.image }}</td>
+        <td>{{ c.status }}</td>
+        <td>{{ c.name }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<br class="clear">
+{% endfor %}
+{% endblock %}

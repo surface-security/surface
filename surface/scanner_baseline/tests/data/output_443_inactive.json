@@ -1,0 +1,1 @@
+{"timestamp":"2021-09-29T07:42:32.6080298Z","url":"https://www.winzip.com","input":"www.winzip.com","domain":"www.winzip.com","port":"443","error":"context deadline exceeded (Client.Timeout exceeded while awaiting headers)","failed":true}

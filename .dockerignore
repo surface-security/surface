@@ -1,0 +1,16 @@
+**/*.egg-info
+**/*.log
+**/*.pyc
+**/*.sqlite3
+**/local.env
+**/.DS_Store
+**/.vagrant
+.coverage
+.vscode
+.idea
+.git
+build
+dist
+env
+*.md
+dev/aws-cdk

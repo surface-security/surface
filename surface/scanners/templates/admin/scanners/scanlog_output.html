@@ -1,0 +1,111 @@
+{% extends "admin/base.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {{ media.css }}
+  {# FIXME: style not confirmed in any browser/monitor but ONE, needs review and adjusting that 320 fixed value at least... #}
+  <style>
+    .card-body {
+      height: calc(100vh - 320px);
+      overflow: scroll; 
+      display: flex;
+      flex-direction: column-reverse;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-inner">
+    <div class="page-header">
+        {% include 'includes/breadcrumbs.html' %}
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title">{{ title }}</h4>
+                        (<span id="scanner-state">{{ original.get_state_display }}</span>)
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% if original.state == original.States.RUNNING %}
+                    <div class="inner text-center" id="loadingOutput">
+                        <span class="fa"><i class="fas fa-spinner fa-spin"></i></span>
+                    </div>
+                    {% endif %}
+                    <span id="output-panel"></span>
+                    {% if output_list %}
+                        {% for line in output_list %}
+                        {# NOTE!! use forloop.first because order is reversed, DO NOT CHANGE #}
+                        <div class="inner line" {% if forloop.first %}data-isoformat="{{ line.timestamp.isoformat }}"{% endif %}>
+                            <strong>
+                            {{ line.timestamp|date:"d-m-Y H:i:s" }}
+                            </strong>
+                            {{ line.line }}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="inner line"><em>{% trans 'No output for this scan (so far).' %}</em></div>
+                    {% endif %}
+                    </span>
+                    {% if output_list %}
+                    <div class="inner text-center">
+                        <em>
+                            {% if not full_mode %}
+                            skipped some output - 
+                            {% endif %}
+                            <a target="_blank" href="{% url 'admin:scanners_scanlog_output' original.pk %}?mode=raw">
+                                view full raw output
+                            </a>
+                        </em>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ block.super }}
+    {% if original.state == original.States.RUNNING %}
+    <script>
+        var lastCursor;
+        var lastState = "{{ original.get_state_display }}";
+        var outputPanel = $('#output-panel');
+        var scannerState = $('#scanner-state');
+
+        function fetchLogs() {
+            $.getJSON("{% url 'admin:scanners_scanlog_output' original.pk %}", {mode: "json", cursor: lastCursor}, function(data) {
+                lastState = data.state;
+                lastCursor = data.cursor;
+                scannerState.text(data.state);
+                $.each(data.lines, function( ind, val ) {
+                    outputPanel.append(
+                        $('<div class="inner line"/>').text(val[1]).prepend($('<strong/>').text(val[0]))
+                    );
+                });
+            }).always(function(){
+                if (lastState == "{{ original.get_state_display }}") {
+                    setTimeout(fetchLogs, 3000);
+                } else {
+                    $('#loadingOutput').hide();
+                }
+            });
+        };
+
+        $(function() {
+            lastCursor = $('div.inner.line').data('isoformat');
+            setTimeout(fetchLogs, 3000);
+        });
+    </script>
+    {% endif %}
+{% endblock javascripts %}

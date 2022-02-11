@@ -1,0 +1,25 @@
+FROM python:3.9-slim-buster as builder
+
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y \
+        libmariadbclient-dev \
+        build-essential \
+        libldap2-dev \
+        libsasl2-dev \
+        git \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN --mount=type=bind,target=/tmpapp \
+    pip wheel -w /wheels -r /tmpapp/surface/requirements_test.txt
+
+############################################################################
+
+FROM python:3.9-slim-buster
+
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y \
+       libmariadb3 \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN --mount=type=bind,from=builder,target=/builderroot --mount=type=bind,target=/tmpapp \
+    pip install --no-index --find-links=/builderroot/wheels -r /tmpapp/surface/requirements_test.txt

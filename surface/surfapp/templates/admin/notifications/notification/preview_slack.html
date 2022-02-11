@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="page-inner">
+    <div class="page-header">
+        {% include 'includes/breadcrumbs.html' %}
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title">{{ title }}</h4>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="inner text-center">
+                        <em>
+                            markdown is readable but you can always render this message in 
+                            <a target="_blank" href="https://app.slack.com/block-kit-builder/{{ slack_team }}#{{ message_blocks|urlencode }}">
+                                block-kit-builder
+                            </a>
+                        </em>
+                    </div>
+                    <div>&nbsp;</div>
+                    <pre>{{ message }}</pre>
+                    {% for attachment in attachments %}
+                    <div>&nbsp;</div>
+                    <div class="inner text-center">
+                        <em>
+                            markdown is readable but you can always render this attachment in 
+                            <a target="_blank" href="https://app.slack.com/block-kit-builder/{{ slack_team }}#{{ attachment.1|urlencode }}">
+                                block-kit-builder
+                            </a>
+                        </em>
+                    </div>
+                    <pre>{{ attachment.0 }}</pre>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

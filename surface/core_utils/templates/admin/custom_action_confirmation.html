@@ -1,0 +1,40 @@
+{% extends "admin/delete_selected_confirmation.html" %}
+{% load i18n %}
+
+{# not needed with core theme but required with surface-theme as it does not use base_site.html #}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+    <div class="page-header">
+        {% include 'includes/breadcrumbs.html' %}
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <p>{% block action_question %}Are you sure you want to {{ action_short_description }} for the selected {{ objects_name }}?{% endblock action_question %}</p>
+                    <h2>Summary</h2>
+                    {% block action_summary %}
+                    {% for obj in queryset %}
+                        <ul>{{ obj }}</ul>
+                    {% endfor %}
+                    {% endblock action_summary %}
+                    {% block action_form %}
+                    <form method="post" class="form-group p-0">{% csrf_token %}
+                        <div>
+                        {% for obj in queryset %}
+                            <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}">
+                        {% endfor %}
+                        <input type="hidden" name="action" value="{{ action }}">
+                        <input type="hidden" name="post" value="yes">
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Yes, I’m sure' %}">
+                        <a href="#" class="btn btn-dark cancel-link">{% trans "No, take me back" %}</a>
+                        </div>
+                    </form>
+                    {% endblock action_form %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

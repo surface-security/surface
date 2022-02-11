@@ -1,0 +1,98 @@
+version: '3.1'
+
+# to make use of this compose, make sure your local.env has these settings:
+#
+# SURF_DATABASE_URL=mysql://root:@127.0.0.1:23306/surface
+# SURF_ALLOWED_HOSTS=*
+# SURF_DKRON_WEB_PORT=8888
+# SURF_DKRON_URL=http://localhost:8888/
+# SURF_DKRON_SERVER=true
+#
+
+x-env: &env
+  env_file:
+    - ../surface/local.env
+  environment:
+    SURF_DATABASE_URL: mysql://root:@mysql/surface
+    SURF_DKRON_URL: http://dkron:8888/
+    SURF_DKRON_BIN_DIR: /surface/dev/dkronlinux
+
+x-surf: &surf
+  <<: *env
+  build:
+    context: ..
+    dockerfile: dev/Dockerfile-IN-A-BOX
+  working_dir: /surface/surface
+  depends_on:
+    - mysql
+  volumes:
+    - ..:/surface
+  deploy:
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+
+services:
+  surface:
+    <<: *surf
+    command: ./manage.py runserver 0.0.0.0:8000
+
+  dkron:
+    <<: *surf
+    command: ./manage.py run_dkron -s
+  
+  resync-rootbox:
+    <<: *surf
+    command: ./manage.py resync_rootbox
+
+  nginx:
+    # optional (in dev) but light and nice - use for staticfiles in production
+    <<: *env
+    image: docker.app.betfair/appsec/surface/nginx:1.19-2
+    environment:
+      SURF_ALLOWED_HOSTS: '*'
+      # 192.168.65.2 is the default host IP in Docker for Mac
+      # Windows to be added
+      # Linux doesn't have one as it doesn't need the docker VMs
+      NGINX_APP_IP: surface
+      NGINX_APP_PORT: 8000
+      NGINX_DKRON_IP: dkron
+      NGINX_DKRON_PORT: 8888
+      SURF_STATIC_ROOT: ''
+    # turn off webping, this is dev, no need for noise
+    healthcheck:
+      test: ""
+    depends_on:
+      - surface
+      - dkron
+    ports:
+      - 8080:8080
+    volumes:
+      - ./media:/surface/media/
+
+  mysql:
+    image: mysql:8.0.23
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --skip-character-set-client-handshake
+    ports:
+      - 33306:3306
+    environment:
+      MYSQL_INNODB_BUFFER_POOL_SIZE: 512M
+      MYSQL_DATABASE: surface
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  dockerd:
+    # isolated docker host to test scanners
+    image: docker:20.10-dind
+    environment:
+      DOCKER_TLS_CERTDIR: ''
+    command: --tls=false
+    privileged: true
+
+
+volumes:
+  mysql_data: {}

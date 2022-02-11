@@ -1,0 +1,36 @@
+Service Name,Port Number,Transport Protocol,Description,Assignee,Contact,Registration Date,Modification Date,Reference,Service Code,Unauthorized Use Reported,Assignment Notes
+,0,tcp,Reserved,[Jon_Postel],[Jon_Postel],,,,,,
+,0,udp,Reserved,[Jon_Postel],[Jon_Postel],,,,,,
+compressnet,2,tcp,Management Utility,,,,,,,,
+compressnet,2,udp,Management Utility,,,,,,,,
+compressnet,3,tcp,Compression Process,[Bernie_Volz],[Bernie_Volz],,,,,,
+compressnet,3,udp,Compression Process,[Bernie_Volz],[Bernie_Volz],,,,,,
+ftp-data,20,tcp,File Transfer [Default Data],[Jon_Postel],[Jon_Postel],,,,,,
+ftp-data,20,udp,File Transfer [Default Data],[Jon_Postel],[Jon_Postel],,,,,,
+ftp-data,20,sctp,FTP,[Randall_Stewart],[Randall_Stewart],,,[RFC4960],,,
+ftp,21,tcp,File Transfer Protocol [Control],[Jon_Postel],[Jon_Postel],,,[RFC959],,,Defined TXT keys: u=<username> p=<password> path=<path>
+ftp,21,udp,File Transfer Protocol [Control],[Jon_Postel],[Jon_Postel],,,[RFC959],,,Defined TXT keys: u=<username> p=<password> path=<path>
+ftp,21,sctp,FTP,[Randall_Stewart],[Randall_Stewart],,,[RFC4960],,,Defined TXT keys: u=<username> p=<password> path=<path>
+ssh,22,tcp,The Secure Shell (SSH) Protocol,,,,,[RFC4251],,,Defined TXT keys: u=<username> p=<password>
+ssh,22,udp,The Secure Shell (SSH) Protocol,,,,,[RFC4251],,,Defined TXT keys: u=<username> p=<password>
+ssh,22,sctp,SSH,[Randall_Stewart],[Randall_Stewart],,,[RFC4960],,,Defined TXT keys: u=<username> p=<password>
+telnet,23,tcp,Telnet,[Jon_Postel],[Jon_Postel],,,[RFC854],,,Defined TXT keys: u=<username> p=<password>
+telnet,23,udp,Telnet,[Jon_Postel],[Jon_Postel],,,[RFC854],,,Defined TXT keys: u=<username> p=<password>
+domain,53,tcp,Domain Name Server,[Paul_Mockapetris],[Paul_Mockapetris],,,,,,
+domain,53,udp,Domain Name Server,[Paul_Mockapetris],[Paul_Mockapetris],,,,,,
+whoispp,63,tcp,"whois++
+
+
+IANA assigned this well-formed service name as a replacement for ""whois++"".",[Rickard_Schoultz],[Rickard_Schoultz],,,,,,
+whois++,63,tcp,whois++,[Rickard_Schoultz],[Rickard_Schoultz],,,,,,"This entry is an alias to ""whoispp"".
+This entry is now historic, not usable for use with many
+common service discovery mechanisms."
+whoispp,63,udp,"whois++
+
+
+IANA assigned this well-formed service name as a replacement for ""whois++"".",[Rickard_Schoultz],[Rickard_Schoultz],,,,,,
+whois++,63,udp,whois++,[Rickard_Schoultz],[Rickard_Schoultz],,,,,,"This entry is an alias to ""whoispp"".
+This entry is now historic, not usable for use with many
+common service discovery mechanisms."
+covia,64,tcp,Communications Integrator (CI),[Dan_Smith],[Dan_Smith],,,,,,
+covia,64,udp,Communications Integrator (CI),[Dan_Smith],[Dan_Smith],,,,,,

@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <div class="page-inner">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <h4 class="card-title">{{ title }}</h4>
+
+                            <form class="form" method="post">
+                                {% csrf_token %}
+                        
+                                <h5>
+                                    <select class="form-control d-inline w-auto" name="update" id="update">
+                                        <option value="add">Add</option>
+                                        <option value="remove">Remove</option>
+                                    </select>
+                                    the tag                                     
+                                    <select class="form-control d-inline w-auto" name="tag" id="tag">
+                                        {% for tag in tags %}
+                                            <option value="{{ tag.pk }}">{{ tag.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    for the selected items
+                                </h5>
+
+                                {% for item in items %}
+                                    <input type="hidden" name="_selected_action" value="{{ item.pk }}" />
+                                {% endfor %}
+                                <input type="hidden" name="action" value="update_tag_on_selected" />
+                                <input type="submit" class="form-control btn-primary w-auto" name="apply" value="Submit"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
