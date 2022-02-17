@@ -31,7 +31,7 @@ class Baseline(BaseParser):
             else:
                 headers.append(l)
         return redirects, cookies, headers
-    
+
     def _find_host_record(self, hostname):
         # in a method for easier subclassing
         obj = (
@@ -92,7 +92,7 @@ class Baseline(BaseParser):
             return
         rec = self._parse_record(obj, rootbox, scanner, baseline_data)
         self._parse_tech(rec, baseline_data)
-    
+
     def _parse_tech(self, rec, baseline_data):
         techs = baseline_data.get('technologies', [])
         if techs:

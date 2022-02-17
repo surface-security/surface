@@ -1,7 +1,6 @@
 from django.test import TestCase
 
 from django.contrib.contenttypes import models as ct_models
-from surface import models as surf_models
 from dns_ips import models as dns_models
 from scanners import models
 

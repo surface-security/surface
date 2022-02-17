@@ -11,8 +11,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
@@ -20,7 +19,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('active', models.BooleanField(db_index=True, default=True)),
-                ('last_seen', models.DateTimeField(blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True)),
+                (
+                    'last_seen',
+                    models.DateTimeField(
+                        blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True
+                    ),
+                ),
                 ('name', models.CharField(db_index=True, max_length=255, null=True)),
                 ('notes', models.TextField(blank=True, null=True)),
                 ('registration_date', models.DateTimeField(blank=True, db_index=True, null=True)),
@@ -31,7 +35,10 @@ class Migration(migrations.Migration):
                 ('register_csc_lock', models.BooleanField(db_index=True, default=False)),
                 ('register_masking', models.BooleanField(db_index=True, default=False)),
                 ('register_registrant_name', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('register_registrant_organisation', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
+                (
+                    'register_registrant_organisation',
+                    models.CharField(blank=True, db_index=True, max_length=255, null=True),
+                ),
                 ('register_registrant_address', models.CharField(blank=True, max_length=255, null=True)),
                 ('register_registrant_postcode', models.CharField(blank=True, max_length=255, null=True)),
                 ('register_registrant_city', models.CharField(blank=True, max_length=255, null=True)),
@@ -81,7 +88,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('active', models.BooleanField(default=True)),
-                ('last_seen', models.DateTimeField(blank=True, default=django.utils.timezone.now, editable=False, null=True)),
+                (
+                    'last_seen',
+                    models.DateTimeField(blank=True, default=django.utils.timezone.now, editable=False, null=True),
+                ),
                 ('name', models.CharField(max_length=255, null=True)),
             ],
             options={
@@ -94,10 +104,20 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('active', models.BooleanField(db_index=True, default=True)),
-                ('last_seen', models.DateTimeField(blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True)),
+                (
+                    'last_seen',
+                    models.DateTimeField(
+                        blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True
+                    ),
+                ),
                 ('name', models.CharField(db_index=True, max_length=255, null=True)),
                 ('notes', models.TextField(blank=True, null=True)),
-                ('domain', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.dnsdomain')),
+                (
+                    'domain',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.dnsdomain'
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'DNS Record',
@@ -111,7 +131,12 @@ class Migration(migrations.Migration):
                 ('range_min', core_utils.fields.UnsignedIntegerField(blank=True, null=True)),
                 ('range_max', core_utils.fields.UnsignedIntegerField(blank=True, null=True)),
                 ('active', models.BooleanField(db_index=True, default=True)),
-                ('last_seen', models.DateTimeField(blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True)),
+                (
+                    'last_seen',
+                    models.DateTimeField(
+                        blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True
+                    ),
+                ),
                 ('vlan', models.CharField(blank=True, max_length=255, null=True)),
                 ('zone', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
                 ('datacenter', models.CharField(blank=True, max_length=255, null=True)),
@@ -169,7 +194,12 @@ class Migration(migrations.Migration):
                 ('manufacturer', models.CharField(blank=True, max_length=255, null=True)),
                 ('customer', models.CharField(blank=True, max_length=255, null=True)),
                 ('notes', models.TextField(blank=True, null=True)),
-                ('source', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.source')),
+                (
+                    'source',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.source'
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Organisation',
@@ -185,8 +215,18 @@ class Migration(migrations.Migration):
                 ('expected_ports', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
                 ('expected_protocol', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('organisation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.organisation')),
-                ('range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.iprange')),
+                (
+                    'organisation',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.organisation'
+                    ),
+                ),
+                (
+                    'range',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.iprange'
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'IP Range - Third Party (SN)',
@@ -196,19 +236,50 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='iprange',
             name='source',
-            field=models.ForeignKey(default=dns_ips.models.default_source_unknown, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.source'),
+            field=models.ForeignKey(
+                default=dns_ips.models.default_source_unknown,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='dns_ips.source',
+            ),
         ),
         migrations.CreateModel(
             name='IPAddress',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('active', models.BooleanField(db_index=True, default=True)),
-                ('last_seen', models.DateTimeField(blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True)),
+                (
+                    'last_seen',
+                    models.DateTimeField(
+                        blank=True, db_index=True, default=django.utils.timezone.now, editable=False, null=True
+                    ),
+                ),
                 ('name', models.GenericIPAddressField(db_index=True)),
                 ('notes', models.TextField(blank=True, null=True)),
-                ('organisation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.organisation')),
-                ('organisation_ip_owner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='organisation_ip_owner', to='dns_ips.organisation')),
-                ('source', models.ForeignKey(default=dns_ips.models.default_source_unknown, on_delete=django.db.models.deletion.CASCADE, related_name='dns_ips_source', to='dns_ips.source')),
+                (
+                    'organisation',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.organisation'
+                    ),
+                ),
+                (
+                    'organisation_ip_owner',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='organisation_ip_owner',
+                        to='dns_ips.organisation',
+                    ),
+                ),
+                (
+                    'source',
+                    models.ForeignKey(
+                        default=dns_ips.models.default_source_unknown,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='dns_ips_source',
+                        to='dns_ips.source',
+                    ),
+                ),
                 ('tags', models.ManyToManyField(blank=True, to='dns_ips.Tag')),
             ],
             options={
@@ -220,12 +291,41 @@ class Migration(migrations.Migration):
             name='DNSRecordValue',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('rtype', models.CharField(choices=[('A', 'A'), ('CNAME', 'Cname'), ('TXT', 'Txt'), ('SPF', 'Spf'), ('MX', 'Mx'), ('DKIM', 'Dkim'), ('DMARC', 'Dmarc'), ('SRV', 'Srv'), ('SOA', 'Soa'), ('PTR', 'Ptr'), ('NS', 'Ns'), ('AAAA', 'Aaaa'), ('APEXALIAS', 'Apexalias'), ('LB', 'Lb'), ('CAA', 'Caa')], db_index=True, max_length=10, verbose_name='Record Type')),
+                (
+                    'rtype',
+                    models.CharField(
+                        choices=[
+                            ('A', 'A'),
+                            ('CNAME', 'Cname'),
+                            ('TXT', 'Txt'),
+                            ('SPF', 'Spf'),
+                            ('MX', 'Mx'),
+                            ('DKIM', 'Dkim'),
+                            ('DMARC', 'Dmarc'),
+                            ('SRV', 'Srv'),
+                            ('SOA', 'Soa'),
+                            ('PTR', 'Ptr'),
+                            ('NS', 'Ns'),
+                            ('AAAA', 'Aaaa'),
+                            ('APEXALIAS', 'Apexalias'),
+                            ('LB', 'Lb'),
+                            ('CAA', 'Caa'),
+                        ],
+                        db_index=True,
+                        max_length=10,
+                        verbose_name='Record Type',
+                    ),
+                ),
                 ('ttl', models.IntegerField(default=None, null=True, verbose_name='TTL')),
                 ('value', models.TextField(blank=True, null=True)),
                 ('active', models.BooleanField(default=True)),
                 ('last_seen', models.DateTimeField(default=django.utils.timezone.now, editable=False)),
-                ('ips', models.ManyToManyField(blank=True, related_name='dnsrecordvalue_ips', to='dns_ips.IPAddress', verbose_name='IPs')),
+                (
+                    'ips',
+                    models.ManyToManyField(
+                        blank=True, related_name='dnsrecordvalue_ips', to='dns_ips.IPAddress', verbose_name='IPs'
+                    ),
+                ),
                 ('record', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dns_ips.dnsrecord')),
             ],
             options={
@@ -235,7 +335,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dnsrecord',
             name='source',
-            field=models.ForeignKey(default=dns_ips.models.default_source_unknown, on_delete=django.db.models.deletion.CASCADE, related_name='dnsrecord_source', to='dns_ips.source'),
+            field=models.ForeignKey(
+                default=dns_ips.models.default_source_unknown,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='dnsrecord_source',
+                to='dns_ips.source',
+            ),
         ),
         migrations.AddField(
             model_name='dnsrecord',

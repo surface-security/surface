@@ -102,10 +102,13 @@ class TestLiveInt(Base):
         x1 = self._create_livehost(host=self.d2)
         x2 = self._create_livehost(host=self.ip2)
 
-        self.assertEqual(self.generate_input(), [
-            str(x1),
-            str(x2),
-        ])
+        self.assertEqual(
+            self.generate_input(),
+            [
+                str(x1),
+                str(x2),
+            ],
+        )
 
 
 class TestLivePPBHosts(Base):

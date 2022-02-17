@@ -26,6 +26,7 @@ class IPsInt(IPs):
     """
     ToDo: once input generators can receive parameters, this no longer makes sense :soon:
     """
+
     name = 'IPSINT'
     label = 'Internal IPs'
 
