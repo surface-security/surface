@@ -36,7 +36,6 @@ class Test(ScannerTestMixin, TestCase):
         self.assertEqual(scanner_models.LiveHost.objects.count(), 0)
 
     def test_parser(self):
-        self.maxDiff = None
         self._create_dnsrecord(name='www.winzip.com')
         self._run_it()
         self.assertEqual(scanner_models.LiveHost.objects.count(), 2)

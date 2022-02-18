@@ -111,36 +111,6 @@ class TestLiveInt(Base):
         )
 
 
-class TestLivePPBHosts(Base):
-    INP = 'LIVEPPBHOSTS'
-
-    def test_inp(self):
-        d3 = self._create_dnsrecord(name='w1.paddypower.com')
-        d3.tags.add(self.tag_ext)
-        d3.dnsrecordvalue_set.create(rtype='A')
-        d4 = self._create_dnsrecord(name='old.betfair.com')
-        d4.tags.add(self.tag_ext)
-        d4.dnsrecordvalue_set.create(rtype='A')
-        d5 = self._create_dnsrecord(name='noweb.betfair.com')
-        d5.tags.add(self.tag_ext)
-        d5.dnsrecordvalue_set.create(rtype='A')
-
-        # included betfair.com
-        self._create_livehost(host=self.d1)
-        # not included, .betfair
-        self._create_livehost(host=self.d2)
-        # included paddypower.com
-        self._create_livehost(host=d3, port=80)
-        # not included, last_seen too long ago
-        l4 = self._create_livehost(host=d4)
-        # cheat auto_now...!
-        l4.__class__.objects.filter(pk=l4.pk).update(last_seen=timezone.now() - timezone.timedelta(days=50))
-        # not included, non-web port
-        self._create_livehost(host=d5, port=999)
-
-        self.assertEqual(self.generate_input(), ['https://w1.betfair.com', 'http://w1.paddypower.com'])
-
-
 class TestTestHosts(Base):
     INP = 'TESTHOSTS'
 
@@ -169,18 +139,4 @@ class TestTestIPs(Base):
     def test_inp(self):
         tag = self._create_tag(name='test')
         self.ip1.tags.add(tag)
-        self.assertEqual(self.generate_input(), ['1.1.1.1'])
-
-
-class TestTestIPs(Base):
-    INP = 'IPSWHITE'
-    INP_IPS = True
-    INP_HOSTS = False
-
-    def test_inp(self):
-        self.assertEqual(self.generate_input(), [])
-
-        org = ip_models.Organisation.objects.create(whitelisted_to_be_scanned=True)
-        self.ip1.organisation_ip_owner = org
-        self.ip1.save()
         self.assertEqual(self.generate_input(), ['1.1.1.1'])

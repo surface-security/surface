@@ -24,6 +24,7 @@ local.env
 .mypy_cache/
 .vim/
 __pycache__/
+coverage.xml
 
 dev/*
 !dev/Dockerfile*

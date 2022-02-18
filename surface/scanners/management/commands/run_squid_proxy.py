@@ -31,8 +31,8 @@ class Command(LogBaseCommand):
                 f'{image_name}:latest',
                 name=container_name,
                 environment={
-                    'SCANNER_USERNAME': settings.SCANNER_USERNAME,
-                    'SCANNER_PASSWORD': settings.SCANNER_PASSWORD,
+                    'SCANNER_USERNAME': settings.SCANNERS_PROXY_USERNAME,
+                    'SCANNER_PASSWORD': settings.SCANNERS_PROXY_PASSWORD,
                 },
                 ports={3128: 1080},
             )

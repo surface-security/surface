@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'inventory',
     'dns_ips',
     'scanners',
+    'scanner_baseline',
 ]
 
 MIDDLEWARE = [

@@ -10,6 +10,8 @@ from scanners import models
 
 
 def settings_to_file(b64content, filepath, mode=0o600):
+    if b64content is None or not filepath:
+        raise Exception('missing file path')
     if not os.path.isfile(filepath) or os.stat(filepath).st_size == 0:
         with open(filepath, 'wb') as file:
             file.write(base64.b64decode(b64content))

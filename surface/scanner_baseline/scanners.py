@@ -64,22 +64,10 @@ class Baseline(BaseParser):
             defaults=defaults,
         )
         if (rec.active is False and active is False) or created:
-            source = f'{models.LiveHost._meta.app_label}.{models.LiveHost._meta.object_name}'
-            title = f"Port {rec.port} is open on {rec.host}. {datetime.now().strftime('%d/%m/%Y')}"
-            logger.info(f"Creating alert for SOC: {title}")
-            # soc.create_incident(
-            #     brand="ppb",
-            #     source_id=rec.id,
-            #     source=source,
-            #     severity="Medium",
-            #     title=title,
-            #     family="external",
-            #     alert_body=title,
-            #     ticket_details={
-            #         'discovery_method': 'rootbox',
-            #     },
-            #     draft=True,
-            # )
+            # TODO: call notify?
+            # source = f'{models.LiveHost._meta.app_label}.{models.LiveHost._meta.object_name}'
+            # title = f"Port {rec.port} is open on {rec.host}. {datetime.now().strftime('%d/%m/%Y')}"
+            pass
         if not created:
             rec.active = active
             rec.save()
