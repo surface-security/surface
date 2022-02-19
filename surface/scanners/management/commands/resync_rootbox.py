@@ -22,7 +22,7 @@ class Command(LogBaseCommand):
     def __init__(self, *a, **b):
         super().__init__(*a, **b)
         self.__run_match = re.compile(rf'scanner-{settings.AVZONE}-(\d+)-(.*)')
-        self._helper = f'{settings.SCANNERS_IMAGE_PREFIX}helper:85'
+        self._helper = f'{settings.SCANNERS_HELPER_IMAGE}:{settings.SCANNERS_HELPER_IMAGE_TAG}'
 
     def add_arguments(self, parser):
         parser.add_argument('-1', '--run-once', action='store_true', default=False, help='Run only one check')

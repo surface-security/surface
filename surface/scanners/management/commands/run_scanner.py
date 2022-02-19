@@ -118,9 +118,8 @@ class Command(LogBaseCommand):
                 # no input
                 return
 
-            image_name = f'{settings.SCANNERS_IMAGE_PREFIX}{ scanner.image.name }'
             try:
-                docker.images.pull(image_name, scanner.docker_tag)
+                docker.images.pull(scanner.image.image, scanner.docker_tag)
             except APIError as e:
                 # log warning only, this is optional tag "refresh"
                 # registry might be down from time to time (maintenance, etc)
@@ -128,7 +127,7 @@ class Command(LogBaseCommand):
 
             scanner_timestamp = int(time.time())
             c = docker.containers.create(
-                f'{image_name}:{scanner.docker_tag}',
+                f'{scanner.image.image}:{scanner.docker_tag}',
                 name=f'{cont_name}{ scanner_timestamp }',
                 command=' '.join(scanner_args),
                 privileged=True,
