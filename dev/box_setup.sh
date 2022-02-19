@@ -22,9 +22,9 @@ EOF
 # create images for sample scanners
 cat <<EOF | dexec -T surface ./manage.py shell
 from scanners import models
-models.ScannerImage.objects.get_or_create(name='example')
-models.ScannerImage.objects.get_or_create(name='httpx')
-models.ScannerImage.objects.get_or_create(name='nmap')
+models.ScannerImage.objects.update_or_create(name='example', defaults={'image': 'ghcr.io/surface-security/scanner-example'})
+models.ScannerImage.objects.update_or_create(name='httpx', defaults={'image': 'ghcr.io/surface-security/scanner-httpx'})
+models.ScannerImage.objects.update_or_create(name='nmap', defaults={'image': 'ghcr.io/surface-security/scanner-nmap'})
 EOF
 
 echo done

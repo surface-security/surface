@@ -24,11 +24,10 @@ class Command(LogBaseCommand):
         # validate that all rootboxes exist before processing
         boxes = [models.Rootbox.objects.get(name=rootbox) for rootbox in set(options['rootbox'])]
         container_name = f'squid-{settings.AVZONE}'
-        image_name = f'{settings.SCANNERS_IMAGE_PREFIX}squid'
 
         def _doit(docker, rootbox):
             c = docker.containers.create(
-                f'{image_name}:latest',
+                f'{settings.SCANNERS_PROXY_IMAGE}:{settings.SCANNERS_PROXY_IMAGE_TAG}',
                 name=container_name,
                 environment={
                     'SCANNER_USERNAME': settings.SCANNERS_PROXY_USERNAME,
@@ -43,7 +42,7 @@ class Command(LogBaseCommand):
         for rootbox in boxes:
             docker = utils.get_docker_client(rootbox.ip, rootbox.dockerd_port, use_tls=rootbox.dockerd_tls)
             try:
-                docker.images.pull(image_name, 'latest')
+                docker.images.pull(settings.SCANNERS_PROXY_IMAGE, settings.SCANNERS_PROXY_IMAGE_TAG)
             except APIError as e:
                 # log warning only, this is optional tag "refresh"
                 # registry might be down from time to time (maintenance, etc)

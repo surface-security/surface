@@ -35,6 +35,9 @@ class Rootbox(models.Model):
 
 class ScannerImage(models.Model):
     name = models.CharField(max_length=255, primary_key=True)
+    image = models.CharField(
+        max_length=255, null=False, blank=False, help_text='Full path to image, including registry'
+    )
     description = models.TextField(null=True, blank=True)
     vault_secrets = models.BooleanField(default=False)
 

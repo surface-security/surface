@@ -4,8 +4,7 @@ from django.conf import settings
 APP_SETTINGS = dict(
     PUBLIC_KEY_PATH=None,
     PRIVATE_KEY_PATH=None,
-    REGISTRY_TOKEN=None,
-    IMAGE_PREFIX=None,
+    REGISTRY_AUTH={},
     DOCKER_CA_CERT=None,
     DOCKER_CA_CERT_PATH=None,
     DOCKER_CLIENT_KEY=None,
@@ -14,6 +13,10 @@ APP_SETTINGS = dict(
     DOCKER_CLIENT_CERT_PATH=None,
     PROXY_USERNAME=None,
     PROXY_PASSWORD=None,
+    HELPER_IMAGE='ghcr.io/surface-security/scanner-helper',
+    HELPER_IMAGE_TAG='1',
+    PROXY_IMAGE='ghcr.io/surface-security/scanner-proxy',
+    PROXY_IMAGE_TAG='latest',
 )
 
 

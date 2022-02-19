@@ -7,5 +7,5 @@ as the main settings file loads values from enviornment, this one should make su
 from .settings import *
 
 AVZONE = 'test'
-SCANNERS_IMAGE_PREFIX = 'registry.com/test/'
 LOGBASECOMMAND_PREFIX = 'surface.command'
+SCANNERS_PROXY_IMAGE = 'registry.com/test/squid'

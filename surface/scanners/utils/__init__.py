@@ -38,16 +38,7 @@ def get_docker_client(ip, port=80, use_tls=True):
         tls=tlsconfig,
     )
     # set _auth_configs to avoid need of config.json on disk or passing the info on every method
-    client.api._auth_configs = docker.auth.AuthConfig(
-        {
-            'auths': {
-                docker.auth.resolve_repository_name(settings.SCANNERS_IMAGE_PREFIX)[0]: {
-                    'username': 'ignored',
-                    'password': settings.SCANNERS_REGISTRY_TOKEN,
-                }
-            }
-        }
-    )
+    client.api._auth_configs = docker.auth.AuthConfig({'auths': settings.SCANNERS_REGISTRY_AUTH})
     return client
 
 
