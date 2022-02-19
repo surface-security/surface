@@ -10,8 +10,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-
-
     dependencies = [
         ('contenttypes', '0002_remove_content_type_name'),
     ]
@@ -28,7 +26,10 @@ class Migration(migrations.Migration):
                 ('ssh_port', models.CharField(blank=True, max_length=255, null=True)),
                 ('ssh_key', models.CharField(blank=True, max_length=255, null=True)),
                 ('dockerd_port', models.IntegerField(default=80, help_text='TCP port to use for dockerd')),
-                ('dockerd_tls', models.BooleanField(default=True, help_text='Use TLS with dockerd', verbose_name='Dockerd TLS')),
+                (
+                    'dockerd_tls',
+                    models.BooleanField(default=True, help_text='Use TLS with dockerd', verbose_name='Dockerd TLS'),
+                ),
                 ('location', models.CharField(default='', max_length=255)),
                 ('notes', models.TextField(blank=True, null=True)),
             ],
@@ -44,9 +45,30 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(db_index=True, max_length=128, unique=True)),
                 ('first_seen', models.DateTimeField(auto_now_add=True, db_index=True, null=True)),
                 ('last_seen', models.DateTimeField(auto_now=True, db_index=True, null=True)),
-                ('state', models.IntegerField(blank=True, choices=[(1, 'Created'), (2, 'Restarting'), (3, 'Running'), (4, 'Removing'), (5, 'Paused'), (6, 'Exited'), (7, 'Dead')], db_index=True, null=True)),
+                (
+                    'state',
+                    models.IntegerField(
+                        blank=True,
+                        choices=[
+                            (1, 'Created'),
+                            (2, 'Restarting'),
+                            (3, 'Running'),
+                            (4, 'Removing'),
+                            (5, 'Paused'),
+                            (6, 'Exited'),
+                            (7, 'Dead'),
+                        ],
+                        db_index=True,
+                        null=True,
+                    ),
+                ),
                 ('exit_code', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('rootbox', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox')),
+                (
+                    'rootbox',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox'
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -74,7 +96,12 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('timestamp', models.DateTimeField(db_index=True)),
                 ('line', models.TextField()),
-                ('log', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='output_lines', to='scanners.scanlog')),
+                (
+                    'log',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name='output_lines', to='scanners.scanlog'
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -87,16 +114,33 @@ class Migration(migrations.Migration):
                 ('input', scanners.models.FakeChoicesCharField(blank=True, db_index=True, max_length=30, null=True)),
                 ('parser', scanners.models.FakeChoicesCharField(blank=True, db_index=True, max_length=20, null=True)),
                 ('extra_args', models.CharField(blank=True, max_length=255, null=True)),
-                ('environment_vars', models.TextField(blank=True, help_text='Environment variables in json format to be passed to ansible.', null=True)),
+                (
+                    'environment_vars',
+                    models.TextField(
+                        blank=True, help_text='Environment variables in json format to be passed to ansible.', null=True
+                    ),
+                ),
                 ('notes', models.TextField(blank=True, null=True)),
-                ('image', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='scanners.scannerimage')),
-                ('rootbox', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='scanners.rootbox')),
+                (
+                    'image',
+                    models.ForeignKey(
+                        blank=True, on_delete=django.db.models.deletion.CASCADE, to='scanners.scannerimage'
+                    ),
+                ),
+                (
+                    'rootbox',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='scanners.rootbox'
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
             model_name='scanlog',
             name='scanner',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner'),
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner'
+            ),
         ),
         migrations.CreateModel(
             name='RawResult',
@@ -108,8 +152,18 @@ class Migration(migrations.Migration):
                 ('notes', models.TextField(blank=True, null=True)),
                 ('file_name', models.CharField(blank=True, max_length=255, null=True)),
                 ('raw_results', models.TextField(blank=True, null=True)),
-                ('rootbox', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox')),
-                ('scanner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner')),
+                (
+                    'rootbox',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox'
+                    ),
+                ),
+                (
+                    'scanner',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner'
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Scanner Result - Raw',
@@ -134,9 +188,30 @@ class Migration(migrations.Migration):
                 ('third_party', models.BooleanField(default=False)),
                 ('headers', models.TextField(blank=True, null=True)),
                 ('cookies', models.TextField(blank=True, null=True)),
-                ('host_content_type', models.ForeignKey(limit_choices_to=models.Q(models.Q(('app_label', 'dns_ips'), ('model', 'dnsrecord')), models.Q(('app_label', 'dns_ips'), ('model', 'ipaddress')), _connector='OR'), on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('rootbox', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox')),
-                ('scanner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner')),
+                (
+                    'host_content_type',
+                    models.ForeignKey(
+                        limit_choices_to=models.Q(
+                            models.Q(('app_label', 'dns_ips'), ('model', 'dnsrecord')),
+                            models.Q(('app_label', 'dns_ips'), ('model', 'ipaddress')),
+                            _connector='OR',
+                        ),
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to='contenttypes.contenttype',
+                    ),
+                ),
+                (
+                    'rootbox',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox'
+                    ),
+                ),
+                (
+                    'scanner',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner'
+                    ),
+                ),
                 ('technologies', models.ManyToManyField(to='scanners.Technology')),
             ],
             options={
@@ -157,8 +232,18 @@ class Migration(migrations.Migration):
                 ('version', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
                 ('confidence', models.IntegerField(blank=True, db_index=True, null=True)),
                 ('host', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='scanners.livehost')),
-                ('rootbox', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox')),
-                ('scanner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner')),
+                (
+                    'rootbox',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.rootbox'
+                    ),
+                ),
+                (
+                    'scanner',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='scanners.scanner'
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Scanner Result - Tech Used',

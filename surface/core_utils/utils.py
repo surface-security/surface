@@ -1,13 +1,6 @@
-import os
-from pathlib import Path
-import base64
 import json
 import hashlib
 from typing import Any
-from dateutil import parser
-
-from django.conf import settings
-from django.utils import timezone
 
 
 def digital_sizer(num, suffix='B'):
@@ -21,10 +14,6 @@ def json_hash(obj: dict[str, Any]) -> str:
     """md5 hex digest of json of an object."""
     j = json.dumps(obj, sort_keys=True, indent=2)
     return hashlib.md5(j.encode("utf-8")).hexdigest()  # nosec - md5 not used for security
-
-
-def datetime_parser(datetime):
-    return timezone.make_aware(parser.parse(datetime), timezone.get_current_timezone())
 
 
 def array_split(array, parts):

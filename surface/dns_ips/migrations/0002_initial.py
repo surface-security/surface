@@ -18,12 +18,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dnsrecord',
             name='tla',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dns', to='inventory.application'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='dns',
+                to='inventory.application',
+            ),
         ),
         migrations.AddField(
             model_name='dnsnameserver',
             name='source',
-            field=models.ForeignKey(default=dns_ips.models.default_source_unknown, on_delete=django.db.models.deletion.CASCADE, to='dns_ips.source'),
+            field=models.ForeignKey(
+                default=dns_ips.models.default_source_unknown,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='dns_ips.source',
+            ),
         ),
         migrations.AddField(
             model_name='dnsdomain',
@@ -38,7 +48,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dnsdomain',
             name='source',
-            field=models.ForeignKey(default=dns_ips.models.default_source_unknown, on_delete=django.db.models.deletion.CASCADE, related_name='domain_source', to='dns_ips.source'),
+            field=models.ForeignKey(
+                default=dns_ips.models.default_source_unknown,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='domain_source',
+                to='dns_ips.source',
+            ),
         ),
         migrations.AlterUniqueTogether(
             name='ipaddress',

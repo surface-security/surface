@@ -22,4 +22,6 @@ class IPsHosts(BaseInput):
         """
         :return: iterator with all external IPs and DNSRecords (A, LB, CNAME)
         """
-        return itertools.chain(ips.IPs().generate(internal=True, **kwargs), hosts.Hosts().generate(internal=True, **kwargs))
+        return itertools.chain(
+            ips.IPs().generate(internal=True, **kwargs), hosts.Hosts().generate(internal=True, **kwargs)
+        )

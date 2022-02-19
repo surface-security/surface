@@ -163,13 +163,13 @@ class TestRunSquidProxy(ScannerTestMixin, TestCase):
         self.setUpScanner()
         client_mock = call_mock.return_value
         # no way to assert logs were NOT called...? so much for branch coverage
-        with self.assertLogs(logger='surface.management.commands.run_squid_proxy', level='WARNING') as cm:
+        with self.assertLogs(logger='surface.command.run_squid_proxy', level='WARNING') as cm:
             management.call_command(self._cmd, self.rootbox.name)
             cm.records.append('x')  # monkey wants to assert no logs
         self.assertEqual(cm.output, [])
         self.assertEqual(self._out.getvalue(), '')
         self.assertEqual(self._err.getvalue(), '')
-        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=True)
+        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=False)
         client_mock.images.pull.assert_called_once_with('registry.com/test/squid', 'latest')
         client_mock.containers.create.assert_called_once()
         client_mock.containers.create.return_value.start.assert_called_once_with()
@@ -179,12 +179,12 @@ class TestRunSquidProxy(ScannerTestMixin, TestCase):
         self.setUpScanner()
         client_mock = call_mock.return_value
         client_mock.images.pull.side_effect = APIError('wtv')
-        with self.assertLogs(logger='surface.management.commands.run_squid_proxy', level='WARNING') as cm:
+        with self.assertLogs(logger='surface.command.run_squid_proxy', level='WARNING') as cm:
             management.call_command(self._cmd, self.rootbox.name)
-        self.assertEqual(cm.output, ['WARNING:surface.management.commands.run_squid_proxy:failed to pull image: wtv'])
+        self.assertEqual(cm.output, ['WARNING:surface.command.run_squid_proxy:failed to pull image: wtv'])
         self.assertEqual(self._out.getvalue(), '')
         self.assertEqual(self._err.getvalue(), '')
-        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=True)
+        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=False)
         client_mock.images.pull.assert_called_once_with('registry.com/test/squid', 'latest')
         client_mock.containers.create.assert_called_once()
         client_mock.containers.create.return_value.start.assert_called_once_with()
@@ -197,12 +197,12 @@ class TestRunSquidProxy(ScannerTestMixin, TestCase):
             '', response=mock.MagicMock(status_code=409), explanation='X is already in use by container X'
         )
         # no way to assert logs were NOT called...? so much for branch coverage
-        with self.assertLogs(logger='surface.management.commands.run_squid_proxy', level='WARNING') as cm:
+        with self.assertLogs(logger='surface.command.run_squid_proxy', level='WARNING') as cm:
             management.call_command(self._cmd, self.rootbox.name)
-        self.assertEqual(cm.output, ['WARNING:surface.management.commands.run_squid_proxy:already running in testvm'])
+        self.assertEqual(cm.output, ['WARNING:surface.command.run_squid_proxy:already running in testvm'])
         self.assertEqual(self._out.getvalue(), '')
         self.assertEqual(self._err.getvalue(), '')
-        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=True)
+        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=False)
         client_mock.images.pull.assert_called_once_with('registry.com/test/squid', 'latest')
         client_mock.containers.create.assert_called_once()
 
@@ -218,12 +218,12 @@ class TestRunSquidProxy(ScannerTestMixin, TestCase):
             container_mock,
         ]
         # no way to assert logs were NOT called...? so much for branch coverage
-        with self.assertLogs(logger='surface.management.commands.run_squid_proxy', level='WARNING') as cm:
+        with self.assertLogs(logger='surface.command.run_squid_proxy', level='WARNING') as cm:
             management.call_command(self._cmd, self.rootbox.name, recreate=True)
-        self.assertEqual(cm.output, ['WARNING:surface.management.commands.run_squid_proxy:already running in testvm'])
+        self.assertEqual(cm.output, ['WARNING:surface.command.run_squid_proxy:already running in testvm'])
         self.assertEqual(self._out.getvalue(), '')
         self.assertEqual(self._err.getvalue(), '')
-        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=True)
+        call_mock.assert_called_once_with('1.1.1.1', 80, use_tls=False)
         client_mock.images.pull.assert_called_once_with('registry.com/test/squid', 'latest')
         client_mock.api.remove_container.assert_called_once_with('squid-test')
         self.assertEqual(client_mock.containers.create.call_count, 2)

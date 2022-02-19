@@ -25,5 +25,18 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  # postgres:
+  #   image: postgres:14.1-alpine
+  #   ports:
+  #     - 35432:5432
+  #   environment:
+  #     POSTGRES_PASSWORD: surfdbpassword
+  #     POSTGRES_USER: surface
+  #     PGDATA: /var/lib/postgresql/data/pgdata
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+
+
 volumes:
   mysql_data: {}
+  pgsql_data: {}

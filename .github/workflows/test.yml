@@ -1,0 +1,78 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install black
+      run: pip install black==22.1.0
+
+    - name: Style check
+      run : make style_check
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+        database:
+        - db: mysql
+          url: mysql://root:root@127.0.0.1:8877/surface
+        # FIXME: add postgresql after fixing LiveHosts IPAddress query
+        # database: [sqlite, mysql, postgresql]
+
+    services:
+      mysql:
+        image: mysql:5
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+        - 8877:3306
+        # needed because the container does not provide a healthcheck
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5
+      # FIXME: add postgresql after fixing LiveHosts IPAddress query
+      # postgres:
+      #   image: postgres:10
+      #   env:
+      #     POSTGRES_USER: postgres
+      #     POSTGRES_PASSWORD: postgres
+      #     POSTGRES_DB: postgres
+      #   ports:
+      #   - 8878:5432
+      #   # needed because the postgres container does not provide a healthcheck
+      #   options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install requirements
+      run: pip install -r surface/requirements_test.txt
+
+    - name: run tests
+      run: SURF_DATABASE_URL=${{ matrix.database.url }} make coverage
+
+    - uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: true
