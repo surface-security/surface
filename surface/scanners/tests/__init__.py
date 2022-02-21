@@ -20,7 +20,7 @@ class ScannerTestMixin:
     rootbox = None
 
     def setUpScanner(self, input=None, parser=None, image='docker_image', name='scanner_name', extra_args=None):
-        self.scannerimage = models.ScannerImage.objects.create(name=image)
+        self.scannerimage = models.ScannerImage.objects.create(name=image, image=f'registry.com/test/{image}')
         self.rootbox = models.Rootbox.objects.create(
             name='testvm', ip='1.1.1.1', ssh_user='yourmom', location='local', dockerd_tls=False
         )
