@@ -1,5 +1,3 @@
-Susan Phillip [@DoggySmooth](https://github.com/DoggySmooth)
-
 Teofil Cojocariu [@cojoeu](https://github.com/cojoeu)
 
 Duarte Duarte [@DDuarte](https://github.com/DDuarte)
@@ -21,6 +19,8 @@ André Morais [@v1sion](https://github.com/v1sion)
 [Stefan Magda](https://gitlab.com/stefanmagda)
 
 [Andrei Gaftoniuc](https://www.linkedin.com/in/gaftoniuc-andrei)
+
+Susan Phillip [@DoggySmooth](https://github.com/DoggySmooth)
 
 Pedro Moura [@moura8](https://github.com/moura8)
 
