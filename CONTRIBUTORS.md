@@ -1,7 +1,8 @@
 ## [BOSS](https://translate.google.com/?sl=es&tl=ja&text=Before%20Open%20Sourcing%20Surface&op=translate "Before Open Sourcing Surface") Contributors
 
-As the commit history was reset, this is the list of contributors before open-source:
+As the commit history was reset, this is the list of contributors before open sourcing Surface
 
+--------
 
 Teofil Cojocariu [@cojoeu](https://github.com/cojoeu)
 
