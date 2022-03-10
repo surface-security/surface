@@ -1,4 +1,4 @@
-## [BOSS](https://translate.google.com/?sl=es&tl=ja&text=Before%20Open%20Sourcing%20Surface&op=translate "Before Open Sourcing Surface") Contributors
+## [BOSS](#boss "Before Open Sourcing Surface") Contributors
 
 As the commit history was reset, this is the list of contributors before open sourcing Surface
 
@@ -45,3 +45,9 @@ Diogo Lemos [@lemosd-ppb](https://github.com/lemosd-ppb)
 Vlad Baesu [@vladgb](https://github.com/vladgb)
 
 Maria Andriesa [@mariandppb](https://github.com/mariandppb)
+
+--------
+
+### BOSS
+
+`B`efore `O`pen `S`ourcing `S`urface  
