@@ -32,7 +32,7 @@ Pedro Moura [@moura8](https://github.com/moura8)
 
 Alexandru Dima [@alexandrumd](https://github.com/alexandrumd)
 
-Catalin Berbece
+[Catalin Berbece](https://www.linkedin.com/in/catalin-berbece/)
 
 João Morais [@jmoraissec](https://github.com/jmoraissec)
 
