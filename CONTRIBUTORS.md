@@ -1,6 +1,6 @@
-## [BOSS](#boss "Before Open Sourcing Surface") Contributors
+## [BOSS](#boss-contributors "Before Open Sourcing Surface") Contributors
 
-As the commit history was reset, this is the list of contributors before open sourcing Surface
+As the commit history was reset, this is the list of contributors `B`efore `O`pen `S`ourcing `S`urface  
 
 --------
 
@@ -47,7 +47,3 @@ Vlad Baesu [@vladgb](https://github.com/vladgb)
 Maria Andriesa [@mariandppb](https://github.com/mariandppb)
 
 --------
-
-### BOSS
-
-`B`efore `O`pen `S`ourcing `S`urface  
