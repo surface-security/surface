@@ -28,4 +28,5 @@ jobs:
           cache-from: |
             type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
             type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}
+            type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}-amd64
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }},mode=max
