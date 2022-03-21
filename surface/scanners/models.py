@@ -1,8 +1,8 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
+from functools import lru_cache
 
 from core_utils.fields import TruncatingCharField
 from dns_ips import models as dns_models
@@ -152,6 +152,28 @@ class LiveHostQS(models.QuerySet):
             'record': (dns_models.DNSRecord,),
             'any': (dns_models.DNSRecord, dns_models.IPAddress),
         }
+        # validator that will choose whether or not to include this CT for a given value
+        # this prevents db backend errors such as sending hostnames using `any` on Postgres
+        # (where IPAddress fields are cast to ::inet)
+        self.__validators = {
+            dns_models.IPAddress: self._valid_ip_fields,
+        }
+
+    @classmethod
+    @lru_cache
+    def valid_ip_re(cls):
+        import re
+
+        return re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/\d{1,2})?$')
+
+    @classmethod
+    def valid_ip(cls, value):
+        return cls.valid_ip_re().match(value) is not None
+
+    def _valid_ip_fields(self, parts, value):
+        if not parts or parts[0] != 'name':
+            return True
+        return self.valid_ip(value)
 
     def _filter_or_exclude_gfk_models(self, keyword):
         # TODO: to support configurable/allowed ContentTypes
@@ -174,6 +196,8 @@ class LiveHostQS(models.QuerySet):
             parts = field.split('__')
             combined_q = Q()
             for model in self._filter_or_exclude_gfk_models(parts[1]):
+                if model in self.__validators and not self.__validators[model](parts[2:], value):
+                    continue
                 qkwargs = {}
                 qkwargs['host_content_type'] = ContentType.objects.get_for_model(model)
                 if len(parts) == 2:
@@ -184,6 +208,10 @@ class LiveHostQS(models.QuerySet):
                     # TODO: group all host__CT together to put in the same filter()
                     qkwargs['host_object_id__in'] = model.objects.filter(**{att: value})
                 combined_q |= models.Q(**qkwargs)
+            if not combined_q:
+                # if Q() is still empty, it means no valid values were passed, so nothing should be returned!
+                # TODO: is there a Q() that results in .none() being called (ie: no DB query)? handle it higher for now
+                raise ValueError(-1, 'all filters invalid')
             return combined_q, True
         return q_tuple, False
 
@@ -208,17 +236,23 @@ class LiveHostQS(models.QuerySet):
         # TODO: properly handle/merge multiple host__ kwargs...
         # also handle contentypes dynamically.. (based on limit_choices from model?)
 
-        args = self._filter_or_exclude_args(args)
-        to_remove = set()
-        for k, v in kwargs.items():
-            q, c = self._filter_or_exclude_q_tuple((k, v))
-            if c:
-                # do not modify kwargs inside loop
-                to_remove.add(k)
-                args.append(q)
-        for k in to_remove:
-            kwargs.pop(k)
-        return super()._filter_or_exclude(negate, args, kwargs)
+        try:
+            args = self._filter_or_exclude_args(args)
+            to_remove = set()
+            for k, v in kwargs.items():
+                q, c = self._filter_or_exclude_q_tuple((k, v))
+                if c:
+                    # do not modify kwargs inside loop
+                    to_remove.add(k)
+                    args.append(q)
+            for k in to_remove:
+                kwargs.pop(k)
+            return super()._filter_or_exclude(negate, args, kwargs)
+        except ValueError as e:
+            if e.args == (-1, 'all filters invalid'):
+                # crappy check... to be removed, once Q() .none equivalent is found
+                return super().none()
+            raise
 
 
 class LiveHostManager(models.Manager):

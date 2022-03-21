@@ -1,6 +1,5 @@
 import json
 import logging
-from datetime import datetime
 from pathlib import Path
 
 from scanners.parsers.base import BaseParser
@@ -34,10 +33,9 @@ class Baseline(BaseParser):
 
     def _find_host_record(self, hostname):
         # in a method for easier subclassing
-        obj = (
-            dns_models.DNSRecord.objects.filter(name=hostname).first()
-            or dns_models.IPAddress.objects.filter(name=hostname).first()
-        )
+        obj = dns_models.DNSRecord.objects.filter(name=hostname).first()
+        if obj is None and models.LiveHostQS.valid_ip(hostname):
+            obj = dns_models.IPAddress.objects.filter(name=hostname).first()
         if obj is None:
             logger.error('cannot create livehost with invalid host: %s', hostname)
         return obj

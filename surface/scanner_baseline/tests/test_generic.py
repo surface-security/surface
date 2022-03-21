@@ -15,8 +15,10 @@ class Test(ScannerTestMixin, TestCase):
         tmp_dir = Path(tempfile.mkdtemp())
         st = tmp_dir / '1'
         st.mkdir()
-        self._asset_copy(f'data/{n80}', st / n80)
-        self._asset_copy(f'data/{n443}', st / n443)
+        if n80:
+            self._asset_copy(f'data/{n80}', st / n80)
+        if n443:
+            self._asset_copy(f'data/{n443}', st / n443)
         try:
             self._parse_results(tmp_dir)
         finally:
@@ -63,6 +65,13 @@ AWSALBCORS=O5iHoWdpWQwUeBnkzHu/x75n5Xy5ReJI8ohJ2jmTn3Vv4CNxZ8+cywVF8WoTrxU6y0zIt
         )
         self.assertEqual(w.final_url, 'https://www.winzip.com/mac/en/')
         self.assertEqual(w.timing, '1.48609208s')
+
+    def test_parser_ip(self):
+        self._create_ipaddress()
+        self._run_it(n80='output_80_ip.json', n443=None)
+        self.assertEqual(scanner_models.LiveHost.objects.count(), 1)
+        self.assertEqual(scanner_models.LiveHost.objects.filter(port=80).count(), 1)
+        self.assertEqual(scanner_models.LiveHost.objects.filter(port=443).count(), 0)
 
     def test_parser_technologies(self):
         self.test_parser()

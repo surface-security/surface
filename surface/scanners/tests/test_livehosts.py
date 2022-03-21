@@ -113,3 +113,32 @@ class Test(TestCase):
         x = models.LiveHost.objects.filter(models.Q(host__ip__name='8.8.8.8'))
         self.assertEqual(x.count(), 1)
         self.assertEqual(x[0], lh1)
+
+    def test_valid_ip_re(self):
+        self.assertTrue(models.LiveHostQS.valid_ip('127.0.0.1'))
+        self.assertTrue(models.LiveHostQS.valid_ip('127.0.0.1'))
+        self.assertTrue(models.LiveHostQS.valid_ip('127.0.0.1'))
+        self.assertTrue(models.LiveHostQS.valid_ip('127.0.0.1/24'))
+
+        self.assertFalse(models.LiveHostQS.valid_ip('x'))
+        self.assertFalse(models.LiveHostQS.valid_ip('127.0.0.1/244'))
+
+        # TODO: these should be false but is it worth making the regex more complex (and expensive)?
+        # using something like: re.compile(r'^[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d(\/\d{1,2})?$')
+        # costs 50% more and it's not even complete yet..
+        # self.assertFalse(models.LiveHostQS.valid_ip('527.0.0.1/244'))
+        # self.assertFalse(models.LiveHostQS.valid_ip('277.0.0.1/244'))
+
+    def test_another(self):
+        i1 = dns_models.IPAddress.objects.create(name='8.8.8.8')
+        lh1 = models.LiveHost.objects.create(host=i1)
+
+        x = models.LiveHost.objects.filter(host__ip__name='8.8.8.8')
+        self.assertEqual(x.count(), 1)
+        self.assertEqual(x[0], lh1)
+
+        x = models.LiveHost.objects.filter(host__any__name='a.com')
+        self.assertEqual(x.count(), 0)
+
+        x = models.LiveHost.objects.filter(host__ip__name='a.com')
+        self.assertEqual(x.count(), 0)
