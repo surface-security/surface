@@ -6,12 +6,6 @@ on:
       cache-from:
         required: true
         type: string
-      cache-to:
-        required: true
-        type: string
-      tags:
-        required: true
-        type: string
 
 jobs:
   test:
@@ -33,9 +27,10 @@ jobs:
           file: dev/Dockerfile
           platforms: linux/amd64
           outputs: type=docker,dest=/tmp/myimage.tar
-          tags: ${{ inputs.tags }}
+          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
           cache-from: ${{ inputs.cache-from }}
-          cache-to: ${{ inputs.cache-to }}
+          # specific "cache-to" here as otherwise it would override the latest multi-platform cache with this amd64-only one
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}-amd64,mode=max
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2

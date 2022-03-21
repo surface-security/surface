@@ -10,12 +10,9 @@ jobs:
   test_image:
     uses: ./.github/workflows/lib_test_image.yml
     with:
-      tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
       cache-from: |
         type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
         type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}
-      # specific "cache-to" here as otherwise it would override the latest multi-platform cache with this amd64-only one
-      cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}-amd64,mode=max
 
   tests:
     needs: test_image

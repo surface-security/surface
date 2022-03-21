@@ -8,6 +8,8 @@ on:
 jobs:
   test_image:
     uses: ./.github/workflows/lib_test_image.yml
+    with:
+      cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
 
   tests:
     needs: test_image
@@ -16,6 +18,9 @@ jobs:
   push:
     needs: tests
     uses: ./.github/workflows/lib_push_image.yml
-    # tags: ghcr.io/${{ github.repository }}:latest
-    #           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
-    #           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache,mode=max
+    with:
+      tags: ghcr.io/${{ github.repository }}:${{ github.run_number }},ghcr.io/${{ github.repository }}:latest
+      cache-from: |
+        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
+        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}-amd64
+      cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache,mode=max
