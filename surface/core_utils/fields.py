@@ -15,9 +15,12 @@ class UnsignedIntegerField(fields.IntegerField):
             return "integer UNSIGNED"
         if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
             return 'integer'
-        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
+        if settings.DATABASES['default']['ENGINE'] in (
+            'django.db.backends.postgresql_psycopg2',
+            'django.db.backends.postgresql',
+        ):
             return 'bigint'
-        raise NotImplementedError
+        raise NotImplementedError(settings.DATABASES['default']['ENGINE'])
 
     def get_internal_type(self):
         return "UnsignedIntegerField"

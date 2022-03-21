@@ -92,7 +92,7 @@ class TestRunScannersContinuously(ScannerTestMixin, TestCase):
         self.assertEqual(self._out.getvalue(), '')
         self.assertEqual(self._err.getvalue(), '')
         self.assertEqual(
-            call_mock.mock_calls,
+            sorted(call_mock.call_args_list, key=lambda x: x[0][1].pk),
             [
                 mock.call(run_mock.return_value, self.scanner),
                 mock.call(run_mock.return_value, scanner2),

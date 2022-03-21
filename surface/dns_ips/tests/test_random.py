@@ -64,17 +64,23 @@ class Test(TestCase):
         dv11 = DNSRecordValue.objects.create(record=d1, rtype=DNSRecordValue.RecordType.A, value='1.1.1.1')
         dv12 = DNSRecordValue.objects.create(record=d1, rtype=DNSRecordValue.RecordType.CNAME, value='b.b.com')
         dv21 = DNSRecordValue.objects.create(record=d2, rtype=DNSRecordValue.RecordType.CNAME, value='b.b.com')
-        dv11.ips.add(IPAddress.objects.create(name='1.1.1.1'))
-        dv12.ips.add(IPAddress.objects.create(name='1.1.1.2'))
-        dv12.ips.add(IPAddress.objects.create(name='1.1.1.3'))
-        dv21.ips.add(IPAddress.objects.create(name='8.8.8.8'))
+        ip1 = IPAddress.objects.create(name='1.1.1.1')
+        ip2 = IPAddress.objects.create(name='1.1.1.2')
+        ip3 = IPAddress.objects.create(name='1.1.1.3')
+        dv11.ips.add(ip1)
+        dv12.ips.add(ip1)
+        dv12.ips.add(ip2)
+        dv21.ips.add(ip3)
 
         with self.assertNumQueries(1):
-            for rv in DNSRecordValue.objects.all().annotate(ip_pk_list=GroupConcat('ips', separator=',')):
-                if rv.pk in (dv11.pk, dv21.pk):
-                    self.assertNotIn(',', rv.ip_pk_list)
-                if rv.pk == dv12.pk:
-                    self.assertIn(',', rv.ip_pk_list)
+            results = list(
+                DNSRecordValue.objects.all()
+                .annotate(ip_pk_list=GroupConcat('ips', ordering='ipaddress_id', separator=','))
+                .order_by('pk')
+            )
+            self.assertEqual(results[0].ip_pk_list, ','.join(map(str, [ip1.pk])))
+            self.assertEqual(results[1].ip_pk_list, ','.join(map(str, [ip1.pk, ip2.pk])))
+            self.assertEqual(results[2].ip_pk_list, ','.join(map(str, [ip3.pk])))
 
         with self.assertNumQueries(2):
             list(DNSRecordValue.objects.all().prefetch_related('ips'))
