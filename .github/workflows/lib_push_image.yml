@@ -2,6 +2,16 @@ name: test image
 
 on:
   workflow_call:
+    inputs:
+      cache-from:
+        required: true
+        type: string
+      cache-to:
+        required: true
+        type: string
+      tags:
+        required: true
+        type: string
 
 jobs:
   test:
@@ -24,9 +34,6 @@ jobs:
           file: dev/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
-          cache-from: |
-            type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
-            type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}
-            type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}-amd64
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }},mode=max
+          tags: ${{ inputs.tags }}
+          cache-from: ${{ inputs.cache-from }}
+          cache-to: ${{ inputs.cache-to }}
