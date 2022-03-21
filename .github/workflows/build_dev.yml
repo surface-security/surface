@@ -1,0 +1,19 @@
+name: ci dev
+
+on:
+  push:
+    branches:
+      - dev
+      - dev-*
+
+jobs:
+  test_image:
+    uses: ./.github/workflows/lib_test_image.yml
+
+  tests:
+    needs: test_image
+    uses: ./.github/workflows/lib_tests.yml
+
+  push:
+    needs: tests
+    uses: ./.github/workflows/lib_push_image.yml

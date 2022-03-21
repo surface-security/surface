@@ -1,13 +1,7 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: tests
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call:
 
 jobs:
   style:
@@ -58,22 +52,20 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v2
+      - name: Download artifacts (Docker images) from previous workflows
+        uses: actions/download-artifact@v2
+        with:
+          name: surface-tests
+          path: /tmp
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Load Docker images from previous workflows
+        run: |
+          docker load --input /tmp/myimage.tar
 
-    - name: Install requirements
-      run: |
-        pip install -r surface/requirements_test.txt
-        pip install psycopg2-binary==2.9.3
+      - name: run tests
+        run: docker run --network host -e SURF_DATABASE_URL=${{ matrix.database.url }} --rm ghcr.io/${{ github.repository }}:${{ github.ref_name }} pytest -n4
 
-    - name: run tests
-      run: SURF_DATABASE_URL=${{ matrix.database.url }} make coverage
-
-    - uses: codecov/codecov-action@v2
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
+    # - uses: codecov/codecov-action@v2
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     fail_ci_if_error: true
