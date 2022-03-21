@@ -20,7 +20,7 @@ jobs:
     - name: Style check
       run : make style_check
 
-  test:
+  pytest:
     runs-on: ubuntu-latest
     strategy:
       matrix:
