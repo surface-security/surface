@@ -1,0 +1,13 @@
+name: test cleanup
+
+on:
+  workflow_call:
+
+jobs:
+  cleanup_artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: surface-tests
+          failOnError: false

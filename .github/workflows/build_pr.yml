@@ -1,0 +1,24 @@
+name: ci pr
+
+on:
+  pull_request:
+    branches-ignore:
+      - main
+      - dev
+      - dev-*
+
+jobs:
+  test_image:
+    uses: ./.github/workflows/lib_test_image.yml
+    with:
+      cache-from: |
+        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
+        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}
+
+  tests:
+    needs: test_image
+    uses: ./.github/workflows/lib_tests.yml
+  
+  testscleanup:
+    needs: tests
+    uses: ./.github/workflows/lib_test_cleanup.yml

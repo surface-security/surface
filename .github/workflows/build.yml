@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:
-      - 'main'
+      - main
 
 jobs:
   test_image:
@@ -16,13 +16,8 @@ jobs:
     uses: ./.github/workflows/lib_tests.yml
 
   testscleanup:
-    runs-on: ubuntu-latest
     needs: tests
-    steps:
-      - uses: geekyeggo/delete-artifact@v1
-        with:
-          name: surface-tests
-          failOnError: false
+    uses: ./.github/workflows/lib_test_cleanup.yml
 
   push:
     needs: tests
