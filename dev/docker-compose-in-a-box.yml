@@ -19,9 +19,7 @@ x-env: &env
 
 x-surf: &surf
   <<: *env
-  build:
-    context: ..
-    dockerfile: dev/Dockerfile-IN-A-BOX
+  image: ghcr.io/fopina/surface:11
   working_dir: /surface/surface
   depends_on:
     - mysql

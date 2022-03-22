@@ -1,0 +1,10 @@
+-r requirements_test.txt
+
+black==22.1.0
+django-debug-toolbar==2.2
+pylint==2.5.3
+pylint-django==2.2.0
+
+# for types
+mypy==0.812
+django-stubs==1.7.0

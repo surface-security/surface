@@ -63,9 +63,16 @@ jobs:
           docker load --input /tmp/myimage.tar
 
       - name: run tests
-        run: docker run --network host -e SURF_DATABASE_URL=${{ matrix.database.url }} --rm ghcr.io/${{ github.repository }}:${{ github.ref_name }} pytest -n4
+        run: |
+          docker run --network host \
+                     -e SURF_DATABASE_URL=${{ matrix.database.url }} \
+                     -v $(pwd)/cov/:/report \
+                     ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
+                     sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
 
-    # - uses: codecov/codecov-action@v2
-    #   with:
-    #     token: ${{ secrets.CODECOV_TOKEN }}
-    #     fail_ci_if_error: true
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # do not fail ci for now - https://github.com/codecov/codecov-action/issues/557#issuecomment-1073777427
+          fail_ci_if_error: false
+          files: ./cov/coverage.xml
