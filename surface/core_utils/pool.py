@@ -2,6 +2,12 @@ import multiprocessing.pool as mp
 import itertools
 
 
+def subprocess_setup():
+    import django
+
+    django.setup()
+
+
 def optional_pool(processes=None, only_threads=False, initializer=None):
     """
     :param processes: number of processes to use.
@@ -17,7 +23,7 @@ def optional_pool(processes=None, only_threads=False, initializer=None):
     if only_threads:
         p = mp.ThreadPool(processes=processes, initializer=initializer)
     else:
-        p = mp.Pool(processes=processes, initializer=initializer)
+        p = mp.Pool(processes=processes, initializer=initializer or subprocess_setup)
     # tag class with custom attribute highlighting multiprocessing is enabled (not a FakePool)
     p._optional_multi = True
     return p
