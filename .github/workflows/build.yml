@@ -9,7 +9,7 @@ jobs:
   test_image:
     uses: ./.github/workflows/lib_test_image.yml
     with:
-      cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
+      cache-from: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
 
   tests:
     needs: test_image
@@ -25,6 +25,6 @@ jobs:
     with:
       tags: ghcr.io/${{ github.repository }}:${{ github.run_number }},ghcr.io/${{ github.repository }}:latest
       cache-from: |
-        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
-        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}-amd64
-      cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache,mode=max
+        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
+        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-amd64
+      cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest,mode=max

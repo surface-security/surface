@@ -12,8 +12,8 @@ jobs:
     uses: ./.github/workflows/lib_test_image.yml
     with:
       cache-from: |
-        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache
-        type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}
+        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
+        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}
 
   tests:
     needs: test_image

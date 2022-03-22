@@ -30,7 +30,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
           cache-from: ${{ inputs.cache-from }}
           # specific "cache-to" here as otherwise it would override the latest multi-platform cache with this amd64-only one
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:builder-cache-${{ github.ref_name }}-amd64,mode=max
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-amd64,mode=max
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
