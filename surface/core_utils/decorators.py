@@ -4,11 +4,10 @@ from functools import lru_cache, wraps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.utils import model_ngettext
-from django.template import response
 from django.http.response import HttpResponseForbidden
+from django.template import defaultfilters, response
 from django.urls import reverse
 from django.utils.html import format_html, mark_safe
-from django.template import defaultfilters
 
 
 def lru_cache_time(seconds, maxsize=None):
@@ -33,7 +32,7 @@ def lru_cache_time(seconds, maxsize=None):
 
         @wraps(func)
         def wrapping(*args, **kwargs):
-            return time_aware(*args, **kwargs, __ttl=int(time.time() / seconds))
+            return time_aware(int(time.time() / seconds), *args, **kwargs)
 
         return wrapping
 
@@ -212,7 +211,7 @@ def require_api_token(token=None):
 
     def wrap(func):
         def wrapped_func(request, *args, **kwargs):
-            inp_token = request.GET.get('token')
+            inp_token = request.GET.get('token') or request.POST.get('token')
             if inp_token != _token:
                 return HttpResponseForbidden()
             return func(request, *args, **kwargs)
