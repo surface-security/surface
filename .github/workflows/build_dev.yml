@@ -17,6 +17,15 @@ jobs:
   tests:
     needs: test_image
     uses: ./.github/workflows/lib_tests.yml
+  
+  testscleanup:
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: surface-tests
+          failOnError: false
 
   push:
     needs: tests

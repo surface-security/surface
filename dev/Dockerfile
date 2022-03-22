@@ -1,12 +1,12 @@
-FROM --platform=$BUILDPLATFORM ghcr.io/surface-security/compile-requirements:3 as requirements
+FROM --platform=$BUILDPLATFORM ghcr.io/surface-security/compile-requirements:4 as requirements
 # merge all requirements.txt files together
 # as we bind mount the whole context here, this stage will have cache invalidated on any context changes
 # but the remaining stages that only use /requirements_full.txt will not
 
-# TODO: compile-requirements currently merges all requirements.txt found, not just the ones mentioned in the "entry" requirements
-# once that is fixed, this Dockerfile needs some attention (ie: mention all entrypoints - _prod and _psql)
 RUN --mount=type=bind,target=/tmpapp \
-    python /run.py /tmpapp/surface/requirements.txt > /requirements_full.txt
+    python /run.py /tmpapp/surface/requirements.txt \
+                   /tmpapp/surface/requirements_prod.txt \
+                   /tmpapp/surface/requirements_psql.txt > /requirements_full.txt
 
 FROM python:3.9-slim-buster as builder
 
