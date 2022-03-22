@@ -10,14 +10,14 @@ RUN --mount=type=bind,target=/tmpapp \
 
 FROM python:3.9-slim-buster as builder
 
-RUN apt-get update \
- && apt-get install --no-install-recommends -y \
-        libmariadbclient-dev \
-        build-essential \
-        libldap2-dev \
-        libsasl2-dev \
-        git \
- && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update \
+#  && apt-get install --no-install-recommends -y \
+#         libmariadbclient-dev \
+#         build-essential \
+#         libldap2-dev \
+#         libsasl2-dev \
+#         git \
+#  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /wheels
 COPY --from=requirements /requirements_full.txt .
@@ -33,10 +33,10 @@ RUN pip wheel -w /wheels -r requirements_full.txt
 
 FROM python:3.9-slim-buster as main
 
-RUN apt-get update \
- && apt-get install --no-install-recommends -y \
-       libmariadb3 \
- && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update \
+#  && apt-get install --no-install-recommends -y \
+#        libmariadb3 \
+#  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=requirements /requirements_full.txt .
 RUN --mount=type=bind,from=builder,src=/wheels,target=/wheels \

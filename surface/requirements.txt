@@ -23,7 +23,8 @@ django-slack-processor==0.0.3
 django-olympus==0.0.3
 django-environ-ppb[vault]==1.0.0
 
-mysqlclient==2.0.3
+#mysqlclient==2.0.3
+psycopg2-binary==2.9.3
 tqdm==4.48.1  # for core_utils that is not really a app/package ..?
 django-database-locks==0.5  # distributed locks (on mysql)
 django-bulk-update-or-create==0.3.0  # for faster batch operations with update_or_create

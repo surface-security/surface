@@ -26,20 +26,20 @@ jobs:
       matrix:
         python-version: [3.9]
         database:
-        - db: mysql
-          url: mysql://root:root@127.0.0.1:8877/surface
+        # - db: mysql
+        #   url: mysql://root:root@127.0.0.1:8877/surface
         - db: postgresql
           url: psql://root:root@127.0.0.1:8878/surface
 
     services:
-      mysql:
-        image: mysql:5
-        env:
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-        - 8877:3306
-        # needed because the container does not provide a healthcheck
-        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5
+      # mysql:
+      #   image: mysql:5
+      #   env:
+      #     MYSQL_ROOT_PASSWORD: root
+      #   ports:
+      #   - 8877:3306
+      #   # needed because the container does not provide a healthcheck
+      #   options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5
       postgres:
         image: postgres:10
         env:
