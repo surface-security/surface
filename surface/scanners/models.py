@@ -144,6 +144,8 @@ class LiveHostQS(models.QuerySet):
     .filter(host__any__name="betfair.com")
     """
 
+    INVALID_VALUE = object()
+
     def __init__(self, *a, **b):
         super().__init__(*a, **b)
         # TODO: get GenericFK fields from model definition / self.model
@@ -172,8 +174,14 @@ class LiveHostQS(models.QuerySet):
 
     def _valid_ip_fields(self, parts, value):
         if not parts or parts[0] != 'name':
-            return True
-        return self.valid_ip(value)
+            return value
+        # TODO: lookups can be anything/custom, meaning value might be anything as well...
+        # how to handle this? or just drop all this LiveHostQS....
+        if len(parts) > 1 and parts[1] == 'in':
+            res = {x for x in value if self.valid_ip(x)} or self.INVALID_VALUE
+        else:
+            res = value if self.valid_ip(value) else self.INVALID_VALUE
+        return res
 
     def _filter_or_exclude_gfk_models(self, keyword):
         # TODO: to support configurable/allowed ContentTypes
@@ -196,8 +204,10 @@ class LiveHostQS(models.QuerySet):
             parts = field.split('__')
             combined_q = Q()
             for model in self._filter_or_exclude_gfk_models(parts[1]):
-                if model in self.__validators and not self.__validators[model](parts[2:], value):
-                    continue
+                if model in self.__validators:
+                    new_value = self.__validators[model](parts[2:], value)
+                    if new_value == self.INVALID_VALUE:
+                        continue
                 qkwargs = {}
                 qkwargs['host_content_type'] = ContentType.objects.get_for_model(model)
                 if len(parts) == 2:
