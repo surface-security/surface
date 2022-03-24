@@ -49,8 +49,7 @@ services:
   nginx:
     # optional in dev - use for staticfiles in production
     <<: *env
-    # FIXME: add proper tag once github actions start working again
-    image: ghcr.io/surface-security/nginx:latest
+    image: ghcr.io/surface-security/nginx:1.19-alpine
     environment:
       # add proper ALLOWED_HOSTS if production (or remove if already defined in an local.env)
       SURF_ALLOWED_HOSTS: '*'
