@@ -138,6 +138,8 @@ SECRET_KEY = ENV_VAR('SURF_SECRET_KEY', default='NOT_THIS_ONE')
 DEBUG = ENV_VAR.bool('SURF_DEBUG', default=True)
 ALLOWED_HOSTS = ENV_VAR.list('SURF_ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 SCANNERS_REGISTRY_AUTH = ENV_VAR.json('SURF_SCANNERS_REGISTRY_AUTH', default={})
 SCANNERS_DOCKER_CA_CERT = ENV_VAR('SURF_SCANNERS_DOCKER_CA_CERT', default=None)
 SCANNERS_DOCKER_CA_CERT_PATH = ENV_VAR('SURF_SCANNERS_DOCKER_CA_CERT_PATH', default=None)
@@ -160,6 +162,15 @@ DKRON_API_AUTH = ENV_VAR('SURF_DKRON_API_AUTH', default=None)
 DKRON_VERSION = ENV_VAR('SURF_DKRON_VERSION', default='3.1.10')
 DKRON_WEBHOOK_URL = ENV_VAR('SURF_DKRON_WEBHOOK_URL', default=None)
 DKRON_NAMESPACE = ENV_VAR('SURF_DKRON_NAMESPACE', default=None)
+DKRON_NODE_NAME = ENV_VAR('SURF_DKRON_NODE_NAME', default=None)
+
+# settings docs in https://github.com/surface-security/django-notification-sender#readme
+NOTIFICATIONS_SLACK_APP_TOKEN = ENV_VAR('SURF_NOTIFICATIONS_SLACK_APP_TOKEN', default=None)
+NOTIFICATIONS_MAIL_FROM = ENV_VAR('SURF_NOTIFICATIONS_MAIL_FROM', default=None)
+
+# settings docs in https://github.com/surface-security/django-slack-processor#readme
+SLACKBOT_BOT_TOKEN = ENV_VAR('SURF_SLACKBOT_BOT_TOKEN', default=None)
+SLACKBOT_APP_TOKEN = ENV_VAR('SURF_SLACKBOT_APP_TOKEN', default=None)
 
 AVZONE = ENV_VAR('SURF_AVZONE', default='dev')
 
