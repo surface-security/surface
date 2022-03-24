@@ -1,14 +1,5 @@
 version: '3.1'
 
-# to make use of this compose, make sure your local.env has these settings:
-#
-# SURF_DATABASE_URL=mysql://root:@127.0.0.1:23306/surface
-# SURF_ALLOWED_HOSTS=*
-# SURF_DKRON_WEB_PORT=8888
-# SURF_DKRON_URL=http://localhost:8888/
-# SURF_DKRON_SERVER=true
-#
-
 services:
   mysql:
     image: mysql:8.0.23

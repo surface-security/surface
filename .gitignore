@@ -31,3 +31,4 @@ dev/*
 !dev/aws-cdk
 !dev/*.sh
 !dev/docker-compose-*.yml
+!dev/*.conf
