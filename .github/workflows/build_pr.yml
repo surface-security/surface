@@ -3,7 +3,7 @@ name: ci pr
 on:
   push:
     branches-ignore:
-      - main
+      - mymain
       - dev
       - dev-*
 
