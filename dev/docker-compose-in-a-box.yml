@@ -16,10 +16,13 @@ x-env: &env
     SURF_DATABASE_URL: mysql://root:@mysql/surface
     SURF_DKRON_URL: http://dkron:8888/
     SURF_DKRON_BIN_DIR: /surface/dev/dkronlinux
+    SURF_DKRON_NODE_NAME: surfdkron
 
 x-surf: &surf
   <<: *env
-  image: ghcr.io/fopina/surface:11
+  build:
+    context: ..
+    dockerfile: dev/Dockerfile-IN-A-BOX
   working_dir: /surface/surface
   depends_on:
     - mysql
@@ -44,29 +47,23 @@ services:
     command: ./manage.py resync_rootbox
 
   nginx:
-    # optional (in dev) but light and nice - use for staticfiles in production
+    # optional in dev - use for staticfiles in production
     <<: *env
-    image: docker.app.betfair/appsec/surface/nginx:1.19-2
+    # FIXME: add proper tag once github actions start working again
+    image: ghcr.io/surface-security/nginx:latest
     environment:
+      # add proper ALLOWED_HOSTS if production (or remove if already defined in an local.env)
       SURF_ALLOWED_HOSTS: '*'
-      # 192.168.65.2 is the default host IP in Docker for Mac
-      # Windows to be added
-      # Linux doesn't have one as it doesn't need the docker VMs
       NGINX_APP_IP: surface
       NGINX_APP_PORT: 8000
-      NGINX_DKRON_IP: dkron
-      NGINX_DKRON_PORT: 8888
       SURF_STATIC_ROOT: ''
-    # turn off webping, this is dev, no need for noise
-    healthcheck:
-      test: ""
     depends_on:
       - surface
-      - dkron
     ports:
       - 8080:8080
     volumes:
       - ./media:/surface/media/
+      - ./nginx.template.conf:/etc/nginx/templates/default.conf.template:ro
 
   mysql:
     image: mysql:8.0.23
