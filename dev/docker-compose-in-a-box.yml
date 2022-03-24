@@ -13,7 +13,7 @@ x-env: &env
   env_file:
     - ../surface/local.env
   environment:
-    SURF_DATABASE_URL: mysql://root:@mysql/surface
+    SURF_DATABASE_URL: psql://surface:surfdbpassword@postgres/surface
     SURF_DKRON_URL: http://dkron:8888/
     SURF_DKRON_BIN_DIR: /surface/dev/dkronlinux
     SURF_DKRON_NODE_NAME: surfdkron
@@ -25,7 +25,7 @@ x-surf: &surf
     dockerfile: dev/Dockerfile-IN-A-BOX
   working_dir: /surface/surface
   depends_on:
-    - mysql
+    - postgres
   volumes:
     - ..:/surface
   deploy:
@@ -65,20 +65,16 @@ services:
       - ./media:/surface/media/
       - ./nginx.template.conf:/etc/nginx/templates/default.conf.template:ro
 
-  mysql:
-    image: mysql:8.0.23
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_general_ci
-      - --skip-character-set-client-handshake
+  postgres:
+    image: postgres:14.1-alpine
     ports:
-      - 33306:3306
+      - 35432:5432
     environment:
-      MYSQL_INNODB_BUFFER_POOL_SIZE: 512M
-      MYSQL_DATABASE: surface
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      POSTGRES_PASSWORD: surfdbpassword
+      POSTGRES_USER: surface
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - mysql_data:/var/lib/mysql
+      - pgsql_data:/var/lib/postgresql/data
 
   dockerd:
     # isolated docker host to test scanners
@@ -90,4 +86,4 @@ services:
 
 
 volumes:
-  mysql_data: {}
+  pgsql_data: {}
