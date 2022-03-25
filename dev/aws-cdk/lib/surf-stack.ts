@@ -1,12 +1,12 @@
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as rds from '@aws-cdk/aws-rds';
-import * as ecs from '@aws-cdk/aws-ecs';
-import * as asm from '@aws-cdk/aws-secretsmanager';
-import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
-import * as cdk from '@aws-cdk/core';
+import { aws_ec2 as ec2, } from 'aws-cdk-lib';
+import { aws_rds as rds} from 'aws-cdk-lib';
+import { aws_ecs as ecs} from 'aws-cdk-lib';
+import { aws_secretsmanager as asm} from 'aws-cdk-lib';
+import { aws_elasticloadbalancingv2 as elbv2} from 'aws-cdk-lib';
+import { Stack, StackProps, App, Duration, CfnOutput } from 'aws-cdk-lib';
 
-export class SurfStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+export class SurfStack extends Stack {
+  constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
     const vpc = new ec2.Vpc(this, 'SURFVPC', {
         cidr: "10.0.0.0/22",
@@ -34,7 +34,7 @@ export class SurfStack extends cdk.Stack {
       credentials: rds.Credentials.fromGeneratedSecret('syscdk'), // Optional - will default to 'admin' username and generated password
       allocatedStorage: 20,
       databaseName: 'surface',
-      backupRetention: cdk.Duration.days(0),
+      backupRetention: Duration.days(0),
       vpc,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_ISOLATED,        
@@ -96,7 +96,7 @@ export class SurfStack extends cdk.Stack {
       },
     );
 
-    new cdk.CfnOutput(this, 'lbDNSRecord', {
+    new CfnOutput(this, 'lbDNSRecord', {
       value: lb.loadBalancerDnsName,
       description: 'LB DNS Record - set your CNAME to this',
     });
