@@ -33,14 +33,17 @@ RUN pip wheel -w /wheels -r requirements_full.txt
 
 FROM python:3.9-slim-buster as main
 
-# RUN apt-get update \
-#  && apt-get install --no-install-recommends -y \
-#        libmariadb3 \
-#  && rm -rf /var/lib/apt/lists/*
+# FIXME: piwheels does not include libs
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y \
+       libpq5 \
+ && rm -rf /var/lib/apt/lists/*
 
 COPY --from=requirements /requirements_full.txt .
+# FIXME: delete psycopg lib in wheels, as we already installed the lib before - if piwheels includes libs, clean this up
 RUN --mount=type=bind,from=builder,src=/wheels,target=/wheels \
-    pip install --no-index --find-links=/wheels -r /wheels/requirements_full.txt
+    pip install --no-index --find-links=/wheels -r /wheels/requirements_full.txt \
+ && find /usr/local/lib/ -name psycopg2_binary.libs | xargs rm -fr
 
 WORKDIR /app/
 COPY surface surface

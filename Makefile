@@ -15,3 +15,17 @@ style_check:
 
 coverage:
 	cd surface && pytest -n4 --cov --cov-report=xml
+
+tmpbuild:
+	docker buildx build --platform linux/amd64 \
+	                    -f dev/Dockerfile \
+						-t ghcr.io/fopina/surface:tmpbuild \
+						--load \
+						.
+
+tmpbuildarm:
+	docker buildx build --platform linux/arm/v7 \
+	                    -f dev/Dockerfile \
+						-t ghcr.io/fopina/surface:tmpbuild \
+						--push \
+						.
