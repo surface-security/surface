@@ -109,6 +109,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = ENV_VAR('SURF_STATIC_ROOT', default=None)
 
 ## custom settings ##
 

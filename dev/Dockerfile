@@ -46,5 +46,8 @@ RUN --mount=type=bind,from=builder,src=/wheels,target=/wheels \
  && find /usr/local/lib/ -name psycopg2_binary.libs | xargs rm -fr
 
 WORKDIR /app/
+
+ENV PYTHONUNBUFFERED=1
+
 COPY surface surface
 WORKDIR /app/surface/
