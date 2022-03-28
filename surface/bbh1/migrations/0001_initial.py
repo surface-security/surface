@@ -7,8 +7,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
@@ -20,11 +19,19 @@ class Migration(migrations.Migration):
                 ('link', models.URLField()),
                 ('monitor', models.BooleanField(default=False)),
                 ('torify', models.BooleanField(default=False)),
-                ('disabled', models.BooleanField(default=False, help_text='only include in scan if specified explicity (not by wildcards)')),
+                (
+                    'disabled',
+                    models.BooleanField(
+                        default=False, help_text='only include in scan if specified explicity (not by wildcards)'
+                    ),
+                ),
                 ('big_scope', models.BooleanField(default=False, help_text='include even if scope is big')),
                 ('scope_domains_in', models.TextField()),
                 ('scope_domains_out', models.TextField()),
-                ('ignore_domains', models.TextField(help_text='domains that might be discovered but are never processed')),
+                (
+                    'ignore_domains',
+                    models.TextField(help_text='domains that might be discovered but are never processed'),
+                ),
             ],
         ),
     ]

@@ -14,9 +14,7 @@ class Scope(models.Model):
         default=False,
         help_text="only include in scan if specified explicity (not by wildcards)",
     )
-    big_scope = models.BooleanField(
-        default=False, help_text="include even if scope is big"
-    )
+    big_scope = models.BooleanField(default=False, help_text="include even if scope is big")
     scope_domains_in = models.TextField(null=True, blank=True)
     scope_domains_out = models.TextField(null=True, blank=True)
     ignore_domains = models.TextField(

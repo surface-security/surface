@@ -18,7 +18,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='scope',
             name='ignore_domains',
-            field=models.TextField(blank=True, help_text='domains that might be discovered but are never processed', null=True),
+            field=models.TextField(
+                blank=True, help_text='domains that might be discovered but are never processed', null=True
+            ),
         ),
         migrations.AlterField(
             model_name='scope',

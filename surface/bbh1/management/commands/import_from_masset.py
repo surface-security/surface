@@ -29,5 +29,5 @@ class Command(LogBaseCommand):
                         'scope_domains_in': '\n'.join(obj['scope_domains_in']) if obj['scope_domains_in'] else None,
                         'scope_domains_out': '\n'.join(obj['scope_domains_out']) if obj['scope_domains_out'] else None,
                         'ignore_domains': '\n'.join(obj['ignore_domains']) if obj['ignore_domains'] else None,
-                    }
+                    },
                 )

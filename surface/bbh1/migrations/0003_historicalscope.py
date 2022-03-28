@@ -23,16 +23,37 @@ class Migration(migrations.Migration):
                 ('link', models.URLField(blank=True, null=True)),
                 ('monitor', models.BooleanField(default=False)),
                 ('torify', models.BooleanField(default=False)),
-                ('disabled', models.BooleanField(default=False, help_text='only include in scan if specified explicity (not by wildcards)')),
+                (
+                    'disabled',
+                    models.BooleanField(
+                        default=False, help_text='only include in scan if specified explicity (not by wildcards)'
+                    ),
+                ),
                 ('big_scope', models.BooleanField(default=False, help_text='include even if scope is big')),
                 ('scope_domains_in', models.TextField(blank=True, null=True)),
                 ('scope_domains_out', models.TextField(blank=True, null=True)),
-                ('ignore_domains', models.TextField(blank=True, help_text='domains that might be discovered but are never processed', null=True)),
+                (
+                    'ignore_domains',
+                    models.TextField(
+                        blank=True, help_text='domains that might be discovered but are never processed', null=True
+                    ),
+                ),
                 ('history_id', models.AutoField(primary_key=True, serialize=False)),
                 ('history_date', models.DateTimeField()),
                 ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    'history_type',
+                    models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1),
+                ),
+                (
+                    'history_user',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'historical scope',
