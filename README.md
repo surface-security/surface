@@ -1,27 +1,18 @@
-# surface-oss
+# Surface
 
-lighter version of Surface
+Asset inventory tracking and security scanners.
 
-## v1 features/apps
+## Setting it up
 
-* surface-theme - custom face always looks better
-* notifications - everyone needs notifications
-* customenv - 12factor with VAULT and FILE support
-* dkron - scheduled jobs and async tasks
-* dns_ips - manage the scope
-* scanners - scan the scope managed in `dns_ips`
-* scanner_* - for the scanners that are onboarded
-
-## cleanup pending
-
-* TLA field in dns_ips: change to organisation. how does the outter project (such as our Surface) change or add the link to TLA? monkeypatch the admin model with reference to a OneToOne bridge model? Using swappable (like `auth.User`) won't work as dns_ips itself has references to the model and will always create migrations inside... currently using *fake* inventory app)
-* import_export mixin?
-* move `slack_display` stuff to a model list setting from slackbot, not per admin model
-* `core_utils` what to do about it? currently **duplicated** as it's heavily modified in our version
+[TODO - list existing settings / enviornment variables and document them]
 
 ## Quickstart
 
+### AWS
+
 *For AWS, check [aws-cdk](dev/aws-cdk/README.md) folder*
+
+### docker
 
 ```
 # Clone this repo
