@@ -1,6 +1,6 @@
 -r requirements_test.txt
 
-black==22.1.0
+black==22.3.0
 django-debug-toolbar==3.2.4
 pylint==2.5.3
 pylint-django==2.2.0
