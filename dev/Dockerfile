@@ -8,14 +8,15 @@ RUN --mount=type=bind,target=/tmpapp \
                    /tmpapp/surface/requirements_prod.txt \
                    /tmpapp/surface/requirements_psql.txt > /requirements_full.txt
 
-FROM python:3.9-slim-buster as base-arm-v7-builder
+FROM python:3.9-slim-buster as builder-armv7
 # FIXME: armv7 debian buster misses several wheels such as cryptography and postgres
 # piwheels.org is not reliable but can't take 1h to compile cryptography...
 RUN printf "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf
 
-FROM python:3.9-slim-buster as base-amd64--builder
+FROM python:3.9-slim-buster as builder-amd64
+FROM python:3.9-slim-buster as builder-arm64
 
-FROM base-${TARGETARCH}-${TARGETVARIANT}-builder as builder
+FROM builder-${TARGETARCH}${TARGETVARIANT} as builder
 
 WORKDIR /wheels
 COPY --from=requirements /requirements_full.txt .
@@ -33,6 +34,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 FROM python:3.9-slim-buster as main-amd64
+FROM python:3.9-slim-buster as main-arm64
 
 FROM main-${TARGETARCH}${TARGETVARIANT} as main
 
