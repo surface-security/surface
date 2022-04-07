@@ -8,46 +8,42 @@ RUN --mount=type=bind,target=/tmpapp \
                    /tmpapp/surface/requirements_prod.txt \
                    /tmpapp/surface/requirements_psql.txt > /requirements_full.txt
 
-FROM python:3.9-slim-buster as builder
+FROM python:3.9-slim-buster as base-arm-v7-builder
+# FIXME: armv7 debian buster misses several wheels such as cryptography and postgres
+# piwheels.org is not reliable but can't take 1h to compile cryptography...
+RUN printf "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf
 
-# RUN apt-get update \
-#  && apt-get install --no-install-recommends -y \
-#         libmariadbclient-dev \
-#         build-essential \
-#         libldap2-dev \
-#         libsasl2-dev \
-#         git \
-#  && rm -rf /var/lib/apt/lists/*
+FROM python:3.9-slim-buster as base-amd64--builder
+
+FROM base-${TARGETARCH}-${TARGETVARIANT}-builder as builder
 
 WORKDIR /wheels
 COPY --from=requirements /requirements_full.txt .
-
-ARG TARGETPLATFORM
-# arm/v7 debian buster has no cryptography wheel available, so it tries to build it (and fails)
-# use piwheels wheel repo to avoid building it
-RUN [ "$TARGETPLATFORM" != "linux/arm/v7" ] || printf "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf
 
 RUN pip wheel -w /wheels -r requirements_full.txt
 
 ############################################################################
 
-FROM python:3.9-slim-buster as main
+FROM python:3.9-slim-buster as main-armv7
+# arm/v7 debian buster does not have the same wheels as the rest, install libs
 
-# FIXME: piwheels does not include libs
 RUN apt-get update \
  && apt-get install --no-install-recommends -y \
-       libpq5 \
+                    libpq5 \
  && rm -rf /var/lib/apt/lists/*
 
+FROM python:3.9-slim-buster as main-amd64
+
+FROM main-${TARGETARCH}${TARGETVARIANT} as main
+
 COPY --from=requirements /requirements_full.txt .
-# FIXME: delete psycopg lib in wheels, as we already installed the lib before - if piwheels includes libs, clean this up
 RUN --mount=type=bind,from=builder,src=/wheels,target=/wheels \
-    pip install --no-index --find-links=/wheels -r /wheels/requirements_full.txt \
- && find /usr/local/lib/ -name psycopg2_binary.libs | xargs rm -fr
+    pip install --no-index --find-links=/wheels -r /wheels/requirements_full.txt
 
 WORKDIR /app/
 
 ENV PYTHONUNBUFFERED=1
 
 COPY surface surface
+RUN touch /app/surface/local.env
 WORKDIR /app/surface/
