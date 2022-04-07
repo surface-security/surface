@@ -52,22 +52,29 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - name: Download artifacts (Docker images) from previous workflows
-        uses: actions/download-artifact@v2
+      # - name: Download artifacts (Docker images) from previous workflows
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: surface-tests
+      #     path: /tmp
+
+      # - name: Load Docker images from previous workflows
+      #   run: |
+      #     docker load --input /tmp/myimage.tar
+
+      # artifacts storage limit suck - use gchr to store temporary image
+      - name: Login to GHCR
+        uses: docker/login-action@v1 
         with:
-          name: surface-tests
-          path: /tmp
-
-      - name: Load Docker images from previous workflows
-        run: |
-          docker load --input /tmp/myimage.tar
-
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: run tests
         run: |
           docker run --network host \
                      -e SURF_DATABASE_URL=${{ matrix.database.url }} \
                      -v $(pwd)/cov/:/report \
-                     ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
+                     ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-test-artifact \
                      sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
 
       - uses: codecov/codecov-action@v2

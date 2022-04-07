@@ -26,15 +26,19 @@ jobs:
         with:
           file: dev/Dockerfile
           platforms: linux/amd64
-          outputs: type=docker,dest=/tmp/myimage.tar
-          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
-          cache-from: ${{ inputs.cache-from }}
+          # artifacts storage limit suck - use gchr to store temporary image
+          # outputs: type=docker,dest=/tmp/myimage.tar
+          push: true
+          tags: ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-test-artifact
+          cache-from: |
+            ${{ inputs.cache-from }}
+            type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-amd64
           # specific "cache-to" here as otherwise it would override the latest multi-platform cache with this amd64-only one
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-amd64,mode=max
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: surface-tests
-          path: /tmp/myimage.tar
-          retention-days: 1
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: surface-tests
+      #     path: /tmp/myimage.tar
+      #     retention-days: 1
