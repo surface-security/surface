@@ -29,9 +29,9 @@ class Scope(models.Model):
         return self.name
 
     def clean_domains(self, all=False):
-        l = self.scope_domains_in or []
+        l = (self.scope_domains_in or '').splitlines()
         if all:
-            l.extend(self.scope_domains_out or [])
+            l.extend((self.scope_domains_out or '').splitlines())
         r = []
         for _d in l:
             # some entries will have multiple domains with "," like magisto
@@ -42,7 +42,7 @@ class Scope(models.Model):
                 if "*" in d:
                     # still some star, just ignore...
                     continue
-                r.append(_d)
+                r.append(d)
         return r
 
     def ignore_re_check(self, domain):
