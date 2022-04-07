@@ -18,7 +18,3 @@ jobs:
   tests:
     needs: test_image
     uses: ./.github/workflows/lib_tests.yml
-  
-  testscleanup:
-    needs: tests
-    uses: ./.github/workflows/lib_test_cleanup.yml
