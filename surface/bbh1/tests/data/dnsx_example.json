@@ -1,0 +1,4 @@
+{"host":"completely-made-up.example.com","resolver":["8.8.8.8:53"],"soa":["anirban.ns.cloudflare.com","dns.cloudflare.com"],"has_internal_ips":false,"status_code":"NOERROR","timestamp":"2022-04-08T16:23:06.570844+01:00"}
+{"host":"www.example.com","resolver":["8.8.8.8:53"],"a":["185.199.110.153","185.199.109.153","185.199.108.153","185.199.111.153"],"cname":["fopina.github.io"],"has_internal_ips":false,"status_code":"NOERROR","timestamp":"2022-04-08T16:23:06.571537+01:00"}
+{"host":"rpg.example.com","resolver":["8.8.8.8:53"],"a":["185.199.108.153","185.199.109.153","185.199.110.153","185.199.111.153"],"cname":["fopina.github.io"],"has_internal_ips":false,"status_code":"NOERROR","timestamp":"2022-04-08T16:23:06.584916+01:00"}
+{"host":"example.com","resolver":["1.0.0.1:53"],"a":["172.67.193.55","104.21.20.166"],"has_internal_ips":false,"status_code":"NOERROR","timestamp":"2022-04-08T16:23:06.627203+01:00"}

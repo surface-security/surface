@@ -7,7 +7,7 @@ from scanners.inputs.base import BaseInput
 from scanners.parsers.base import BaseParser
 
 from dns_ips import models as dns_models
-from .models import Scope
+from ..models import Scope
 
 
 class Scopes(BaseInput):
