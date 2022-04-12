@@ -28,6 +28,4 @@ class Migration(migrations.Migration):
         ('bbh1', '0004_historicaltempscope_tempscope'),
     ]
 
-    operations = [
-        migrations.RunPython(datafix, reverse_code=migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(datafix, reverse_code=migrations.RunPython.noop)]

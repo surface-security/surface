@@ -29,11 +29,19 @@ class Scope(inv_models.Application):
 
     def __str__(self) -> str:
         return self.name
-    
-    def save(self, force_insert: bool = False, force_update: bool = False, using: Optional[str] = None, update_fields: Optional[Iterable[str]] = None) -> None:
+
+    def save(
+        self,
+        force_insert: bool = False,
+        force_update: bool = False,
+        using: Optional[str] = None,
+        update_fields: Optional[Iterable[str]] = None,
+    ) -> None:
         if not self.tla:
             self.tla = f'BBH1_{self.name.upper()}'
-        return super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        return super().save(
+            force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
+        )
 
     def clean_domains(self, all=False):
         l = (self.scope_domains_in or '').splitlines()

@@ -59,7 +59,7 @@ class Subfinder(BaseParser):
                     defaults={
                         'last_seen': self.timestamp_dt,
                         'tla': tla,
-                    }
+                    },
                 )
 
     def parse(self, rootbox, scanner, timestamp, filepath):

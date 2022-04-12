@@ -24,6 +24,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='historicalscope',
-            options={'get_latest_by': 'history_date', 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical scope'},
+            options={
+                'get_latest_by': 'history_date',
+                'ordering': ('-history_date', '-history_id'),
+                'verbose_name': 'historical scope',
+            },
         ),
     ]

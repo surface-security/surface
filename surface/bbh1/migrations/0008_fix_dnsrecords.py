@@ -8,10 +8,7 @@ def datafix(app, schema):
     S1 = app.get_model('dns_ips', 'Source')
     ss, _ = S1.objects.get_or_create(name='subfinder')
     S = app.get_model('inventory', 'Application')
-    tlas = {
-        x.tla: x.pk
-        for x in S.objects.all()
-    }
+    tlas = {x.tla: x.pk for x in S.objects.all()}
     for d in D.objects.filter(tla=None).select_related('source'):
         if d.source.name.startswith('bb1_'):
             tlan = f'BBH1_{d.source.name[4:].upper()}'
@@ -26,6 +23,4 @@ class Migration(migrations.Migration):
         ('bbh1', '0007_auto_20220412_1018'),
     ]
 
-    operations = [
-        migrations.RunPython(datafix, reverse_code=migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(datafix, reverse_code=migrations.RunPython.noop)]
