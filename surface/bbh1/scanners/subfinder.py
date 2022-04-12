@@ -2,11 +2,13 @@ from pathlib import Path
 import json
 
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from scanners.inputs.base import BaseInput
 from scanners.parsers.base import BaseParser
 
 from dns_ips import models as dns_models
+from inventory import models as inv_models
 from ..models import Scope
 
 
@@ -41,13 +43,23 @@ class Subfinder(BaseParser):
     name = 'SUBFINDER'
     label = 'Subfinder'
 
+    @cached_property
+    def source(self):
+        source, _ = dns_models.Source.objects.get_or_create(name='subfinder')
+        return source
+
     def _parse_file(self, rootbox, scanner, filepath):
-        source, _ = dns_models.Source.objects.get_or_create(name=f'bb1_{filepath.stem}')
+        tla = inv_models.Application.objects.get(tla=f'BBH1_{filepath.stem.upper()}')
         with filepath.open('r') as f:
             for rec in f:
                 obj = json.loads(rec)
                 dns_models.DNSRecord.objects.update_or_create(
-                    source=source, name=obj['host'], defaults={'last_seen': self.timestamp_dt}
+                    source=self.source,
+                    name=obj['host'],
+                    defaults={
+                        'last_seen': self.timestamp_dt,
+                        'tla': tla,
+                    }
                 )
 
     def parse(self, rootbox, scanner, timestamp, filepath):

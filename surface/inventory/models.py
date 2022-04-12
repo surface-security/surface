@@ -12,3 +12,6 @@ class Application(models.Model):
     director = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
     director_direct = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
     dev_lead = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
+
+    def __str__(self) -> str:
+        return self.tla

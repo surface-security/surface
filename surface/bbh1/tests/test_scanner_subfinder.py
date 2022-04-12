@@ -52,6 +52,9 @@ class TestScopes(ScannerTestMixin, TestCase):
 class TestParser(ScannerTestMixin, TestCase):
     def setUp(self):
         self.setUpScanner(input='SCOPES', parser='SUBFINDER', image='x', name='x')
+        self._s1 = models.Scope.objects.create(
+            name='example',
+        )
 
     def _run_it(self, asset='example.json'):
         tmp_dir = Path(tempfile.mkdtemp())
@@ -66,4 +69,5 @@ class TestParser(ScannerTestMixin, TestCase):
     def test_parser(self):
         self._run_it()
         self.assertEqual(dns_models.DNSRecord.objects.count(), 75)
-        self.assertEqual(dns_models.DNSRecord.objects.first().source.name, 'bb1_example')
+        self.assertEqual(dns_models.DNSRecord.objects.first().source.name, 'subfinder')
+        self.assertEqual(dns_models.DNSRecord.objects.first().tla_id, self._s1.pk)

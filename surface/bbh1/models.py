@@ -1,10 +1,12 @@
+from typing import Iterable, Optional
 from django.db import models
 from functools import lru_cache
 
+from inventory import models as inv_models
 from simple_history.models import HistoricalRecords
 
 
-class Scope(models.Model):
+class Scope(inv_models.Application):
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField(null=True, blank=True)
     link = models.URLField(null=True, blank=True)
@@ -27,6 +29,11 @@ class Scope(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    def save(self, force_insert: bool = False, force_update: bool = False, using: Optional[str] = None, update_fields: Optional[Iterable[str]] = None) -> None:
+        if not self.tla:
+            self.tla = f'BBH1_{self.name.upper()}'
+        return super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
     def clean_domains(self, all=False):
         l = (self.scope_domains_in or '').splitlines()
