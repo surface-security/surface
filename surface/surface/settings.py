@@ -144,6 +144,19 @@ ALLOWED_HOSTS = ENV_VAR.list('SURF_ALLOWED_HOSTS', default=['127.0.0.1', 'localh
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+SENTRY_DSN = ENV_VAR('SURF_SENTRY_DSN', default=None)
+
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=ENV_VAR.float('SURF_SENTRY_TRACES', default=1.0),
+        send_default_pii=ENV_VAR.bool('SURF_SENTRY_SEND_PII', default=True),
+    )
+
 # sample: SURF_SCANNERS_REGISTRY_AUTH={"ghcr.io":{"username":"x", "password": "token"}}
 SCANNERS_REGISTRY_AUTH = ENV_VAR.json('SURF_SCANNERS_REGISTRY_AUTH', default={})
 SCANNERS_DOCKER_CA_CERT = ENV_VAR('SURF_SCANNERS_DOCKER_CA_CERT', default=None)
