@@ -27,7 +27,9 @@ tmpbuildarm:
 	docker buildx build --platform linux/arm/v7 \
 	                    -f dev/Dockerfile \
 						-t ghcr.io/fopina/surface:tmpbuild \
+						--build-arg SURFACE_VERSION=dev-$(shell git rev-parse --short HEAD) \
 						--cache-from type=registry,ref=ghcr.io/fopina/surface-builder-cache:latest \
 						--cache-from type=registry,ref=ghcr.io/fopina/surface-builder-cache:tmpbuild \
+						--cache-to type=registry,ref=ghcr.io/fopina/surface-builder-cache:tmpbuild \
 						--push \
 						.

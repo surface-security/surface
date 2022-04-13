@@ -48,4 +48,9 @@ ENV PYTHONUNBUFFERED=1
 
 COPY surface surface
 RUN touch /app/surface/local.env
+
+# at the end to not invalidate cache
+ARG SURFACE_VERSION
+ENV SURF_SURFACE_VERSION ${SURFACE_VERSION}
+
 WORKDIR /app/surface/
