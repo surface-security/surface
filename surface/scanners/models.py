@@ -3,6 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
 from functools import lru_cache
+from django.db.models.expressions import Exists
 
 from core_utils.fields import TruncatingCharField
 from dns_ips import models as dns_models
@@ -233,6 +234,9 @@ class LiveHostQS(models.QuerySet):
             q_obj, _ = self._filter_or_exclude_q_tuple(q_obj)
         else:
             # is there anything else that should be supported? assert for now
+
+            if isinstance(q_obj, Exists):
+                return q_obj
             assert isinstance(q_obj, Q)
             for ind, child in enumerate(q_obj.children):
                 q_obj.children[ind] = self._filter_or_exclude_q_obj(child)
