@@ -14,7 +14,7 @@ django-jsoneditor==0.1.6
 netaddr==0.8.0
 
 # our own
-django-surface-theme==0.0.7
+django-surface-theme==0.0.8
 django-dbcleanup==0.1.2
 django-logbasecommand==0.0.1
 django-notification-sender[slack]==0.0.4
