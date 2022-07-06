@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Update branch name
         shell: bash
-        run: echo "##[set-output name=safe_branch;]$(echo ${GITHUB_REF_NAME}//\//-})"
+        run: echo "##[set-output name=safe_branch;]$(echo ${GITHUB_REF_NAME//\//-})"
         id: substitutions
       - uses: actions/checkout@master
       - name: Set up Docker Buildx
