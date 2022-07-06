@@ -13,7 +13,7 @@ jobs:
     with:
       cache-from: |
         type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
-        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}
+        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${GITHUB_REF_NAME//\//-}
 
   tests:
     needs: test_image
