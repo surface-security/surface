@@ -9,12 +9,12 @@ on:
 
 jobs:
   substitutions:
-    - name: slash-standardisation
-      outputs:
-        SAFE_BRANCH_NAME: ${{ steps:substitute.outputs.check }}
-      steps:
-        - id: substitute
-          run: echo "::set-output name=SAFE_BRANCH_NAME::${GITHUB_REF_NAME//\//-}"
+    name: slash-standardisation
+    outputs:
+      SAFE_BRANCH_NAME: ${{ steps:substitute.outputs.check }}
+    steps:
+      - id: substitute
+        run: echo "::set-output name=SAFE_BRANCH_NAME::${GITHUB_REF_NAME//\//-}"
   doit:
     runs-on: ubuntu-latest
     steps:
