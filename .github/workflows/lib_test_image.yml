@@ -8,16 +8,13 @@ on:
         type: string
 
 jobs:
-  substitutions:
-    name: slash-standardisation
-    outputs:
-      SAFE_BRANCH_NAME: ${{ steps:substitute.outputs.check }}
-    steps:
-      - id: substitute
-        run: echo "::set-output name=SAFE_BRANCH_NAME::${GITHUB_REF_NAME//\//-}"
   doit:
     runs-on: ubuntu-latest
     steps:
+      - name: Update branch name
+        shell: bash
+        run: echo "##[set-output name=safe_branch;]$(echo ${GITHUB_REF_NAME}//\//-})"
+        id: substitutions
       - uses: actions/checkout@master
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -34,10 +31,10 @@ jobs:
           file: dev/Dockerfile
           platforms: linux/amd64
           outputs: type=docker,dest=/tmp/myimage.tar
-          tags: ghcr.io/${{ github.repository }}:${GITHUB_REF_NAME//\//-}
+          tags: ghcr.io/${{ github.repository }}:${{ steps.substitutions.outputs.safe_branch }}
           cache-from: ${{ inputs.cache-from }}
           # specific "cache-to" here as otherwise it would override the latest multi-platform cache with this amd64-only one
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ needs.substitutions.outputs.SAFE_BRANCH_NAME }}-amd64,mode=max
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ steps.substitutions.outputs.safe_branch }}-amd64,mode=max
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
