@@ -17,6 +17,7 @@ RUN apt-get update \
         libldap2-dev \
         libsasl2-dev \
         git \
+        libpq-dev \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /wheels
