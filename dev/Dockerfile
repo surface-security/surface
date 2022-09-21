@@ -13,6 +13,7 @@ FROM python:3.9-slim-buster as builder
 RUN apt-get update \
  && apt-get install --no-install-recommends -y \
         libmariadbclient-dev \
+        libpq-dev \
         build-essential \
         libldap2-dev \
         libsasl2-dev \
@@ -21,11 +22,6 @@ RUN apt-get update \
 
 WORKDIR /wheels
 COPY --from=requirements /requirements_full.txt .
-
-ARG TARGETPLATFORM
-# arm/v7 debian buster has no cryptography wheel available, so it tries to build it (and fails)
-# use piwheels wheel repo to avoid building it
-RUN [ "$TARGETPLATFORM" != "linux/arm/v7" ] || printf "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf
 
 RUN pip wheel -w /wheels -r requirements_full.txt
 
