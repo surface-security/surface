@@ -66,7 +66,7 @@ services:
       - ./nginx.template.conf:/etc/nginx/templates/default.conf.template:ro
 
   mysql:
-    image: mysql:8.0.23
+    image: mysql:8.0.30
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_general_ci
