@@ -13,11 +13,11 @@ FROM python:3.9-slim-buster as builder
 RUN apt-get update \
  && apt-get install --no-install-recommends -y \
         libmariadbclient-dev \
+        libpq-dev \
         build-essential \
         libldap2-dev \
         libsasl2-dev \
         git \
-        libpq-dev \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /wheels
