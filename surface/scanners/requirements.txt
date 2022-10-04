@@ -1,4 +1,4 @@
-cffi==1.15.0
+cffi==1.15.1
 packaging==21.0
 pyOpenSSL==19.1.0
 # docker-py5 requires cryptography higher than OCI
