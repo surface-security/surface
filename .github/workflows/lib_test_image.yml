@@ -1,5 +1,8 @@
 name: test image
 
+permissions:
+  packages: write
+
 on:
   workflow_call:
     inputs:
