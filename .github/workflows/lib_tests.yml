@@ -15,7 +15,7 @@ jobs:
         python-version: 3.9
 
     - name: Install black
-      run: pip install black==22.3.0
+      run: pip install black==22.8.0
 
     - name: Style check
       run : make style_check
