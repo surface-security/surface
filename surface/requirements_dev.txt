@@ -7,4 +7,4 @@ pylint-django==2.2.0
 
 # for types
 mypy==0.982
-django-stubs==1.7.0
+django-stubs==1.12.0
