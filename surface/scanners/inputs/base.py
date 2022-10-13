@@ -1,7 +1,6 @@
 __CACHE__ = {}
 from abc import ABCMeta
 
-
 CHOICES = []
 
 

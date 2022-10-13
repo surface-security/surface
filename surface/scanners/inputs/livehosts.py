@@ -3,7 +3,6 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.utils import timezone
-
 from scanners import models
 
 from .base import BaseInput
@@ -17,6 +16,7 @@ class LiveIPsHosts(BaseInput):
 
     def _queryset(self, ports, tag_filter):
         return models.LiveHost.objects.filter(
+            active=True,
             host__any__tags__name=tag_filter,
             last_seen__gte=timezone.now() - timezone.timedelta(days=7),
             port__in=ports,

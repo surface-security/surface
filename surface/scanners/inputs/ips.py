@@ -1,5 +1,6 @@
-from .base import BaseInput
 from dns_ips import models
+
+from .base import BaseInput
 
 
 class IPs(BaseInput):
