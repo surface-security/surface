@@ -1,4 +1,5 @@
 import itertools
+
 from . import hosts, ips
 from .base import BaseInput
 
