@@ -257,7 +257,7 @@ class DNSRecord(models.Model):
     domain = models.ForeignKey('dns_ips.DNSDomain', null=True, blank=True, on_delete=models.CASCADE)
 
     tla = models.ForeignKey(
-        'inventory.Application', blank=True, null=True, related_name='dns', on_delete=models.SET_NULL
+        'inventory.Application', blank=True, null=True, related_name='dns', on_delete=models.SET_NULL, verbose_name="Application"
     )
 
     tags = models.ManyToManyField('dns_ips.Tag', blank=True)
