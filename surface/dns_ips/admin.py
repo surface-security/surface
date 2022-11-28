@@ -8,7 +8,7 @@ from django.utils.html import format_html_join, format_html
 import netaddr
 from import_export import resources
 from import_export.admin import ExportActionMixin, ImportMixin
-from core_utils.admin_filters import DefaultFilterMixin
+from core_utils.admin_filters import DefaultFilterMixin, custom_titled_filter
 from theme.filters import RelatedFieldAjaxListFilter
 from core_utils.decorators import relatedobj_field, admin_link_helper
 
@@ -303,7 +303,7 @@ class DNSRecordAdmin(DefaultFilterMixin, ImportMixin, ExportActionMixin, admin.M
         ('tla__owned_by', RelatedFieldAjaxListFilter),
         ('tla__director_direct', RelatedFieldAjaxListFilter),
         ('tla__director', RelatedFieldAjaxListFilter),
-        ('tla', RelatedFieldAjaxListFilter),
+        (('tla', RelatedFieldAjaxListFilter)[0], custom_titled_filter('Application')),
         'source',
         'active',
         'tags',
@@ -366,7 +366,7 @@ class DNSRecordValueAdmin(DefaultFilterMixin, ImportMixin, ExportActionMixin, ad
         relatedobj_field('record', 'source', description='Source'),
         'active',
         'last_seen',
-        relatedobj_field('record', 'tla', description='TLA'),
+        relatedobj_field('record', 'tla', description='Application'),
         'ttl',
         'rtype',
         'value',
