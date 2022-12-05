@@ -14,10 +14,10 @@ def default_source_unknown():
     @functools.lru_cache
     def wrap():
         u, _ = Source.objects.get_or_create(
-            name='UNKNOWN',
+            name="UNKNOWN",
             defaults={
-                'function': '',
-                'owner': '',
+                "function": "",
+                "owner": "",
             },
         )
         return u.pk
@@ -33,8 +33,8 @@ class Tag(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'DNS & IPs Tag'
-        verbose_name_plural = 'DNS & IPs Tags'
+        verbose_name = "DNS & IPs Tag"
+        verbose_name_plural = "DNS & IPs Tags"
 
 
 class Source(models.Model):
@@ -49,12 +49,12 @@ class Source(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Source'
-        verbose_name_plural = 'Sources'
+        verbose_name = "Source"
+        verbose_name_plural = "Sources"
 
 
 class Organisation(models.Model):
-    source = models.ForeignKey('Source', blank=True, null=True, on_delete=models.CASCADE)
+    source = models.ForeignKey("Source", blank=True, null=True, on_delete=models.CASCADE)
     source_key = models.CharField(max_length=255, null=True, blank=True)
     active = models.BooleanField(default=True, db_index=True)
 
@@ -77,12 +77,12 @@ class Organisation(models.Model):
         return str(self.name)
 
     class Meta:
-        verbose_name = 'Organisation'
-        verbose_name_plural = 'Organisations'
+        verbose_name = "Organisation"
+        verbose_name_plural = "Organisations"
 
 
 class IPRange(RangeModel):
-    source = models.ForeignKey('Source', on_delete=models.CASCADE, default=default_source_unknown)
+    source = models.ForeignKey("Source", on_delete=models.CASCADE, default=default_source_unknown)
     active = models.BooleanField(default=True, db_index=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
@@ -96,16 +96,16 @@ class IPRange(RangeModel):
         return self.range
 
     def slack_display(self):
-        return f'{self.range} (DC {self.datacenter}, vlan {self.vlan})'
+        return f"{self.range} (DC {self.datacenter}, vlan {self.vlan})"
 
     class Meta:
-        verbose_name = 'IP Range'
-        verbose_name_plural = 'IP Ranges'
+        verbose_name = "IP Range"
+        verbose_name_plural = "IP Ranges"
 
 
 class IPRangeThirdParty(models.Model):
-    range = models.ForeignKey('dns_ips.IPRange', blank=True, null=True, on_delete=models.CASCADE)
-    organisation = models.ForeignKey('Organisation', blank=True, null=True, on_delete=models.CASCADE)
+    range = models.ForeignKey("dns_ips.IPRange", blank=True, null=True, on_delete=models.CASCADE)
+    organisation = models.ForeignKey("Organisation", blank=True, null=True, on_delete=models.CASCADE)
     sn_ref = models.CharField(max_length=64, blank=True, null=True)
     expected_traffic = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     expected_ports = models.CharField(max_length=255, blank=True, null=True, db_index=True)
@@ -113,50 +113,60 @@ class IPRangeThirdParty(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f'{self.sn_ref} ({self.expected_traffic})'
+        return f"{self.sn_ref} ({self.expected_traffic})"
 
     class Meta:
-        verbose_name = 'IP Range - Third Party (SN)'
-        verbose_name_plural = 'IP Ranges - Third Parties (SN)'
+        verbose_name = "IP Range - Third Party (SN)"
+        verbose_name_plural = "IP Ranges - Third Parties (SN)"
 
 
 class IPAddress(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
 
     source = models.ForeignKey(
-        'Source', related_name='dns_ips_source', on_delete=models.CASCADE, default=default_source_unknown
+        "Source",
+        related_name="dns_ips_source",
+        on_delete=models.CASCADE,
+        default=default_source_unknown,
     )
     active = models.BooleanField(default=True, db_index=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
     name = models.GenericIPAddressField(db_index=True)
-    organisation = models.ForeignKey('Organisation', blank=True, null=True, on_delete=models.CASCADE)
+    organisation = models.ForeignKey("Organisation", blank=True, null=True, on_delete=models.CASCADE)
     organisation_ip_owner = models.ForeignKey(
-        'Organisation', blank=True, null=True, related_name='organisation_ip_owner', on_delete=models.CASCADE
+        "Organisation",
+        blank=True,
+        null=True,
+        related_name="organisation_ip_owner",
+        on_delete=models.CASCADE,
     )
-    tags = models.ManyToManyField('dns_ips.Tag', blank=True)
+    tags = models.ManyToManyField("dns_ips.Tag", blank=True)
     notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.name) or ''
+        return str(self.name) or ""
 
     def slack_display(self):
         if self.name is not None:
-            return '{} ({}, {}, {})'.format(
-                str(self.name), str(self.location), str(self.organisation) or '', str(self.notes)
+            return "{} ({}, {}, {})".format(
+                str(self.name),
+                str(self.location),
+                str(self.organisation) or "",
+                str(self.notes),
             )
-        return ''
+        return ""
 
     class Meta:
-        verbose_name = 'IP Address'
-        verbose_name_plural = 'IP Addresses'
-        unique_together = (('source', 'name'),)
+        verbose_name = "IP Address"
+        verbose_name_plural = "IP Addresses"
+        unique_together = (("source", "name"),)
 
 
 class DNSNameserver(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
 
-    source = models.ForeignKey('Source', on_delete=models.CASCADE, default=default_source_unknown)
+    source = models.ForeignKey("Source", on_delete=models.CASCADE, default=default_source_unknown)
     active = models.BooleanField(default=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True)
     name = models.CharField(max_length=255, null=True)
@@ -165,13 +175,16 @@ class DNSNameserver(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'DNS Nameserver'
-        verbose_name_plural = 'DNS Nameservers'
+        verbose_name = "DNS Nameserver"
+        verbose_name_plural = "DNS Nameservers"
 
 
 class DNSDomain(models.Model):
     source = models.ForeignKey(
-        'Source', related_name='domain_source', on_delete=models.CASCADE, default=default_source_unknown
+        "Source",
+        related_name="domain_source",
+        on_delete=models.CASCADE,
+        default=default_source_unknown,
     )
     active = models.BooleanField(default=True, db_index=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
@@ -223,9 +236,9 @@ class DNSDomain(models.Model):
     register_portfolio_sections = models.CharField(max_length=255, null=True, blank=True)
     register_account_name = models.CharField(max_length=255, null=True, blank=True)
     register_nameservers = models.ManyToManyField(
-        'dns_ips.DNSNameserver', blank=True, related_name='register_nameservers'
+        "dns_ips.DNSNameserver", blank=True, related_name="register_nameservers"
     )
-    dns_nameservers = models.ManyToManyField('dns_ips.DNSNameserver', blank=True, related_name='dns_nameservers')
+    dns_nameservers = models.ManyToManyField("dns_ips.DNSNameserver", blank=True, related_name="dns_nameservers")
     register_tld_region = models.CharField(max_length=255, null=True, blank=True)
     register_tld_country = models.CharField(max_length=255, null=True, blank=True)
     register_email = models.CharField(max_length=255, null=True, blank=True)
@@ -239,28 +252,36 @@ class DNSDomain(models.Model):
         return self.name
 
     def slack_display(self):
-        return f'{self.name}'
+        return f"{self.name}"
 
     class Meta:
-        verbose_name = 'DNS Domain'
-        verbose_name_plural = 'DNS Domains'
+        verbose_name = "DNS Domain"
+        verbose_name_plural = "DNS Domains"
 
 
 class DNSRecord(models.Model):
     source = models.ForeignKey(
-        'Source', related_name='dnsrecord_source', on_delete=models.CASCADE, default=default_source_unknown
+        "Source",
+        related_name="dnsrecord_source",
+        on_delete=models.CASCADE,
+        default=default_source_unknown,
     )
     active = models.BooleanField(default=True, db_index=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
     name = models.CharField(max_length=255, db_index=True, null=True)
-    domain = models.ForeignKey('dns_ips.DNSDomain', null=True, blank=True, on_delete=models.CASCADE)
+    domain = models.ForeignKey("dns_ips.DNSDomain", null=True, blank=True, on_delete=models.CASCADE)
 
     tla = models.ForeignKey(
-        'inventory.Application', blank=True, null=True, related_name='dns', on_delete=models.SET_NULL
+        "inventory.Application",
+        blank=True,
+        null=True,
+        related_name="dns",
+        on_delete=models.SET_NULL,
+        verbose_name="Application",
     )
 
-    tags = models.ManyToManyField('dns_ips.Tag', blank=True)
+    tags = models.ManyToManyField("dns_ips.Tag", blank=True)
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -272,42 +293,52 @@ class DNSRecord(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'DNS Record'
+        verbose_name = "DNS Record"
 
 
 class DNSRecordValue(models.Model):
     class RecordType(models.TextChoices):
-        A = 'A'
-        CNAME = 'CNAME'
-        TXT = 'TXT'
-        SPF = 'SPF'
-        MX = 'MX'
-        DKIM = 'DKIM'
-        DMARC = 'DMARC'
-        SRV = 'SRV'
-        SOA = 'SOA'
-        PTR = 'PTR'
-        NS = 'NS'
-        AAAA = 'AAAA'
-        APEXALIAS = 'APEXALIAS'
-        LB = 'LB'
-        CAA = 'CAA'
+        A = "A"
+        CNAME = "CNAME"
+        TXT = "TXT"
+        SPF = "SPF"
+        MX = "MX"
+        DKIM = "DKIM"
+        DMARC = "DMARC"
+        SRV = "SRV"
+        SOA = "SOA"
+        PTR = "PTR"
+        NS = "NS"
+        AAAA = "AAAA"
+        APEXALIAS = "APEXALIAS"
+        LB = "LB"
+        CAA = "CAA"
 
     record = models.ForeignKey(DNSRecord, on_delete=models.CASCADE)
-    rtype = models.CharField(max_length=10, choices=RecordType.choices, verbose_name='Record Type', db_index=True)
-    ttl = models.IntegerField(null=True, default=None, verbose_name='TTL')
+    rtype = models.CharField(
+        max_length=10,
+        choices=RecordType.choices,
+        verbose_name="Record Type",
+        db_index=True,
+    )
+    ttl = models.IntegerField(null=True, default=None, verbose_name="TTL")
     # Value is used for cname,txt,spf,mx only
     value = models.TextField(null=True, blank=True)
-    ips = models.ManyToManyField('dns_ips.IPAddress', blank=True, verbose_name='IPs', related_name='dnsrecordvalue_ips')
+    ips = models.ManyToManyField(
+        "dns_ips.IPAddress",
+        blank=True,
+        verbose_name="IPs",
+        related_name="dnsrecordvalue_ips",
+    )
 
     active = models.BooleanField(default=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False)
 
     class Meta:
         indexes = [
-            models.Index(fields=['active', 'last_seen']),
+            models.Index(fields=["active", "last_seen"]),
         ]
-        verbose_name = 'DNS Record Value'
+        verbose_name = "DNS Record Value"
 
     def __str__(self):
-        return f'{self.pk} {self.record.name} {self.rtype}'
+        return f"{self.pk} {self.record.name} {self.rtype}"
