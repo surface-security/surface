@@ -42,9 +42,7 @@ class Source(models.Model):
     function = models.CharField(max_length=255, null=False, blank=False, db_index=True)
     owner = models.CharField(max_length=255, null=False, blank=False, db_index=True)
     active = models.BooleanField(default=True, db_index=True)
-    last_sync = models.DateTimeField(
-        default=timezone.now, editable=False, db_index=True
-    )
+    last_sync = models.DateTimeField(default=timezone.now, editable=False, db_index=True)
     notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -56,9 +54,7 @@ class Source(models.Model):
 
 
 class Organisation(models.Model):
-    source = models.ForeignKey(
-        "Source", blank=True, null=True, on_delete=models.CASCADE
-    )
+    source = models.ForeignKey("Source", blank=True, null=True, on_delete=models.CASCADE)
     source_key = models.CharField(max_length=255, null=True, blank=True)
     active = models.BooleanField(default=True, db_index=True)
 
@@ -86,13 +82,9 @@ class Organisation(models.Model):
 
 
 class IPRange(RangeModel):
-    source = models.ForeignKey(
-        "Source", on_delete=models.CASCADE, default=default_source_unknown
-    )
+    source = models.ForeignKey("Source", on_delete=models.CASCADE, default=default_source_unknown)
     active = models.BooleanField(default=True, db_index=True)
-    last_seen = models.DateTimeField(
-        default=timezone.now, editable=False, null=True, blank=True, db_index=True
-    )
+    last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
     vlan = models.CharField(max_length=255, null=True, blank=True)
     zone = models.CharField(max_length=255, null=True, blank=True, db_index=True)
@@ -112,22 +104,12 @@ class IPRange(RangeModel):
 
 
 class IPRangeThirdParty(models.Model):
-    range = models.ForeignKey(
-        "dns_ips.IPRange", blank=True, null=True, on_delete=models.CASCADE
-    )
-    organisation = models.ForeignKey(
-        "Organisation", blank=True, null=True, on_delete=models.CASCADE
-    )
+    range = models.ForeignKey("dns_ips.IPRange", blank=True, null=True, on_delete=models.CASCADE)
+    organisation = models.ForeignKey("Organisation", blank=True, null=True, on_delete=models.CASCADE)
     sn_ref = models.CharField(max_length=64, blank=True, null=True)
-    expected_traffic = models.CharField(
-        max_length=255, blank=True, null=True, db_index=True
-    )
-    expected_ports = models.CharField(
-        max_length=255, blank=True, null=True, db_index=True
-    )
-    expected_protocol = models.CharField(
-        max_length=255, blank=True, null=True, db_index=True
-    )
+    expected_traffic = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    expected_ports = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    expected_protocol = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -148,14 +130,10 @@ class IPAddress(models.Model):
         default=default_source_unknown,
     )
     active = models.BooleanField(default=True, db_index=True)
-    last_seen = models.DateTimeField(
-        default=timezone.now, editable=False, null=True, blank=True, db_index=True
-    )
+    last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
     name = models.GenericIPAddressField(db_index=True)
-    organisation = models.ForeignKey(
-        "Organisation", blank=True, null=True, on_delete=models.CASCADE
-    )
+    organisation = models.ForeignKey("Organisation", blank=True, null=True, on_delete=models.CASCADE)
     organisation_ip_owner = models.ForeignKey(
         "Organisation",
         blank=True,
@@ -188,13 +166,9 @@ class IPAddress(models.Model):
 class DNSNameserver(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
 
-    source = models.ForeignKey(
-        "Source", on_delete=models.CASCADE, default=default_source_unknown
-    )
+    source = models.ForeignKey("Source", on_delete=models.CASCADE, default=default_source_unknown)
     active = models.BooleanField(default=True)
-    last_seen = models.DateTimeField(
-        default=timezone.now, editable=False, null=True, blank=True
-    )
+    last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True)
     name = models.CharField(max_length=255, null=True)
 
     def __str__(self):
@@ -213,9 +187,7 @@ class DNSDomain(models.Model):
         default=default_source_unknown,
     )
     active = models.BooleanField(default=True, db_index=True)
-    last_seen = models.DateTimeField(
-        default=timezone.now, editable=False, null=True, blank=True, db_index=True
-    )
+    last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
     name = models.CharField(max_length=255, db_index=True, null=True)
     notes = models.TextField(null=True, blank=True)
@@ -228,33 +200,19 @@ class DNSDomain(models.Model):
     register_csc_lock = models.BooleanField(default=False, db_index=True)
     register_masking = models.BooleanField(default=False, db_index=True)
     # Registrant
-    register_registrant_name = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True
-    )
-    register_registrant_organisation = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True
-    )
-    register_registrant_address = models.CharField(
-        max_length=255, null=True, blank=True
-    )
-    register_registrant_postcode = models.CharField(
-        max_length=255, null=True, blank=True
-    )
+    register_registrant_name = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    register_registrant_organisation = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    register_registrant_address = models.CharField(max_length=255, null=True, blank=True)
+    register_registrant_postcode = models.CharField(max_length=255, null=True, blank=True)
     register_registrant_city = models.CharField(max_length=255, null=True, blank=True)
     register_registrant_state = models.CharField(max_length=255, null=True, blank=True)
-    register_registrant_country = models.CharField(
-        max_length=255, null=True, blank=True
-    )
+    register_registrant_country = models.CharField(max_length=255, null=True, blank=True)
     register_registrant_phone = models.CharField(max_length=255, null=True, blank=True)
     register_registrant_fax = models.CharField(max_length=255, null=True, blank=True)
-    register_registrant_email = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True
-    )
+    register_registrant_email = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     # Admin
     register_admin_name = models.CharField(max_length=255, null=True, blank=True)
-    register_admin_organisation = models.CharField(
-        max_length=255, null=True, blank=True
-    )
+    register_admin_organisation = models.CharField(max_length=255, null=True, blank=True)
     register_admin_address = models.CharField(max_length=255, null=True, blank=True)
     register_admin_postcode = models.CharField(max_length=255, null=True, blank=True)
     register_admin_city = models.CharField(max_length=255, null=True, blank=True)
@@ -265,13 +223,9 @@ class DNSDomain(models.Model):
     register_admin_email = models.CharField(max_length=255, null=True, blank=True)
     # Technical
     register_technical_name = models.CharField(max_length=255, null=True, blank=True)
-    register_technical_organisation = models.CharField(
-        max_length=255, null=True, blank=True
-    )
+    register_technical_organisation = models.CharField(max_length=255, null=True, blank=True)
     register_technical_address = models.CharField(max_length=255, null=True, blank=True)
-    register_technical_postcode = models.CharField(
-        max_length=255, null=True, blank=True
-    )
+    register_technical_postcode = models.CharField(max_length=255, null=True, blank=True)
     register_technical_city = models.CharField(max_length=255, null=True, blank=True)
     register_technical_state = models.CharField(max_length=255, null=True, blank=True)
     register_technical_country = models.CharField(max_length=255, null=True, blank=True)
@@ -279,16 +233,12 @@ class DNSDomain(models.Model):
     register_technical_fax = models.CharField(max_length=255, null=True, blank=True)
     register_technical_email = models.CharField(max_length=255, null=True, blank=True)
     # Other
-    register_portfolio_sections = models.CharField(
-        max_length=255, null=True, blank=True
-    )
+    register_portfolio_sections = models.CharField(max_length=255, null=True, blank=True)
     register_account_name = models.CharField(max_length=255, null=True, blank=True)
     register_nameservers = models.ManyToManyField(
         "dns_ips.DNSNameserver", blank=True, related_name="register_nameservers"
     )
-    dns_nameservers = models.ManyToManyField(
-        "dns_ips.DNSNameserver", blank=True, related_name="dns_nameservers"
-    )
+    dns_nameservers = models.ManyToManyField("dns_ips.DNSNameserver", blank=True, related_name="dns_nameservers")
     register_tld_region = models.CharField(max_length=255, null=True, blank=True)
     register_tld_country = models.CharField(max_length=255, null=True, blank=True)
     register_email = models.CharField(max_length=255, null=True, blank=True)
@@ -317,14 +267,10 @@ class DNSRecord(models.Model):
         default=default_source_unknown,
     )
     active = models.BooleanField(default=True, db_index=True)
-    last_seen = models.DateTimeField(
-        default=timezone.now, editable=False, null=True, blank=True, db_index=True
-    )
+    last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
     name = models.CharField(max_length=255, db_index=True, null=True)
-    domain = models.ForeignKey(
-        "dns_ips.DNSDomain", null=True, blank=True, on_delete=models.CASCADE
-    )
+    domain = models.ForeignKey("dns_ips.DNSDomain", null=True, blank=True, on_delete=models.CASCADE)
 
     tla = models.ForeignKey(
         "inventory.Application",
