@@ -91,6 +91,7 @@ class IPRange(RangeModel):
     datacenter = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+    tags = models.ManyToManyField("dns_ips.Tag", blank=True)
 
     def __str__(self):
         return self.range
@@ -101,23 +102,6 @@ class IPRange(RangeModel):
     class Meta:
         verbose_name = "IP Range"
         verbose_name_plural = "IP Ranges"
-
-
-class IPRangeThirdParty(models.Model):
-    range = models.ForeignKey("dns_ips.IPRange", blank=True, null=True, on_delete=models.CASCADE)
-    organisation = models.ForeignKey("Organisation", blank=True, null=True, on_delete=models.CASCADE)
-    sn_ref = models.CharField(max_length=64, blank=True, null=True)
-    expected_traffic = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    expected_ports = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    expected_protocol = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.sn_ref} ({self.expected_traffic})"
-
-    class Meta:
-        verbose_name = "IP Range - Third Party (SN)"
-        verbose_name_plural = "IP Ranges - Third Parties (SN)"
 
 
 class IPAddress(models.Model):

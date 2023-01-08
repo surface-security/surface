@@ -22,7 +22,6 @@ class DNSIPSProcessor(MessageProcessor):
     IGNORED_TERMS = ['1.1.1.1', '127.0.0.1', 'internal', 'localhost']
     IPS_MODELS = [
         'dns_ips.iprange',
-        'dns_ips.iprangethirdparty',
         'dns_ips.ipaddress',
         'dns_ips.dnsrecord',
     ]
