@@ -9,20 +9,12 @@ from django.db.utils import IntegrityError
 def tag_existing_ranges(apps, db_schema):
     iprange = apps.get_model("dns_ips", "iprange")
     iprange3rd = apps.get_model("dns_ips", "iprangethirdparty")
-    internal_tag = (
-        apps.get_model("dns_ips", "tag").objects.filter(name="is_internal").first()
-    )
-    external_tag = (
-        apps.get_model("dns_ips", "tag").objects.filter(name="is_external").first()
-    )
-    trd_party_tag = (
-        apps.get_model("dns_ips", "tag").objects.filter(name="is_third_party").first()
-    )
+    internal_tag = apps.get_model("dns_ips", "tag").objects.filter(name="is_internal").first()
+    external_tag = apps.get_model("dns_ips", "tag").objects.filter(name="is_external").first()
+    trd_party_tag = apps.get_model("dns_ips", "tag").objects.filter(name="is_third_party").first()
 
     for thrdpartyrange in iprange3rd.objects.all():
-        for rng in iprange.objects.filter(range=thrdpartyrange.range.range).exclude(
-            tags__id=trd_party_tag.id
-        ):
+        for rng in iprange.objects.filter(range=thrdpartyrange.range.range).exclude(tags__id=trd_party_tag.id):
             if rng.description is None and thrdpartyrange.description is not None:
                 rng.description = thrdpartyrange.description
 
@@ -47,8 +39,6 @@ class Migration(migrations.Migration):
             name="tags",
             field=models.ManyToManyField(blank=True, to="dns_ips.Tag"),
         ),
-        migrations.RunPython(
-            tag_existing_ranges, reverse_code=migrations.RunPython.noop
-        ),
+        migrations.RunPython(tag_existing_ranges, reverse_code=migrations.RunPython.noop),
         migrations.DeleteModel("iprangethirdparty"),
     ]
