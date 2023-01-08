@@ -16,13 +16,13 @@ def tag_existing_ranges(apps, db_schema):
         apps.get_model("dns_ips", "tag").objects.filter(name="is_external").first()
     )
     trd_party_tag = (
-        apps.get_model("dns_ips", "tag")
-        .objects.filter(name="is_third_party")
-        .first()
+        apps.get_model("dns_ips", "tag").objects.filter(name="is_third_party").first()
     )
 
     for thrdpartyrange in iprange3rd.objects.all():
-        for rng in iprange.objects.filter(range=thrdpartyrange.range.range).exclude(tags__id=trd_party_tag.id):
+        for rng in iprange.objects.filter(range=thrdpartyrange.range.range).exclude(
+            tags__id=trd_party_tag.id
+        ):
             if rng.description is None and thrdpartyrange.description is not None:
                 rng.description = thrdpartyrange.description
 
@@ -35,19 +35,20 @@ def tag_existing_ranges(apps, db_schema):
                 continue
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dns_ips', '0003_alter_dnsrecord_tla'),
+        ("dns_ips", "0003_alter_dnsrecord_tla"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='iprange',
-            name='tags',
-            field=models.ManyToManyField(blank=True, to='dns_ips.Tag'),
+            model_name="iprange",
+            name="tags",
+            field=models.ManyToManyField(blank=True, to="dns_ips.Tag"),
         ),
-        migrations.RunPython(tag_existing_ranges, reverse_code=migrations.RunPython.noop),
-        migrations.DeleteModel('iprangethirdparty'),
+        migrations.RunPython(
+            tag_existing_ranges, reverse_code=migrations.RunPython.noop
+        ),
+        migrations.DeleteModel("iprangethirdparty"),
     ]
