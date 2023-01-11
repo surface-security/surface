@@ -12,6 +12,7 @@ django-nested-admin==3.3.2
 django-daterangefilter==1.0.0
 django-jsoneditor==0.1.6
 netaddr==0.8.0
+wheel==0.38.4
 
 # our own
 django-surface-theme==0.0.8
