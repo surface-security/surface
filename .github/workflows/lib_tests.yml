@@ -7,10 +7,10 @@ jobs:
   style:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
 
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.9, 3.11]
         database:
         - db: mysql
           url: mysql://root:root@127.0.0.1:8877/surface
@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Download artifacts (Docker images) from previous workflows
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: surface-tests
           path: /tmp
@@ -70,7 +70,7 @@ jobs:
                      ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
                      sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           # do not fail ci for now - https://github.com/codecov/codecov-action/issues/557#issuecomment-1073777427
