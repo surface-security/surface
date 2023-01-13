@@ -55,7 +55,7 @@ class IPRangeAdmin(DefaultFilterMixin, admin.ModelAdmin):
     ]
     list_display_links = ('range',)
     search_fields = ('range', 'zone', 'datacenter', 'description', 'notes')
-    list_filter = ('source', 'active', 'zone', 'datacenter')
+    list_filter = ('source', 'active', 'zone', 'datacenter', 'tags')
     exclude = ('range_min', 'range_max')
 
     def get_search_results(self, request, queryset, search_term):
@@ -76,14 +76,6 @@ class IPRangeAdmin(DefaultFilterMixin, admin.ModelAdmin):
 
     def get_default_filters(self, request):
         return {'active__exact': 1}
-
-
-@admin.register(models.IPRangeThirdParty)
-class IPRangeThirdParty(admin.ModelAdmin):
-    list_display = [field.name for field in models.IPRangeThirdParty._meta.fields if field.name not in ('id',)]
-    search_fields = ('range__range', 'description', 'expected_traffic', 'expected_ports', 'expected_protocol', 'sn_ref')
-    list_display_links = ('range',)
-    list_filter = ('expected_traffic', 'expected_ports', 'expected_protocol')
 
 
 @admin.register(models.IPAddress)
