@@ -7,33 +7,33 @@ on:
 
 jobs:
   tag:
-    runs-on: ubuntu-latest
     name: get latest tag
+    runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.doit.outputs.new }}
     steps:
       - id: doit
-        run: echo "new=$(git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/v*"| cut -b 2-)" >> $GITHUB_OUTPUT
+        run: echo "new=$(${{ github.ref_name }} | cut -b 2-)" >> $GITHUB_OUTPUT
 
-  build_image:
-    needs: get_tag
+  build_img:
+    needs: tag
     uses: ./.github/workflows/build_image.yml
     with:
-      build-tag: ${{ needs.get_tag.outputs.tag }}
+      build-tag: ${{ needs.tag.outputs.tag }}
       cache-from: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
 
   tests:
-    needs: test_image
+    needs: [tag, build_img]
     uses: ./.github/workflows/run_tests.yml
     with:
-      build-tag: ${{ needs.get_tag.outputs.tag }}
+      build-tag: ${{ needs.tag.outputs.tag }}
 
   testscleanup:
     needs: tests
     uses: ./.github/workflows/test_cleanup.yml
 
   push:
-    needs: tests
+    needs: [tag, tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -53,8 +53,8 @@ jobs:
           file: dev/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ github.run_number }},ghcr.io/${{ github.repository }}:${{ needs.get_tag.outputs.tag }}
+          tags: ghcr.io/${{ github.repository }}:${{ github.run_number }},ghcr.io/${{ github.repository }}:${{ needs.tag.outputs.tag }}
           cache-from: |
             type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
-            type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-amd64
+            type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ needs.tag.outputs.tag }}-amd64
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest,mode=max
