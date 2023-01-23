@@ -13,7 +13,8 @@ jobs:
       tag: ${{ steps.doit.outputs.new }}
     steps:
       - id: doit
-        run: echo "new=$(${{ github.ref_name }} | cut -b 2-)" >> $GITHUB_OUTPUT
+        run: |
+          echo "new=$(echo ${{ github.ref_name }} | cut -b 2-)" >> $GITHUB_OUTPUT
 
   build_img:
     needs: tag
