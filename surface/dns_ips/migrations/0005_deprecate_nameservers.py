@@ -12,29 +12,23 @@ def move_data_over(apps, db_schema):
     a awful lot of entries in this model and hopefully that will help reduce issues with database locks.
     """
     domain_mod = apps.get_model("dns_ips", "dnsdomain")
-    updated_domains = dict()
-    for domain in (
-        domain_mod.objects.all()
-        .prefetch_related('dns_nameservers__name')
-        .exclude(register_nameservers=None, dns_nameservers=None)
-        .values('id', 'nameservers', 'register_nameservers__name', 'dns_nameservers__name')
+    updated_domains = list()
+    for domain in domain_mod.objects.prefetch_related('register_nameservers', 'dns_nameservers').exclude(
+        register_nameservers=None, dns_nameservers=None
     ):
-        obj = dict(id=domain['id'])
+        obj = dict(id=domain.id)
+        nameservers = set()
 
-        if domain.get('register_nameservers__name') is not None:
-            obj['nameservers'] = domain['register_nameservers__name']
-        elif domain.get('dns_nameservers__name') is not None:
-            obj['nameservers'] = domain['dns_nameservers__name']
+        for ns in domain.register_nameservers.all():
+            nameservers.add(ns.name)
 
-        if existing := updated_domains.get(obj['id']):
-            existing['nameservers'] = f'{existing["nameservers"]}, {obj["nameservers"]}'
-            updated_domains[obj['id']].update(existing)
-        else:
-            updated_domains[obj['id']] = obj
+        for ns in domain.dns_nameservers.all():
+            nameservers.add(ns.name)
 
-    domain_mod.objects.bulk_update(
-        [domain_mod(**kv) for kv in updated_domains.values()], ['nameservers'], batch_size=500
-    )
+        obj['nameservers'] = ", ".join(nameservers)
+        updated_domains.append(obj)
+
+    domain_mod.objects.bulk_update([domain_mod(**kv) for kv in updated_domains], ['nameservers'], batch_size=500)
 
 
 class Migration(migrations.Migration):
