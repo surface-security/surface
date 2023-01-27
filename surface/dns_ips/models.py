@@ -1,6 +1,5 @@
 import functools
 
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
 

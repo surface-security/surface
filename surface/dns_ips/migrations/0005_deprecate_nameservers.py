@@ -28,7 +28,7 @@ def move_data_over(apps, db_schema):
         obj['nameservers'] = ", ".join(nameservers)
         updated_domains.append(obj)
 
-    domain_mod.objects.bulk_update([domain_mod(**kv) for kv in updated_domains], ['nameservers'], batch_size=500)
+    domain_mod.objects.bulk_update(updated_domains, ['nameservers'], batch_size=500)
 
 
 class Migration(migrations.Migration):
