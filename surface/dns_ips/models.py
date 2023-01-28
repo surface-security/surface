@@ -3,6 +3,7 @@ import functools
 from django.db import models
 from django.utils import timezone
 
+
 from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
 from core_utils.fields import RangeModel
@@ -147,22 +148,6 @@ class IPAddress(models.Model):
         unique_together = (("source", "name"),)
 
 
-class DNSNameserver(models.Model):
-    objects = BulkUpdateOrCreateQuerySet.as_manager()
-
-    source = models.ForeignKey("Source", on_delete=models.CASCADE, default=default_source_unknown)
-    active = models.BooleanField(default=True)
-    last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True)
-    name = models.CharField(max_length=255, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "DNS Nameserver"
-        verbose_name_plural = "DNS Nameservers"
-
-
 class DNSDomain(models.Model):
     source = models.ForeignKey(
         "Source",
@@ -219,10 +204,7 @@ class DNSDomain(models.Model):
     # Other
     register_portfolio_sections = models.CharField(max_length=255, null=True, blank=True)
     register_account_name = models.CharField(max_length=255, null=True, blank=True)
-    register_nameservers = models.ManyToManyField(
-        "dns_ips.DNSNameserver", blank=True, related_name="register_nameservers"
-    )
-    dns_nameservers = models.ManyToManyField("dns_ips.DNSNameserver", blank=True, related_name="dns_nameservers")
+    register_nameservers = models.TextField(help_text='list of nameservers associated, separated by comma')
     register_tld_region = models.CharField(max_length=255, null=True, blank=True)
     register_tld_country = models.CharField(max_length=255, null=True, blank=True)
     register_email = models.CharField(max_length=255, null=True, blank=True)
