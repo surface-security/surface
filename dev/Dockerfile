@@ -4,8 +4,7 @@ FROM --platform=$BUILDPLATFORM ghcr.io/surface-security/compile-requirements:4 a
 # but the remaining stages that only use /requirements_full.txt will not
 
 RUN --mount=type=bind,target=/tmpapp \
-    python /run.py /tmpapp/surface/requirements.txt \
-                   /tmpapp/surface/requirements_prod.txt \
+    python /run.py /tmpapp/surface/requirements_prod.txt \
                    /tmpapp/surface/requirements_psql.txt > /requirements_full.txt
 
 FROM python:3.9-slim-buster as builder
