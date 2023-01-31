@@ -6,6 +6,9 @@ permissions:
 on:
   workflow_call:
     inputs:
+      build-tag:
+        required: true
+        type: string
       cache-from:
         required: true
         type: string
@@ -30,10 +33,10 @@ jobs:
           file: dev/Dockerfile
           platforms: linux/amd64
           outputs: type=docker,dest=/tmp/myimage.tar
-          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          tags: ghcr.io/${{ github.repository }}:${{ inputs.build-tag }}
           cache-from: ${{ inputs.cache-from }}
           # specific "cache-to" here as otherwise it would override the latest multi-platform cache with this amd64-only one
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-amd64,mode=max
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ inputs.build-tag }}-amd64,mode=max
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
