@@ -12,17 +12,17 @@ jobs:
       tag: ${{ steps.doit.outputs.new }}
     steps:
       - id: doit
-        $run: echo "new=$(echo ${{ github.ref_name }} | cut -b 2-)" >> $GITHUB_OUTPUT
+        run: echo "new=$(echo ${{ github.ref_name }} | cut -b 2-)" >> $GITHUB_OUTPUT
 
   build_img:
-    needs: get_tag
+    needs: tag
     uses: ./.github/workflows/build_image.yml
     with:
       build-tag: ${{ needs.tag.outputs.tag }}
       cache-from: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
 
   tests:
-    needs: [tag, test_image]
+    needs: [tag, build_img]
     uses: ./.github/workflows/run_tests.yml
     with:
       build-tag: ${{ needs.tag.outputs.tag }}
@@ -30,8 +30,6 @@ jobs:
   testscleanup:
     needs: [tag, tests]
     uses: ./.github/workflows/test_cleanup.yml
-    with:
-      build-tag: ${{ needs.tag.outputs.tag }}
 
   push:
     needs: [tag, tests]
