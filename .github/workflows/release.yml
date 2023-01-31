@@ -2,8 +2,7 @@ name: release tag
 
 on:
   release:
-    types:
-      - [created]
+    types: [created]
 
 jobs:
   tag:
