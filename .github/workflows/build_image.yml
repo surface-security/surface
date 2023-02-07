@@ -6,6 +6,9 @@ permissions:
 on:
   workflow_call:
     inputs:
+      build-tag:
+        required: true
+        type: string
       cache-from:
         required: true
         type: string
@@ -14,29 +17,29 @@ jobs:
   doit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
       - name: Login to GHCR
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           file: dev/Dockerfile
           platforms: linux/amd64
           outputs: type=docker,dest=/tmp/myimage.tar
-          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          tags: ghcr.io/${{ github.repository }}:${{ inputs.build-tag }}
           cache-from: ${{ inputs.cache-from }}
           # specific "cache-to" here as otherwise it would override the latest multi-platform cache with this amd64-only one
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}-amd64,mode=max
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ inputs.build-tag }}-amd64,mode=max
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: surface-tests
           path: /tmp/myimage.tar

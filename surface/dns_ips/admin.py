@@ -55,7 +55,7 @@ class IPRangeAdmin(DefaultFilterMixin, admin.ModelAdmin):
     ]
     list_display_links = ('range',)
     search_fields = ('range', 'zone', 'datacenter', 'description', 'notes')
-    list_filter = ('source', 'active', 'zone', 'datacenter')
+    list_filter = ('source', 'active', 'zone', 'datacenter', 'tags')
     exclude = ('range_min', 'range_max')
 
     def get_search_results(self, request, queryset, search_term):
@@ -76,14 +76,6 @@ class IPRangeAdmin(DefaultFilterMixin, admin.ModelAdmin):
 
     def get_default_filters(self, request):
         return {'active__exact': 1}
-
-
-@admin.register(models.IPRangeThirdParty)
-class IPRangeThirdParty(admin.ModelAdmin):
-    list_display = [field.name for field in models.IPRangeThirdParty._meta.fields if field.name not in ('id',)]
-    search_fields = ('range__range', 'description', 'expected_traffic', 'expected_ports', 'expected_protocol', 'sn_ref')
-    list_display_links = ('range',)
-    list_filter = ('expected_traffic', 'expected_ports', 'expected_protocol')
 
 
 @admin.register(models.IPAddress)
@@ -117,16 +109,6 @@ class IPAddress(DefaultFilterMixin, admin.ModelAdmin):
         return {'active__exact': 1}
 
 
-@admin.register(models.DNSNameserver)
-class DNSNameserver(DefaultFilterMixin, admin.ModelAdmin):
-    list_display = [field.name for field in models.DNSNameserver._meta.fields if field.name not in ('id',)]
-    list_display_links = ('name',)
-    search_fields = ('name',)
-
-    def get_default_filters(self, request):
-        return {'active__exact': 1}
-
-
 @admin.register(models.DNSDomain)
 class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
     list_display = (
@@ -134,8 +116,7 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
         'active',
         'last_seen',
         'name',
-        'get_register_nameservers',
-        'get_dns_nameservers',
+        'register_nameservers',
         'registration_date',
         'expire_date',
         'raw_whois',
@@ -147,8 +128,7 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
     search_fields = (
         'name',
         'notes',
-        'register_nameservers__name',
-        'dns_nameservers__name',
+        'register_nameservers',
         'registration_date',
         'expire_date',
         'raw_whois',
@@ -259,16 +239,6 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
         'register_cost_center',
         'register_website',
     )
-
-    def get_register_nameservers(self, obj):
-        return "\n".join([p.name for p in obj.register_nameservers.all()])
-
-    get_register_nameservers.short_description = 'Register Nameservers'
-
-    def get_dns_nameservers(self, obj):
-        return "\n".join([p.name for p in obj.dns_nameservers.all()])
-
-    get_dns_nameservers.short_description = 'DNS Nameservers'
 
     def get_default_filters(self, request):
         return {'active__exact': 1}

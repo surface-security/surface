@@ -2,15 +2,19 @@ name: tests
 
 on:
   workflow_call:
+    inputs:
+      build-tag:
+        required: true
+        type: string
 
 jobs:
   style:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
 
@@ -24,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.9, 3.11]
         database:
         - db: mysql
           url: mysql://root:root@127.0.0.1:8877/surface
@@ -33,15 +37,14 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5
-        env:
-          MYSQL_ROOT_PASSWORD: root
+        image: mysql:8
         ports:
         - 8877:3306
         # needed because the container does not provide a healthcheck
-        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=root --entrypoint sh mysql -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+
       postgres:
-        image: postgres:10
+        image: postgres:15
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: root
@@ -53,24 +56,23 @@ jobs:
 
     steps:
       - name: Download artifacts (Docker images) from previous workflows
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: surface-tests
           path: /tmp
 
       - name: Load Docker images from previous workflows
-        run: |
-          docker load --input /tmp/myimage.tar
+        run: docker load --input /tmp/myimage.tar
 
       - name: run tests
         run: |
           docker run --network host \
                      -e SURF_DATABASE_URL=${{ matrix.database.url }} \
                      -v $(pwd)/cov/:/report \
-                     ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
+                     ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
                      sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           # do not fail ci for now - https://github.com/codecov/codecov-action/issues/557#issuecomment-1073777427

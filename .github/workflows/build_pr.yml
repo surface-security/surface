@@ -1,24 +1,45 @@
-name: ci pr
+name: pull request ci
 
 on:
-  push:
-    branches-ignore:
+  pull_request:
+    branches:
       - main
-      - dev
-      - dev-*
-
+      
 jobs:
-  test_image:
-    uses: ./.github/workflows/lib_test_image.yml
+  tag:
+    name: get latest tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.doit.outputs.new }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: doit
+        env:
+          FALLBACK_VERSION: "1.0.0"
+        run: |
+          latest=$(git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/v*" | cut -b 2-)
+          if [[ $latest -eq "" ]]; then
+            latest=$FALLBACK_VERSION
+            echo "No tag found, using fallback: $latest"
+          fi
+          new=$(echo $latest | awk -F. '{OFS="."; $NF+=1; print $0}')
+          echo "new=$new" >> $GITHUB_OUTPUT
+  
+  build_img:
+    needs: tag
+    uses: ./.github/workflows/build_image.yml
     with:
+      build-tag: ${{ needs.tag.outputs.tag }}-${{ github.run_id }}-dev
       cache-from: |
         type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:latest
-        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ github.ref_name }}
+        type=registry,ref=ghcr.io/${{ github.repository }}-builder-cache:${{ needs.tag.outputs.tag }}-${{ github.run_id }}-dev
 
   tests:
-    needs: test_image
-    uses: ./.github/workflows/lib_tests.yml
-  
+   needs: [tag, build_img]
+   uses: ./.github/workflows/run_tests.yml
+   with:
+    build-tag: ${{ needs.tag.outputs.tag }}-${{ github.run_id }}-dev
+
   testscleanup:
-    needs: tests
-    uses: ./.github/workflows/lib_test_cleanup.yml
+   needs: tests
+   uses: ./.github/workflows/test_cleanup.yml

@@ -3,6 +3,7 @@ import functools
 from django.db import models
 from django.utils import timezone
 
+
 from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
 from core_utils.fields import RangeModel
@@ -91,6 +92,7 @@ class IPRange(RangeModel):
     datacenter = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+    tags = models.ManyToManyField("dns_ips.Tag", blank=True)
 
     def __str__(self):
         return self.range
@@ -101,23 +103,6 @@ class IPRange(RangeModel):
     class Meta:
         verbose_name = "IP Range"
         verbose_name_plural = "IP Ranges"
-
-
-class IPRangeThirdParty(models.Model):
-    range = models.ForeignKey("dns_ips.IPRange", blank=True, null=True, on_delete=models.CASCADE)
-    organisation = models.ForeignKey("Organisation", blank=True, null=True, on_delete=models.CASCADE)
-    sn_ref = models.CharField(max_length=64, blank=True, null=True)
-    expected_traffic = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    expected_ports = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    expected_protocol = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.sn_ref} ({self.expected_traffic})"
-
-    class Meta:
-        verbose_name = "IP Range - Third Party (SN)"
-        verbose_name_plural = "IP Ranges - Third Parties (SN)"
 
 
 class IPAddress(models.Model):
@@ -161,22 +146,6 @@ class IPAddress(models.Model):
         verbose_name = "IP Address"
         verbose_name_plural = "IP Addresses"
         unique_together = (("source", "name"),)
-
-
-class DNSNameserver(models.Model):
-    objects = BulkUpdateOrCreateQuerySet.as_manager()
-
-    source = models.ForeignKey("Source", on_delete=models.CASCADE, default=default_source_unknown)
-    active = models.BooleanField(default=True)
-    last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True)
-    name = models.CharField(max_length=255, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "DNS Nameserver"
-        verbose_name_plural = "DNS Nameservers"
 
 
 class DNSDomain(models.Model):
@@ -235,10 +204,7 @@ class DNSDomain(models.Model):
     # Other
     register_portfolio_sections = models.CharField(max_length=255, null=True, blank=True)
     register_account_name = models.CharField(max_length=255, null=True, blank=True)
-    register_nameservers = models.ManyToManyField(
-        "dns_ips.DNSNameserver", blank=True, related_name="register_nameservers"
-    )
-    dns_nameservers = models.ManyToManyField("dns_ips.DNSNameserver", blank=True, related_name="dns_nameservers")
+    register_nameservers = models.TextField(help_text='list of nameservers associated, separated by comma')
     register_tld_region = models.CharField(max_length=255, null=True, blank=True)
     register_tld_country = models.CharField(max_length=255, null=True, blank=True)
     register_email = models.CharField(max_length=255, null=True, blank=True)
