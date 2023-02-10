@@ -40,3 +40,7 @@ Open http://localhost:8080 and login as `admin`.
 Quick check:
 * add IPAddress or DNSRecord (and tag it `is_external`), create a `Scanner` using `example` image and choose `Run scanner` from the actions dropdown
 * check scan logs
+
+## Documentation
+
+We have more documents and instructions on the project's [wiki](https://github.com/surface-security/surface/wiki)
