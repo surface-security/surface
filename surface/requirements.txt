@@ -19,7 +19,7 @@ django-dbcleanup==0.1.2
 django-logbasecommand==0.0.1
 django-notification-sender[slack]==0.0.4
 django-dkron==1.0.4
-django-slack-processor==0.0.3
+django-slack-processor==0.0.4
 django-olympus==0.0.3
 django-environ-ppb[vault]==1.0.0
 
