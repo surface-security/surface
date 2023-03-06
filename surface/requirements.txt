@@ -10,7 +10,7 @@ django-filter==2.4.0
 django-import-export==2.5.0
 django-nested-admin==3.3.2
 django-daterangefilter==1.0.0
-django-jsoneditor==0.1.6
+django-jsoneditor==0.2.4
 netaddr==0.8.0
 
 # our own
