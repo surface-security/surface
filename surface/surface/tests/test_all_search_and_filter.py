@@ -20,24 +20,18 @@ def _clean_field(fieldname):
 def _method_factory(model_class, model_admin):
     def method_tester(test_case: TestCase):
         # Test the filters and searchfields
-        for fieldname in list(model_admin.list_filter) + list(
-            model_admin.search_fields
-        ):
+        for fieldname in list(model_admin.list_filter) + list(model_admin.search_fields):
             fieldname = _clean_field(fieldname)
             if not fieldname:
                 continue
             try:
                 try:
                     # validate that filter can be executed for fieldname, don't care about result
-                    test_case.assertIsInstance(
-                        model_class.objects.filter(**{fieldname: "1"}).count(), int
-                    )
+                    test_case.assertIsInstance(model_class.objects.filter(**{fieldname: "1"}).count(), int)
                 except ValidationError:
                     # Datetime fields?
                     test_case.assertIsInstance(
-                        model_class.objects.filter(
-                            **{fieldname: timezone.now()}
-                        ).count(),
+                        model_class.objects.filter(**{fieldname: timezone.now()}).count(),
                         int,
                     )
             except Exception as e:
