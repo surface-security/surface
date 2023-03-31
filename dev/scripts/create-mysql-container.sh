@@ -8,5 +8,5 @@ docker run -d --name dev-surface-mysql \
               -e MYSQL_DATABASE=surface \
               -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
               mysql:8.0.30
-# Hack to wait a bit for MySQL - better if we do it with a check in the container, TODO later
+
 docker exec dev-surface-mysql bash -c 'mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql'
