@@ -11,6 +11,7 @@
 /coverage
 .pyc
 .vscode
+.python-version
 .idea/
 .vagrant
 /.idea
