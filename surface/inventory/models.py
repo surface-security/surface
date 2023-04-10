@@ -13,9 +13,6 @@ class Integration(models.Model):
         github = 'Github'
 
     name = models.CharField(max_length=255, null=False, blank=False)
-    type = models.CharField(
-        max_length=64, choices=IntegrationType.choices, verbose_name="Integration Type", db_index=True, editable=False
-    )
     description = models.TextField(null=True, blank=True)
     actions = models.JSONField(null=False, blank=False)
     enabled = models.BooleanField(default=True)

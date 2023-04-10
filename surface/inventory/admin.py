@@ -5,9 +5,8 @@ from . import models
 
 @register(models.Integration)
 class IntegrationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'description', 'actions')
+    list_display = ('name', 'description', 'actions')
     search_fieds = ('name', 'description', 'actions')
-    list_filter = ('type',)
 
     def has_add_permission(self, request):
         return False
