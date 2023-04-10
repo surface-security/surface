@@ -6,12 +6,6 @@ class Person(models.Model):
 
 
 class Integration(models.Model):
-    class IntegrationType(models.TextChoices):
-        aws = 'AWS'
-        cloudflare = 'Cloudflare'
-        gcp = 'GCP'
-        github = 'Github'
-
     name = models.CharField(max_length=255, null=False, blank=False)
     description = models.TextField(null=True, blank=True)
     actions = models.JSONField(null=False, blank=False)
