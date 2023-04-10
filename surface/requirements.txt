@@ -22,6 +22,7 @@ django-dkron==1.1.0
 django-slack-processor==0.0.4
 django-olympus==0.0.3
 django-environ-ppb[vault]==1.0.0
+django-impersonator==0.0.1
 
 mysqlclient==2.0.3
 tqdm==4.48.1  # for core_utils that is not really a app/package ..?
