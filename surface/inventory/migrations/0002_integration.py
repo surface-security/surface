@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('inventory', '0001_initial_20211102'),
     ]
@@ -15,7 +14,16 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
-                ('type', models.CharField(choices=[('AWS', 'Aws'), ('Cloudflare', 'Cloudflare'), ('GCP', 'Gcp'), ('Github', 'Github')], db_index=True, editable=False, max_length=64, verbose_name='Integration Type')),
+                (
+                    'type',
+                    models.CharField(
+                        choices=[('AWS', 'Aws'), ('Cloudflare', 'Cloudflare'), ('GCP', 'Gcp'), ('Github', 'Github')],
+                        db_index=True,
+                        editable=False,
+                        max_length=64,
+                        verbose_name='Integration Type',
+                    ),
+                ),
                 ('description', models.TextField(blank=True, null=True)),
                 ('actions', models.JSONField()),
             ],

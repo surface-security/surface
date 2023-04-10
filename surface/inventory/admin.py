@@ -7,11 +7,11 @@ from . import models
 class IntegrationAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'description', 'actions')
     search_fieds = ('name', 'description', 'actions')
-    list_filter = ('type', )
+    list_filter = ('type',)
 
     def has_add_permission(self, request):
         return False
-    
+
     def has_change_permission(self, request):
         return False
 

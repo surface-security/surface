@@ -7,24 +7,20 @@ class Person(models.Model):
 
 class Integration(models.Model):
     class IntegrationType(models.TextChoices):
-            aws = 'AWS'
-            cloudflare = 'Cloudflare'
-            gcp = 'GCP'
-            github = 'Github'
+        aws = 'AWS'
+        cloudflare = 'Cloudflare'
+        gcp = 'GCP'
+        github = 'Github'
 
     name = models.CharField(max_length=255, null=False, blank=False)
     type = models.CharField(
-        max_length=64,
-        choices=IntegrationType.choices,
-        verbose_name="Integration Type",
-        db_index=True,
-        editable=False
+        max_length=64, choices=IntegrationType.choices, verbose_name="Integration Type", db_index=True, editable=False
     )
     description = models.TextField(null=True, blank=True)
     actions = models.JSONField(null=False, blank=False)
 
     def __str__(self) -> str:
-         return f'{self.name} ({self.type})'
+        return f'{self.name} ({self.type})'
 
 
 class Application(models.Model):
