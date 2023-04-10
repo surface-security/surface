@@ -18,6 +18,7 @@ class Integration(models.Model):
     )
     description = models.TextField(null=True, blank=True)
     actions = models.JSONField(null=False, blank=False)
+    enabled = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return f'{self.name} ({self.type})'
