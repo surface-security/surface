@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+
 import ppbenviron
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'impersonate',
     'surfapp',
     'dkron',
     'notifications',
@@ -48,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'impersonate.middleware.ImpersonateMiddleware',
 ]
 
 ROOT_URLCONF = 'surface.urls'
@@ -71,7 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'surface.wsgi.application'
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -90,7 +92,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -103,7 +104,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -126,7 +126,6 @@ if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
         DATABASES['default']['TEST'] = {}
     DATABASES['default']['TEST']['CHARSET'] = 'utf8mb4'
     DATABASES['default']['TEST']['COLLATION'] = 'utf8mb4_general_ci'
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
