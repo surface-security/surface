@@ -1,0 +1,41 @@
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+target-version = ['py39']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | \.venv3
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+)/
+'''
+
+[tool.ruff]
+exclude = [
+    '.git',
+    '__pycache__',
+    'venv',
+    'venv3',
+]
+ignore = []
+line-length = 120
+select = [
+    'E',
+    'F',
+    'W',
+    "I001",
+]
+src = ['surface', 'e2e']
+
+[tool.ruff.isort]
+known-first-party = ["theme", "dkron", "django_restful_admin", "slackbot", "dbcleanup", "olympus", "notifications", "ppbenviron", "logbasecommand", "impersonate", "apitokens"]
