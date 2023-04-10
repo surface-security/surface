@@ -12,7 +12,7 @@ class Integration(models.Model):
     enabled = models.BooleanField(default=True)
 
     def __str__(self) -> str:
-        return f'{self.name} ({self.type})'
+        return self.name
 
 
 class Application(models.Model):
