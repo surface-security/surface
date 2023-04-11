@@ -1,0 +1,7 @@
+{% extends "includes/navigation.html" %}
+
+{% block menu_options %}
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="{% url 'admin:auth_user_change' request.user.pk %}">Profile</a>
+<a class="dropdown-item" href="{% url 'admin:apitokens_mytoken_changelist' %}">API Tokens</a>
+{% endblock %}
