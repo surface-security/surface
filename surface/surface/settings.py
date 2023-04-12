@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'dns_ips',
     'scanners',
     'scanner_baseline',
+    'knox',
+    'apitokens',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +60,8 @@ ROOT_URLCONF = 'surface.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # surfapp templates required here as well to override `theme` ones (as theme needs to come first in INSTALLED_APPS)
+        # surfapp templates required here as well to override `theme` ones,
+        # (as theme needs to come first in INSTALLED_APPS)
         'DIRS': [BASE_DIR / 'surfapp' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
