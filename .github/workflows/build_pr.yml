@@ -43,3 +43,7 @@ jobs:
   testscleanup:
    needs: tests
    uses: ./.github/workflows/test_cleanup.yml
+
+  integration:
+    needs: [tests, testscleanup]
+    uses: ./.github/workflows/integration.yml
