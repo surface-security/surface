@@ -11,13 +11,14 @@
 /coverage
 .pyc
 .vscode
+.python-version
 .idea/
 .vagrant
 /.idea
 /build
 /dist
 /env
-local.env
+*local.env
 *.retry
 *.sqlite3-journal
 *.swp
