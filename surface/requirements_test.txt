@@ -6,3 +6,6 @@ pytest-django==4.5.2
 pytest-xdist==3.2.1
 pytest-socket==0.4.0
 responses==0.22.0
+
+# for integration testing
+selenium==4.8.3
