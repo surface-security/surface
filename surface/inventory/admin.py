@@ -7,8 +7,14 @@ from django.utils.html import format_html
 
 @register(models.Integration)
 class IntegrationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'get_content_source', 'description', '_actions', 'enabled')
-    list_filter = (('content_source', admin.RelatedOnlyFieldListFilter), 'enabled')
+    list_display = [field.name for field in models.Integration._meta.fields if field.name not in ('content_source')]    
+    list_select_related = ['content_source']
+    exclude = ('content_source',)
+
+    def get_readonly_fields(self, request, obj=None):
+        l = list(super().get_readonly_fields(request, obj=obj))
+        l.insert(1, 'get_content_source')
+        return l
 
     def get_content_source(self, obj):
         meta = obj.content_source.model_class()._meta

@@ -32,7 +32,7 @@ class Integration(models.Model):
         return self.content_source
 
     def __str__(self):
-        return f'{self.pk} [{self.cached_content_source.app_label}] - {self.title}'
+        return f'{self.pk} [{self.cached_content_source.app_label}] - {self.name}'
 
 
 class Application(models.Model):
