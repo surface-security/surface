@@ -17,11 +17,13 @@ class IntegrationAdmin(admin.ModelAdmin):
             reverse(f'admin:{meta.app_label}_{meta.model_name}_change', args=(obj.pk,)),
             f'{meta.app_label}: {meta.verbose_name}',
         )
+
     get_content_source.short_description = 'Content Source'
     get_content_source.admin_order_field = 'content_source'
 
     def _actions(self, obj):
         return ', '.join(obj.actions)
+
     _actions.short_description = 'Actions'
 
 
