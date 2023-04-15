@@ -2,6 +2,8 @@ from django.contrib.admin.sites import site
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
+from django.db.utils import DataError
+from django.db import transaction
 
 
 def _clean_field(fieldname):
@@ -27,11 +29,18 @@ def _method_factory(model_class, model_admin):
             try:
                 try:
                     # validate that filter can be executed for fieldname, don't care about result
-                    test_case.assertIsInstance(model_class.objects.filter(**{fieldname: "1"}).count(), int)
+                    with transaction.atomic():
+                        test_case.assertIsInstance(model_class.objects.filter(**{fieldname: "1"}).count(), int)
                 except ValidationError:
                     # Datetime fields?
                     test_case.assertIsInstance(
                         model_class.objects.filter(**{fieldname: timezone.now()}).count(),
+                        int,
+                    )
+                except DataError:
+                    # IP fields?
+                    test_case.assertIsInstance(
+                        model_class.objects.filter(**{fieldname: "8.8.8.8"}).count(),
                         int,
                     )
             except Exception as e:
