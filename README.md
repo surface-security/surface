@@ -7,10 +7,6 @@
 
 Asset inventory tracking and security scanners.
 
-## Setting it up
-
-[TODO - list existing settings / enviornment variables and document them]
-
 ## Quickstart
 
 ### AWS
@@ -37,6 +33,12 @@ Open http://localhost:8080 and login as `admin`.
 
 `box_setup.sh` created a `local` Rootbox and added the `example`, `httpx` and `nmap` scanners images (all from [here](https://github.com/surface-security/?q=scanner-)).
 
+_You might need to reload `nginx` and `Surface` so the migrations and the webserver are put in effect._ You can do so with `docker container restart dev-nginx-1 dev-surface-1`. 
+
 Quick check:
 * add IPAddress or DNSRecord (and tag it `is_external`), create a `Scanner` using `example` image and choose `Run scanner` from the actions dropdown
 * check scan logs
+
+## Documentation
+
+We have in-depth documentation and instructions on this repository's [wiki page](https://github.com/surface-security/surface/wiki).
