@@ -1,10 +1,8 @@
 import functools
 
+from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 from django.db import models
 from django.utils import timezone
-
-
-from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
 from core_utils.fields import RangeModel
 
@@ -163,6 +161,9 @@ class DNSDomain(models.Model):
     registration_date = models.DateTimeField(null=True, blank=True, db_index=True)
     expire_date = models.DateTimeField(null=True, blank=True, db_index=True)
     raw_whois = models.TextField(null=True, blank=True)
+    nameservers = models.TextField(
+        default="", blank=True, help_text='list of nameservers associated, separated by comma'
+    )
     # Options for Domain
     register_management_status = models.BooleanField(default=False, db_index=True)
     register_dns_managed = models.BooleanField(default=False, db_index=True)

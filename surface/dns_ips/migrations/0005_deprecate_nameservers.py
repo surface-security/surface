@@ -28,7 +28,7 @@ def move_data_over(apps, db_schema):
         obj['nameservers'] = ", ".join(nameservers)
         updated_domains.append(obj)
 
-    domain_mod.objects.bulk_update(updated_domains, ['nameservers'], batch_size=500)
+    domain_mod.objects.bulk_update([domain_mod(**kv) for kv in updated_domains], ['nameservers'], batch_size=500)
 
 
 class Migration(migrations.Migration):
@@ -41,7 +41,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dnsdomain',
             name='nameservers',
-            field=models.TextField(help_text='list of nameservers associated, separated by comma'),
+            field=models.TextField(
+                blank=True, default='', help_text='list of nameservers associated, separated by comma'
+            ),
         ),
         migrations.RunPython(move_data_over, reverse_code=migrations.RunPython.noop),
         migrations.RemoveField(
