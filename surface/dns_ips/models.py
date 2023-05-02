@@ -202,7 +202,9 @@ class DNSDomain(models.Model):
     # Other
     register_portfolio_sections = models.CharField(max_length=255, null=True, blank=True)
     register_account_name = models.CharField(max_length=255, null=True, blank=True)
-    register_nameservers = models.TextField(help_text='list of nameservers associated, separated by comma')
+    register_nameservers = models.TextField(
+        blank=True, default="", help_text='list of nameservers associated, separated by comma'
+    )
     register_tld_region = models.CharField(max_length=255, null=True, blank=True)
     register_tld_country = models.CharField(max_length=255, null=True, blank=True)
     register_email = models.CharField(max_length=255, null=True, blank=True)
