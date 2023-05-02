@@ -1,10 +1,8 @@
 import functools
 
+from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 from django.db import models
 from django.utils import timezone
-
-
-from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
 from core_utils.fields import RangeModel
 
