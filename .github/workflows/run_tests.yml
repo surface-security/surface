@@ -70,7 +70,7 @@ jobs:
                      -e SURF_DATABASE_URL=${{ matrix.database.url }} \
                      -v $(pwd)/cov/:/report \
                      ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
-                     sh -c 'manage.py makemigrations --dry-run --check'
+                     sh -c './manage.py makemigrations --dry-run --check'
 
       - name: run tests
         run: |
