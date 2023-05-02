@@ -65,7 +65,7 @@ jobs:
         run: docker load --input /tmp/myimage.tar
 
       - name: Check migrations for changes in models
-        if: contains(github.event_path == 'models.py')
+        if: github.event_path == /models.*\.py
         run: |
           docker run --network host \
                      -e SURF_DATABASE_URL=${{ matrix.database.url }} \
