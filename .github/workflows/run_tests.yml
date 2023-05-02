@@ -64,6 +64,15 @@ jobs:
       - name: Load Docker images from previous workflows
         run: docker load --input /tmp/myimage.tar
 
+      - name: Check migrations for changes in models
+        if: contains(github.event_path == 'models.py')
+        run: |
+          docker run --network host \
+                     -e SURF_DATABASE_URL=${{ matrix.database.url }} \
+                     -v $(pwd)/cov/:/report \
+                     ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
+                     sh -c 'manage.py makemigrations --dry-run'
+
       - name: run tests
         run: |
           docker run --network host \
