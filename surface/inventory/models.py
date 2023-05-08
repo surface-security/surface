@@ -12,7 +12,7 @@ class Integration(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    actions = models.JSONField(null=False, blank=False)
+    actions = models.JSONField()
     secrets = EncryptedTextField(null=True, blank=False)
     enabled = models.BooleanField(default=True)
 
