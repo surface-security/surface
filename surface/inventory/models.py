@@ -10,7 +10,7 @@ class Person(models.Model):
 class Integration(models.Model):
     content_source = models.ForeignKey(ct_models.ContentType, on_delete=models.CASCADE)
 
-    name = models.CharField(max_length=255, null=False, blank=False)
+    name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     actions = models.JSONField(null=False, blank=False)
     secrets = EncryptedTextField(null=True, blank=False)
