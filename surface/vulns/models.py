@@ -27,7 +27,7 @@ class Finding(models.Model):
 
         # to be reviewed by the team: NEW -> OPEN/CLOSED
         NEW = 1
-        # reviewed by the team, included in finding list: OPEN -> CLOSED
+        # reviewed by the team, included in finding list: OPEN -> RESOLVED
         OPEN = 2
         # nothing to do with these Finding. Final state.
         CLOSED = 3
