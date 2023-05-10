@@ -25,11 +25,11 @@ class Finding(models.Model):
         Do not add a state if the transitions for that state are the same as an existing one.
         """
 
-        # to be reviewed by Security Testing: NEW -> OPEN/CLOSED
+        # to be reviewed by the team: NEW -> OPEN/CLOSED
         NEW = 1
-        # viewed by the teams, included in score: OPEN -> CLOSED
+        # reviewed by the team, included in finding list: OPEN -> CLOSED
         OPEN = 2
-        # no score, nothing to do. Final state.
+        # nothing to do with these Finding. Final state.
         CLOSED = 3
         # resolved/mitigated, can be re-open: RESOLVED -> NEW/OPEN
         RESOLVED = 4
