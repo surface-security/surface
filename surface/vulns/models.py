@@ -23,7 +23,7 @@ class Finding(models.Model):
         States represent a point in the workflow.
         States are not Status.
         Do not add a state if the transitions for that state are the same as an existing one.
-        
+
         mermaid flowchart (https://mermaid.live/)
         flowchart TD
           NEW -->|valid, assigned for resolution| OPEN
