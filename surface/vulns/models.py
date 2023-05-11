@@ -23,15 +23,18 @@ class Finding(models.Model):
         States represent a point in the workflow.
         States are not Status.
         Do not add a state if the transitions for that state are the same as an existing one.
+        
+        mermaid flowchart (https://mermaid.live/)
+        flowchart TD
+          NEW -->|valid, assigned for resolution| OPEN
+          NEW -->|invalid, false positive or known accepted risk | CLOSED
+          OPEN -->|resolved| RESOLVED
+          RESOLVED -->|regression| NEW
         """
 
-        # to be reviewed by the team: NEW -> OPEN/CLOSED
         NEW = 1
-        # reviewed by the team, included in finding list: OPEN -> RESOLVED
         OPEN = 2
-        # nothing to do with these Finding. Final state.
         CLOSED = 3
-        # resolved/mitigated, can be re-open: RESOLVED -> NEW/OPEN
         RESOLVED = 4
 
     content_source = models.ForeignKey(ct_models.ContentType, on_delete=models.CASCADE, related_name="content_source")
