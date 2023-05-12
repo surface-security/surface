@@ -39,6 +39,8 @@ jobs:
         with:
           name: surface-tests
           path: /tmp
+      - name: Load Docker images from previous workflows
+        run: docker load --input /tmp/myimage.tar
       - name: Check for not-migrated changes in models
         run: |
           docker run --network host \
