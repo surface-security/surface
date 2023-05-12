@@ -24,6 +24,28 @@ jobs:
     - name: Style check
       run : make style_check
 
+  migration_check:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        ports:
+        - 8877:3306
+        # needed because the container does not provide a healthcheck
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=root --entrypoint sh mysql -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+    steps:
+      - name: Download artifacts (Docker images) from previous workflows
+        uses: actions/download-artifact@v3
+        with:
+          name: surface-tests
+          path: /tmp
+      - name: Check for not-migrated changes in models
+        run: |
+          docker run --network host \
+                     -e SURF_DATABASE_URL="mysql://root:root@127.0.0.1:8877/surface" \
+                     ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
+                     sh -c './manage.py makemigrations --dry-run --check'
+
   pytest:
     runs-on: ubuntu-latest
     strategy:
@@ -63,14 +85,6 @@ jobs:
 
       - name: Load Docker images from previous workflows
         run: docker load --input /tmp/myimage.tar
-
-      - name: Check migrations for changes in models
-        run: |
-          docker run --network host \
-                     -e SURF_DATABASE_URL=${{ matrix.database.url }} \
-                     -v $(pwd)/cov/:/report \
-                     ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
-                     sh -c './manage.py makemigrations --dry-run --check'
 
       - name: run tests
         run: |
