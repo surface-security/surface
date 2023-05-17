@@ -1,19 +1,5 @@
-from django.db import models
 from django.contrib.contenttypes import models as ct_models
-from django.core import checks
-
-
-class Person(models.Model):
-    name = models.CharField(max_length=128)
-
-
-class Application(models.Model):
-    tla = models.CharField(max_length=128, blank=True, null=True, db_index=True)  # three/ten letter acronym
-    managed_by = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
-    owned_by = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
-    director = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
-    director_direct = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
-    dev_lead = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
+from django.db import models
 
 
 class FindingInheritanceQS(models.QuerySet):
@@ -37,18 +23,21 @@ class Finding(models.Model):
         States represent a point in the workflow.
         States are not Status.
         Do not add a state if the transitions for that state are the same as an existing one.
+
+        mermaid flowchart (https://mermaid.live/)
+        flowchart TD
+          NEW -->|valid, assigned for resolution| OPEN
+          NEW -->|invalid, false positive or known accepted risk | CLOSED
+          OPEN -->|resolved| RESOLVED
+          RESOLVED -->|regression| NEW
         """
 
-        # to be reviewed by Security Testing: NEW -> OPEN/CLOSED
         NEW = 1
-        # viewed by the teams, included in score: OPEN -> CLOSED
         OPEN = 2
-        # no score, nothing to do. Final state.
         CLOSED = 3
-        # resolved/mitigated, can be re-open: RESOLVED -> NEW/OPEN
         RESOLVED = 4
 
-    content_source = models.ForeignKey(ct_models.ContentType, on_delete=models.CASCADE)
+    content_source = models.ForeignKey(ct_models.ContentType, on_delete=models.CASCADE, related_name="content_source")
 
     title = models.TextField(blank=True)
     summary = models.TextField(null=True, blank=True)
@@ -59,7 +48,12 @@ class Finding(models.Model):
     last_seen_date = models.DateTimeField(blank=True, null=True)
 
     application = models.ForeignKey(
-        'inventory.Application', blank=True, null=True, on_delete=models.SET_NULL, verbose_name="Application"
+        'inventory.Application',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name="Application",
+        related_name="application",
     )
 
     related_to = models.ManyToManyField('self', blank=True, help_text='Other findings related to this one')
@@ -74,21 +68,6 @@ class Finding(models.Model):
     @classmethod
     def content_type(cls):
         return ct_models.ContentType.objects.get_for_model(cls)
-
-    @classmethod
-    def check(cls, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(
-            [
-                checks.Warning(
-                    'deprecated model',
-                    hint='Deprecation Warning: Migrate inventory.Finding data to vuln.Finding instead. inventory.Finding will be decommissioned in Surface 2.0',
-                    obj=cls,
-                    id='inventory.W001',
-                )
-            ]
-        )
-        return errors
 
     @property
     def cached_content_source(self):

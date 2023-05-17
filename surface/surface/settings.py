@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'scanner_baseline',
     'knox',
     'apitokens',
+    'vulns',
 ]
 
 MIDDLEWARE = [
