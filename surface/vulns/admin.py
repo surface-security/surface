@@ -26,7 +26,7 @@ class FindingAdmin(admin.ModelAdmin):
         "state",
     ]
 
-    @admin_link('application', 'TLA')
+    @admin_link('application', 'Application')
     def get_tla_link(self, app):
         return str(app)
 
