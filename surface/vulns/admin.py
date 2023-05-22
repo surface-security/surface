@@ -2,22 +2,33 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
+from core_utils.decorators import admin_link
 from vulns import models
 
 
 @admin.register(models.Finding)
 class FindingAdmin(admin.ModelAdmin):
+    search_fields = ['id', 'title', 'summary']
+    list_display = [
+        'id',
+        'title',
+        'severity',
+        'summary',
+        'state',
+        'get_tla_link',
+        'get_content_source',
+    ]
+
     list_select_related = ['content_source']
 
-    def get_list_display(self, request):
-        l = super().get_list_display(request).copy()
-        l.insert(1, 'get_content_source')
-        return l
+    list_filter = [
+        "severity",
+        "state",
+    ]
 
-    def get_readonly_fields(self, request, obj=None):
-        l = super().get_readonly_fields(request, obj=obj).copy()
-        l.insert(1, 'get_content_source')
-        return l
+    @admin_link('application', 'Application')
+    def get_tla_link(self, app):
+        return str(app)
 
     def get_content_source(self, obj):
         meta = obj.content_source.model_class()._meta
