@@ -1,5 +1,5 @@
 # Core Libraries
-Django==3.2.18
+Django==3.2.19
 django-admin-rangefilter==0.6.1
 django-after-response==0.2.2
 django-object-actions==4.1.0
@@ -18,7 +18,7 @@ django-surface-theme==0.0.8
 django-dbcleanup==0.1.3
 django-logbasecommand==0.0.1
 django-notification-sender[slack]==0.0.4
-django-dkron==1.1.0
+django-dkron==1.1.1
 django-slack-processor==0.0.4
 django-olympus==0.0.3
 django-environ-ppb[vault]==1.0.0
