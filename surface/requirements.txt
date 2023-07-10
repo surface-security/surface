@@ -25,7 +25,7 @@ django-environ-ppb[vault]==1.0.0
 django-impersonator==0.0.1
 django-apitokens==0.0.1
 
-mysqlclient==2.0.3
+mysqlclient==2.2.0
 tqdm==4.65.0  # for core_utils that is not really a app/package ..?
 django-database-locks==0.5  # distributed locks (on mysql)
 django-bulk-update-or-create==0.3.0  # for faster batch operations with update_or_create
