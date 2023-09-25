@@ -2,7 +2,7 @@
 Django==3.2.20
 django-admin-rangefilter==0.10.0
 django-after-response==0.2.2
-django-object-actions==4.1.0
+django-object-actions==4.2.0
 djangorestframework==3.14.0
 django-restful-admin==1.1.3
 djangorestframework-queryfields==1.0.0
