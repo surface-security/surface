@@ -91,6 +91,9 @@ class IPRange(RangeModel):
     description = models.TextField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField("dns_ips.Tag", blank=True)
+    application = models.ForeignKey(
+        'inventory.Application', blank=True, null=True, on_delete=models.SET_NULL, verbose_name="Application"
+    )
 
     def __str__(self):
         return self.range
