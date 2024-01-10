@@ -1,30 +1,26 @@
+import netaddr
 from django.contrib import admin
 from django.db.models.query import QuerySet
 from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.shortcuts import render
-from django.utils.html import format_html_join, format_html
-
-import netaddr
+from django.utils.html import format_html_join
 from import_export import resources
 from import_export.admin import ExportActionMixin, ImportMixin
+
 from core_utils.admin_filters import DefaultFilterMixin
+from core_utils.decorators import admin_link_helper, relatedobj_field
 from theme.filters import RelatedFieldAjaxListFilter
-from core_utils.decorators import relatedobj_field, admin_link_helper
 
 from . import models
 
 
 @admin.register(models.Source)
 class SourceAdmin(DefaultFilterMixin, admin.ModelAdmin):
-    list_display = ('get_name', 'name', 'function', 'owner', 'active', 'last_sync', 'notes')
+    list_display = ('name', 'active', 'last_sync', 'notes')
     list_display_links = ('name',)
-    search_fields = ('name', 'function', 'owner', 'active', 'last_sync', 'notes')
-    list_filter = ('function', 'owner', 'active', 'last_sync')
-
-    # PoC to be used as user experience for source of the content - sync, manual or automatic
-    def get_name(self, obj):
-        return format_html('<span class="info_sync"></span> {}', obj.name)
+    search_fields = ('name', 'active', 'last_sync', 'notes')
+    list_filter = ('active', 'last_sync')
 
     def get_default_filters(self, request):
         return {'active__exact': 1}
@@ -34,7 +30,7 @@ class SourceAdmin(DefaultFilterMixin, admin.ModelAdmin):
 class OrganisationAdmin(DefaultFilterMixin, admin.ModelAdmin):
     list_display = [field.name for field in models.Organisation._meta.fields if field.name not in ('id', 'source_key')]
     list_display_links = ('name',)
-    search_fields = ('name', 'notes')
+    search_fields = ('name',)
     list_filter = ('active', 'owned_by_us', 'whitelisted_to_be_scanned')
 
     def get_default_filters(self, request):
@@ -134,8 +130,6 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
         'raw_whois',
         'register_management_status',
         'register_dns_managed',
-        'register_csc_lock',
-        'register_masking',
         'register_registrant_name',
         'register_registrant_organisation',
         'register_registrant_address',
@@ -166,15 +160,9 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
         'register_technical_phone',
         'register_technical_fax',
         'register_technical_email',
-        'register_portfolio_sections',
         'register_account_name',
-        'register_tld_region',
-        'register_tld_country',
         'register_email',
-        'register_puny_code',
-        'register_comment',
         'register_registrar',
-        'register_cost_center',
         'register_website',
     )
     list_filter = (
@@ -187,8 +175,6 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
         'register_registrant_email',
         'register_management_status',
         'register_dns_managed',
-        'register_csc_lock',
-        'register_masking',
     )
     readonly_fields = (
         'registration_date',
@@ -196,8 +182,6 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
         'raw_whois',
         'register_management_status',
         'register_dns_managed',
-        'register_csc_lock',
-        'register_masking',
         'register_registrant_name',
         'register_registrant_organisation',
         'register_registrant_address',
@@ -228,15 +212,9 @@ class DNSDomain(DefaultFilterMixin, admin.ModelAdmin):
         'register_technical_phone',
         'register_technical_fax',
         'register_technical_email',
-        'register_portfolio_sections',
         'register_account_name',
-        'register_tld_region',
-        'register_tld_country',
         'register_email',
-        'register_puny_code',
-        'register_comment',
         'register_registrar',
-        'register_cost_center',
         'register_website',
     )
 
@@ -307,7 +285,7 @@ class DNSRecordAdmin(DefaultFilterMixin, ImportMixin, ExportActionMixin, admin.M
                 for i in queryset:
                     i.tags.remove(tag)
             else:
-                self.message_user(request, f"Action does not exist")
+                self.message_user(request, "Action does not exist")
                 return HttpResponseRedirect(request.get_full_path())
 
             self.message_user(request, f"Updated tags for {queryset.count()} selected items")
