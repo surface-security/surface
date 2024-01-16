@@ -53,7 +53,6 @@ try:
         def get_timezone(self, request):
             return timezone.get_default_timezone()
 
-
 except ImportError:
     pass
 
