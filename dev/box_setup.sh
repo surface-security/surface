@@ -12,7 +12,9 @@ function dexec() {
 dexec surface ./manage.py migrate
 
 # create local admin (ignore failure as user might already exist)
-dexec surface ./manage.py createsuperuser --noinput --username admin --email admin@localhost && dexec surface ./manage.py changepassword admin
+
+#dexec surface ./manage.py createsuperuser --noinput --username admin --email admin@localhost
+dexec surface ./manage.py changepassword admin
 
 # create local "rootbox" (using dockerd service from the docker stack)
 cat <<EOF | dexec -T surface ./manage.py shell
@@ -30,8 +32,8 @@ EOF
 # create default tags used by default scanner Input
 cat <<EOF | dexec -T surface ./manage.py shell
 from dns_ips.models import Tag
-Tag.objects.update_or_create(name="is_external", defaults={"notes": "Tag used for external DNS and IP assets")
-Tag.objects.update_or_create(name="is_external", defaults={"notes": "Tag used for internal DNS and IP assets")
+Tag.objects.update_or_create(name="is_external", defaults={"notes": "Tag used for external DNS and IP assets"})
+Tag.objects.update_or_create(name="is_external", defaults={"notes": "Tag used for internal DNS and IP assets"})
 EOF
 
 echo done
