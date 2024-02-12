@@ -13,8 +13,7 @@ dexec surface ./manage.py migrate
 
 # create local admin (ignore failure as user might already exist)
 
-#dexec surface ./manage.py createsuperuser --noinput --username admin --email admin@localhost
-dexec surface ./manage.py changepassword admin
+dexec surface ./manage.py createsuperuser --noinput --username admin --email admin@localhost
 
 # create local "rootbox" (using dockerd service from the docker stack)
 cat <<EOF | dexec -T surface ./manage.py shell
