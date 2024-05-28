@@ -1,0 +1,141 @@
+{% extends 'views/layout.html' %}
+{% load sca_templatetags %}
+{% block sca_content %}
+    <div class="ui secondary pointing menu">
+        <a class="active item" href="/sca/scaproject/{{ original.pk }}/change/">Dependencies</a>
+        <a class="item"
+           href="/sca/scaproject/{{ original.pk }}/change/?view=vulnerabilities">Vulnerabilities</a>
+    </div>
+    <div class="ui hidden divider"></div>
+    <form method="get" class="ui form">
+        <div class="ui grid">
+            <div class="twelve wide column">
+                <div class="fields">
+                    {% for field in deps_filter.form %}
+                        {% if field.name != "show_vulnerable" %}
+                            <div class="four wide field">
+                                {{ field.label_tag }}
+                                {% if field.field.widget.input_type == 'select' %}
+                                    <select name="{{ field.name }}" class="ui fluid search clearable dropdown">
+                                        {% for choice in field.field.widget.choices %}
+                                            <option {% if choice.0 == field.data %}selected="selected"{% endif %}
+                                                    value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <div class="field">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="ui primary button">Filter</button>
+                    </div>
+                </div>
+            </div>
+            <div class="four wide right aligned column">
+                <div class="field">
+                    <label>&nbsp;</label>
+                    <div class="ui toggle checkbox right aligned">
+                        <input type="checkbox" name="show_vulnerable" id="show_vulnerable_toggle" {% if show_vulnerable %}checked="checked"{% endif %}>
+                        <label><b>Show Vulnerable:</b></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input name="view" type="hidden" value="dependencies">
+    </form>
+    {% if current_object.is_project %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="run_renovate_dependencies_no_deps">
+            <div class="ui vertical labeled icon buttons">
+                <button title="Update all dependencies" type="submit" class="positive ui button">
+                    <i class="ui recycle icon"></i>
+                    Renovate All
+                </button>
+            </div>
+        </form>
+    {% endif %}
+    <div class="ui hidden divider"></div>
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>Dependency</th>
+                {% if current_object.is_project %}
+                    <th>Renovate</th>
+                {% endif %}
+                <th>Version</th>
+                <th>Depends On</th>
+                <th>Last Scan</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dep in deps_filter.qs %}
+                <tr>
+                    <td>
+                        <i class="{{ dep.purl|purl_icon }} icon"></i> <a target="_blank" href="/sca/scaproject/{{ dep.pk }}/change/">{{ dep }}</a>
+                        {% for k, v in dep.vulns.items %}
+                            {% if k %}
+                                <a target="_blank"
+                                   href="/sca/scaproject/{{ dep.pk }}/change/?view=vulnerabilities&severity={{ k }}&finding_type=0"
+                                   title="{{ v.count }} {{ k|criticality_to_str }}"
+                                   class="ui {{ k|severity_to_color }} circular label">{{ v.count }}</a>
+                            {% else %}
+                                <a target="_blank"
+                                   href="/sca/scaproject/{{ dep.pk }}/change/?view=vulnerabilities&finding_type=1"
+                                   title="{{ v.eol }} End of Life"
+                                   class="ui black circular label">{{ v.eol }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% if current_object.is_project %}
+                        <td class="center aligned">
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="run_renovate_dependency">
+                                <input type="hidden" name="dependency_id" value="{{ vuln.dependency.pk }}">
+                                <button class="ui circular icon basic tertiary green button" title="Renovate Dependency">
+                                    <i class="recycle icon"></i>
+                                </button>
+                            </form>
+                        </td>
+                    {% endif %}
+                    <td>{{ dep.version }}</td>
+                    <td>
+                        {% if dep.depends_on %}
+                            {% for d in dep.depends_on.all %}
+                                <i class="{{ d.purl|purl_icon }} icon"></i> <a target="_blank" href="/sca/scaproject/{{ d.pk }}/change/">{{ d }}</a>
+                                <br>
+                            {% endfor %}
+                        {% else %}
+                            <td>N/A</td>
+                        {% endif %}
+                    </td>
+                    <td>{{ dep.last_scan }}</td>
+                    <td>{{ dep.created_at }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td class="center" colspan="5">No Dependencies found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        $('.ui.dropdown').dropdown();
+        $('.ui.checkbox').checkbox();
+        $('#show_vulnerable_toggle').change(function() {
+            const showVuln = $(this).is(':checked');
+            const searchParams = new URLSearchParams(window.location.search);
+            if (showVuln) {
+                searchParams.set('show_vulnerable', 'true');
+            } else {
+                searchParams.delete('show_vulnerable');
+            }
+            window.location.search = searchParams.toString();
+        });
+    </script>
+{% endblock sca_content %}

@@ -1,0 +1,3 @@
+CVSS==2.6
+packageurl-python==0.11.2
+semver==3.0.1
