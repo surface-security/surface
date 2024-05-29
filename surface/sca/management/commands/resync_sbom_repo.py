@@ -257,13 +257,3 @@ class Command(LogBaseCommand):
             self.has_exception,
         )
 
-
-"""
-TODOs:
-- Tests
-- Avoid changing sboms in sbom-repo so much
-- Use bom-ref instead of purl where possible (not all bom-ref are purls)
-- Create a new SCADep, one for the repo directly
-- Import to SCADep all components that do not appear in `dependencies` tree to the main SCADep
-- Tests for EOLFindings :(
-"""
