@@ -448,10 +448,10 @@ sbom_data = {
         {
             "group": "",
             "name": "certifi",
-            "version": "9999.2024.3.7",
-            "purl": "pkg:pypi/certifi@9999.2024.3.7",
+            "version": "2024.3.7",
+            "purl": "pkg:pypi/certifi@2024.3.7",
             "type": "library",
-            "bom-ref": "pkg:pypi/certifi@9999.2024.3.7",
+            "bom-ref": "pkg:pypi/certifi@2024.3.7",
             "evidence": {
                 "identity": {
                     "field": "purl",
@@ -1353,7 +1353,7 @@ sbom_data = {
         {
             "ref": "pkg:pypi/requests@2.31.0",
             "dependsOn": [
-                "pkg:pypi/certifi@9999.2024.3.7",
+                "pkg:pypi/certifi@2024.3.7",
                 "pkg:pypi/charset-normalizer@3.3.2",
                 "pkg:pypi/idna@3.6",
                 "pkg:pypi/urllib3@2.2.1",
@@ -1361,7 +1361,7 @@ sbom_data = {
         },
         {"ref": "pkg:pypi/urllib3@2.2.1", "dependsOn": []},
         {"ref": "pkg:pypi/charset-normalizer@3.3.2", "dependsOn": []},
-        {"ref": "pkg:pypi/certifi@9999.2024.3.7", "dependsOn": []},
+        {"ref": "pkg:pypi/certifi@2024.3.7", "dependsOn": []},
         {"ref": "pkg:pypi/python3-openid@3.2.0", "dependsOn": ["pkg:pypi/defusedxml@0.8.0rc2"]},
         {"ref": "pkg:pypi/pyjwt@2.8.0", "dependsOn": []},
         {"ref": "pkg:pypi/oauthlib@3.2.2", "dependsOn": []},
@@ -1375,7 +1375,7 @@ sbom_data = {
         },
         {
             "ref": "pkg:pypi/sentry-sdk@1.40.4",
-            "dependsOn": ["pkg:pypi/certifi@9999.2024.3.7", "pkg:pypi/urllib3@2.2.1"],
+            "dependsOn": ["pkg:pypi/certifi@2024.3.7", "pkg:pypi/urllib3@2.2.1"],
         },
         {"ref": "pkg:pypi/pyyaml@6.0.1", "dependsOn": []},
         {"ref": "pkg:pypi/rsa@4.9", "dependsOn": ["pkg:pypi/pyasn1@0.5.1"]},
