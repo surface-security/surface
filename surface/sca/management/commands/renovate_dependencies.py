@@ -87,7 +87,7 @@ class Command(LogBaseCommand):
         return str(temp_file_path)
 
     def run_docker(self, platform: str, temp_config_path: str, is_local: bool) -> bool:
-        token = settings.GITHUB_TOKEN if platform == "github" else settings.SURFACE_GITLAB_TOKEN
+        token = settings.SURFACE_GITHUB_TOKEN if platform == "github" else settings.SURFACE_GITLAB_TOKEN
         endpoint = "https://api.github.com" if platform == "github" else settings.SCA_INTERNAL_GITLAB_API
 
         if not token:
