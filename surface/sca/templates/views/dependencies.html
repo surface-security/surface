@@ -96,7 +96,7 @@
                             <form method="post" action="">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="run_renovate_dependency">
-                                <input type="hidden" name="dependency_id" value="{{ vuln.dependency.pk }}">
+                                <input type="hidden" name="dependency_id" value="{{ dep.pk }}">
                                 <button class="ui circular icon basic tertiary green button" title="Renovate Dependency">
                                     <i class="recycle icon"></i>
                                 </button>
