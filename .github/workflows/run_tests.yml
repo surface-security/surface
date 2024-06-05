@@ -65,7 +65,7 @@ jobs:
         ports:
         - 8877:3306
         # needed because the container does not provide a healthcheck
-        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=root --entrypoint sh mysql:8.0.30 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=root --entrypoint sh mysql -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
 
       postgres:
         image: postgres:15
