@@ -368,9 +368,9 @@ class SCAProjectAdmin(admin.ModelAdmin):
                 severity=vuln["severity"],
                 color=vuln["color"],
                 criticality=criticality if criticality != "eol" else None,
-                finding_type=models.SCAFinding.FindingType.VULN
-                if criticality != "eol"
-                else models.SCAFinding.FindingType.EOL,
+                finding_type=(
+                    models.SCAFinding.FindingType.VULN if criticality != "eol" else models.SCAFinding.FindingType.EOL
+                ),
             )
             for criticality, vuln in severity_mapping.items()
         ]

@@ -86,9 +86,11 @@ class Command(LogBaseCommand):
                         "finding_type": SCAFinding.FindingType.EOL,
                         "published": eol.eol,
                         "ecosystem": purl.type,
-                        "state": SCAFinding.State.NEW
-                        if not suppressed_findings.filter(vuln_id=eol.pk)
-                        else SCAFinding.State.CLOSED,
+                        "state": (
+                            SCAFinding.State.NEW
+                            if not suppressed_findings.filter(vuln_id=eol.pk)
+                            else SCAFinding.State.CLOSED
+                        ),
                         "last_seen_date": self.sync_time,
                     },
                 )
@@ -127,9 +129,11 @@ class Command(LogBaseCommand):
                 "finding_type": SCAFinding.FindingType.VULN,
                 "title": vuln.get("summary", "").capitalize(),
                 "summary": vuln["details"],
-                "state": SCAFinding.State.NEW
-                if not suppressed_findings.filter(vuln_id=vuln["id"])
-                else SCAFinding.State.CLOSED,
+                "state": (
+                    SCAFinding.State.NEW
+                    if not suppressed_findings.filter(vuln_id=vuln["id"])
+                    else SCAFinding.State.CLOSED
+                ),
                 "aliases": ", ".join(vuln.get("aliases", [])),
                 "fixed_in": ", ".join(fixed_in) if fixed_in else "",
                 "last_seen_date": self.sync_time,
@@ -256,4 +260,3 @@ class Command(LogBaseCommand):
             self.exited_earlier_not_master,
             self.has_exception,
         )
-

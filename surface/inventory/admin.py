@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.contrib.admin.decorators import register
-from theme.filters import RelatedFieldAjaxListFilter
 from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html
 
+from theme.filters import RelatedFieldAjaxListFilter
 
 from . import models
 
@@ -16,7 +16,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         "owned_by",
         "director",
         "director_direct",
-        "dev_lead",        
+        "dev_lead",
     ]
     list_filter = (
         ("dev_lead", RelatedFieldAjaxListFilter),
@@ -26,10 +26,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         ("director_direct", RelatedFieldAjaxListFilter),
     )
 
-
-    search_fields = (
-        "tla",
-    )
+    search_fields = ("tla",)
 
     list_select_related = (
         "dev_lead",
@@ -38,6 +35,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         "director",
         "director_direct",
     )
+
 
 @admin.register(models.GitSource)
 class GitSourceAdmin(admin.ModelAdmin):
@@ -66,7 +64,9 @@ class GitSourceAdmin(admin.ModelAdmin):
     @admin.display(description="Repo")
     def get_link(self, obj):
         if obj.repo_url:
-            return format_html('<a href="{url}" target="_blank">{url}</a>', url=obj.repo_url)  # nosec - intencional use in order to create admin links
+            return format_html(
+                '<a href="{url}" target="_blank">{url}</a>', url=obj.repo_url
+            )  # nosec - intencional use in order to create admin links
         return ""
 
     def get_queryset(self, request):
