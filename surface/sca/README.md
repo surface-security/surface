@@ -30,7 +30,7 @@ To synchronize SBOMs across your projects, run: \
 `python manage.py resync_sbom_repo`
 
 #### Check for public dependencies
-In order to mark a dependency as internal or public we use multiple repoistories to check it's existence \
+In order to mark a dependency as internal or public we use multiple repositories to check it's existence \
 `python manage.py check_public_dependencies`
 
 #### Check if Dependencies are EndofLife
