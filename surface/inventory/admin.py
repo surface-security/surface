@@ -64,7 +64,9 @@ class GitSourceAdmin(admin.ModelAdmin):
     @admin.display(description="Repo")
     def get_link(self, obj):
         if obj.repo_url:
-            return format_html('<a href="{url}" target="_blank">{url}</a>', url=obj.repo_url)  # nosec - intencional use in order to create admin links
+            return format_html(
+                '<a href="{url}" target="_blank">{url}</a>', url=obj.repo_url
+            )  # nosec - intencional use in order to create admin links
         return ""
 
     def get_queryset(self, request):
