@@ -131,7 +131,9 @@ if DATABASES["default"]["ENGINE"] == "django.db.backends.mysql":
         DATABASES["default"]["TEST"] = {}
     DATABASES["default"]["TEST"]["CHARSET"] = "utf8mb4"
     DATABASES["default"]["TEST"]["COLLATION"] = "utf8mb4_general_ci"
-    DATABASES["default"]["TEST"]["auth_plugin"] = "mysql_native_password"
+    DATABASES["default"]["OPTIONS"] = {
+        "auth_plugin": "mysql_native_password",
+    }
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
