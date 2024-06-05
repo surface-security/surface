@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 import requests
 import semver
@@ -9,10 +9,10 @@ from django.utils import timezone
 from packageurl import PackageURL
 from tqdm import tqdm
 
+from inventory.models import GitSource
 from logbasecommand.base import LogBaseCommand
 from sca.models import EndOfLifeDependency, SCADependency, SCAFinding, SuppressedSCAFinding
 from sca.utils import cvss_to_severity
-from inventory.models import GitSource
 
 MINIMUM_SEVERITY = SCAFinding.Severity.MEDIUM
 
@@ -40,7 +40,7 @@ class Command(LogBaseCommand):
         res.raise_for_status()
         return res.json()
 
-    def create_dependency(self, purl: str, scan_date: str) -> tuple[PackageURL | None, SCADependency | None]:
+    def create_dependency(self, purl: str, scan_date: str) -> tuple[Optional[PackageURL], Optional[SCADependency]]:
         if not purl:
             return None, None
         try:
