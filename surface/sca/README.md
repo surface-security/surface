@@ -34,7 +34,7 @@ In order to mark a dependency as internal or public we use multiple repoistories
 `python manage.py check_public_dependencies`
 
 #### Check if Dependencies are EndofLife
-We make use of `https://endoflife.date/`to check if our dependencies are End of Life \
+We make use of `https://endoflife.date/` to check if our dependencies are End of Life \
 `python manage.py resync_endoflife`
 
 #### Sync Vulnerability Counters for a project
