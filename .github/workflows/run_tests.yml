@@ -98,7 +98,7 @@ jobs:
       
       
       - name: Publish CodeCov Report
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v3
         with:
           files: ./cov/coverage.xml
           verbose: true
