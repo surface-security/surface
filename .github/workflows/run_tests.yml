@@ -79,6 +79,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+
       - name: Download artifacts (Docker images) from previous workflows
         uses: actions/download-artifact@v3
         with:
@@ -96,9 +101,11 @@ jobs:
                      ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
                      sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
 
-      - uses: codecov/codecov-action@v3
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           # do not fail ci for now - https://github.com/codecov/codecov-action/issues/557#issuecomment-1073777427
           fail_ci_if_error: false
           files: ./cov/coverage.xml
+      
