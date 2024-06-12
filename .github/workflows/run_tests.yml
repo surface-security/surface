@@ -2,6 +2,10 @@ name: tests
 
 on:
   workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        description: 'Codecov token'
+        required: true
     inputs:
       build-tag:
         required: true
