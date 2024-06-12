@@ -95,8 +95,8 @@ jobs:
                      -v $(pwd)/cov/:/report \
                      ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
                      sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
-
-      - uses: codecov/codecov-action@v4
+      
+      - uses: codecov/codecov-action@v4.4.0
         with:
           files: ./cov/coverage.xml
           verbose: true
