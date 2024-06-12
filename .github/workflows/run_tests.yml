@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Python 3.9
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
 
@@ -96,7 +96,7 @@ jobs:
                      ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
                      sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           # do not fail ci for now - https://github.com/codecov/codecov-action/issues/557#issuecomment-1073777427
