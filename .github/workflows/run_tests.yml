@@ -80,9 +80,9 @@ jobs:
 
     steps:
       - name: Checkout
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download artifacts (Docker images) from previous workflows
         uses: actions/download-artifact@v3
