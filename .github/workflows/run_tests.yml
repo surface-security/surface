@@ -102,5 +102,5 @@ jobs:
         with:
           files: ./cov/coverage.xml
           verbose: true
-          token: $CODECOV_TOKEN
+          token: ${{ env.CODECOV_TOKEN }}
     
