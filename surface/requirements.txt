@@ -32,3 +32,4 @@ django-bulk-update-or-create==0.3.0  # for faster batch operations with update_o
 django-dynamicsettings==0.0.3
 
 -r scanners/requirements.txt
+-r sca/requirements.txt

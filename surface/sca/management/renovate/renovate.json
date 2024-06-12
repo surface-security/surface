@@ -1,0 +1,19 @@
+{
+  "onboarding": false,
+  "requireConfig": false,
+  "repositories": ["<repo_url>"],
+  "prBodyTemplate": "{{{header}}}{{{table}}}{{{footer}}}",
+  "prFooter": "For more information on how to resolve these vulnerabilities, please see our [security documentation](https://example.com/security) or contact #infosec_engineering.",
+  "packageRules": [
+    {
+      "packagePatterns": ["*"],
+      "enabled": false
+    },
+    {
+      "groupName": "All dependencies",
+      "groupSlug": "all-deps",
+      "enabled": true
+    }
+  ],
+  "prHourlyLimit": 0
+}
