@@ -104,5 +104,5 @@ jobs:
         with:
           files: ./cov/coverage.xml
           verbose: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+    
