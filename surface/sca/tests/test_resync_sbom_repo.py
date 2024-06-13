@@ -8,9 +8,9 @@ from django.test import TestCase
 from django.utils import timezone
 from packageurl import PackageURL
 
+from inventory.models import GitSource
 from sca.management.commands.resync_sbom_repo import Command
 from sca.models import EndOfLifeDependency, SCADependency, SCAFinding, SCAFindingCounter, SuppressedSCAFinding
-from inventory.models import GitSource
 
 from . import data
 
@@ -21,7 +21,7 @@ class Test(TestCase):
     def test_resync_sbom_repo(self, now):
         responses.add(
             responses.GET,
-            f"http://{settings.SCA_SBOM_REPO_URL}/urn:uuid:46d764e2-aae1-4f82-b9f1-c616308e921d?vuln_data=True",
+            f"{settings.SCA_SBOM_REPO_URL}/urn:uuid:46d764e2-aae1-4f82-b9f1-c616308e921d?vuln_data=True",
             status=200,
             content_type="application/json",
             json=data.sbom_data,
@@ -29,7 +29,7 @@ class Test(TestCase):
 
         responses.add(
             responses.GET,
-            f"http://{settings.SCA_SBOM_REPO_URL}/all?since={datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')}",
+            f"{settings.SCA_SBOM_REPO_URL}/all?since={datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')}",
             status=200,
             content_type="application/json",
             json=["urn:uuid:46d764e2-aae1-4f82-b9f1-c616308e921d"],
