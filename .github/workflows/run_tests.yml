@@ -2,6 +2,10 @@ name: tests
 
 on:
   workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        description: 'Codecov token'
+        required: true
     inputs:
       build-tag:
         required: true
@@ -11,10 +15,10 @@ jobs:
   style:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python 3.9
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
 
@@ -35,7 +39,7 @@ jobs:
         options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=root --entrypoint sh mysql:8.0.30 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
     steps:
       - name: Download artifacts (Docker images) from previous workflows
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: surface-tests
           path: /tmp
@@ -58,7 +62,6 @@ jobs:
           url: mysql://root:root@127.0.0.1:8877/surface
         - db: postgresql
           url: psql://root:root@127.0.0.1:8878/surface
-
     services:
       mysql:
         image: mysql:8.0.30
@@ -77,10 +80,9 @@ jobs:
         - 8878:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - name: Download artifacts (Docker images) from previous workflows
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: surface-tests
           path: /tmp
@@ -95,10 +97,12 @@ jobs:
                      -v $(pwd)/cov/:/report \
                      ghcr.io/${{ github.repository }}:${{ inputs.build-tag }} \
                      sh -c 'pip install -r requirements_test.txt && pytest -n4 --cov --cov-report=xml:/report/coverage.xml'
-
-      - uses: codecov/codecov-action@v3
+      
+      
+      - name: Publish CodeCov Report
+        uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          # do not fail ci for now - https://github.com/codecov/codecov-action/issues/557#issuecomment-1073777427
-          fail_ci_if_error: false
           files: ./cov/coverage.xml
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+    

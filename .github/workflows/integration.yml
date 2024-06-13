@@ -11,7 +11,7 @@ jobs:
         image: selenium/standalone-chrome
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set-up environment
         run: pip install -r surface/requirements_test.txt
 
