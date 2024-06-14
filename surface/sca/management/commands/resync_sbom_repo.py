@@ -31,12 +31,12 @@ class Command(LogBaseCommand):
 
     def get_sboms(self, since: datetime) -> list[str]:
         since_str = datetime.strftime(since, "%Y-%m-%dT%H:%M:%S.%f")
-        res = requests.get(f"http://{settings.SCA_SBOM_REPO_URL}/all", params={"since": since_str})
+        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/all", params={"since": since_str})
         res.raise_for_status()
         return res.json()
 
     def get_sbom_details(self, serial_number: str) -> dict[str, Any]:
-        res = requests.get(f"http://{settings.SCA_SBOM_REPO_URL}/{serial_number}", params={"vuln_data": True})
+        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/{serial_number}", params={"vuln_data": True})
         res.raise_for_status()
         return res.json()
 
