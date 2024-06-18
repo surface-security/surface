@@ -1,0 +1,126 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrahead %}
+    {{ block.super }}
+    <meta name='viewport'
+          content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/table.min.css"
+          integrity="sha512-w8hSATT/ZIchIA07WVRukzgVVmKxasf21gI4ejSBJ8MBgoge/JN46CDH61ev1QBSn7SSu7M9A3jwbRoBK287ew=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/dropdown.min.css"
+          integrity="sha512-8q8UOlqPjpVoEpje4wqsvo8Ngfk9WbC2LCUxoNEE2D0oTyaqwW/Cfvhksd2jVoDZCZWzd40rPKg99dyRWlvRkg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/label.min.css"
+          integrity="sha512-dGDd/tDvA1KgVETxsykvhNmdjLJFlAY2Jl1k+lJfu3p+aT8wYVbikIH1xop8tFQ4fY+lcezRZK4M062pdJ9Z6Q=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/icon.min.css"
+          integrity="sha512-Il7/gQDKTBV8i2Xd7kqh8Jv8VA9/RaojB0thVy49XZXnzF8ayZvjZhitDt1SkZqaH+dY1ueTPvTjrNvOYhBVLA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/menu.min.css"
+          integrity="sha512-Zj5DKZXq6qUzzebfSVVHWhdmcr40nR3s9ePDMlhUY5jAivYtVgqF4sgP6gpHznld/67JrmIvHUHw01zVep4h7g=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/divider.min.css"
+          integrity="sha512-CZBVEPgYphdupTW9rdn20vXonNjT0SNGl3wAyZaDPiEBYvKU2L8ao5NrT8+R5WV5pgyl4iE/IKEaAaI/x2DtoA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/container.min.css"
+          integrity="sha512-thTItSge8du6s55mStGuPOjVWkXamw4GnHYmeHUyHXS+hnoBoMZbeCEuYWEGgzJC5EwXLMB4/FxAHXJ5BQXvmw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/form.min.css"
+          integrity="sha512-9G77Fy3CI0pXM/H9Pz7Nk3UmqhZRZUzcRcl4w/dB57hV+WdniTvEWxFd26NrA40wVh6KFhuL7BYo1AtQwq1pxA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/button.min.css"
+          integrity="sha512-usV9vZnEcEGzEi0/SWWAhYpeRCbUdyOF99p/N5SeaCMqEnhE3TytF88WtJGyh6vphD2TOEOvvFlk3n2F6L0Fww=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/icon.min.css"
+          integrity="sha512-Il7/gQDKTBV8i2Xd7kqh8Jv8VA9/RaojB0thVy49XZXnzF8ayZvjZhitDt1SkZqaH+dY1ueTPvTjrNvOYhBVLA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/segment.min.css"
+          integrity="sha512-MPeCJK14eLNtQTeI12i5Xnr/hZPa7ghvz/P73pABORK7MpTcszrrrdBNWLz4fMOaqzEzZ+LieWoKvzvAQBVGEA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/search.min.css"
+          integrity="sha512-deeumIFBIuZFK71tOnN6T+g+faPF4HClCdyuOg8MYd51esR0O0KQQTqbO3a+XpPep2oEsBYYY30/rTlLWuTc3g=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/transition.min.css"
+          integrity="sha512-aRbTBruhLAlVA7139PStK3P0W5fyl2h2Jv5o9zr784TfYxvJkTJi6RfA+CI5PbHehnm5E/97OGoEtpuml4eLqw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/checkbox.min.css"
+          integrity="sha512-Z5Fttp/z8S9ylmhmnpH1DgulXVIpgJh4gxsfe84iBYDMLoFYTUH0MM9O8qrispWeho7kpvzIZZc2Dn86uCVhww=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/grid.min.css"
+          integrity="sha512-q0WXgbOmZrf5nMecrZg6dFy0hHx+xDZjrxgNa0Gcj/yH8pBSwyTNmAWz5pjuDJCNjFxvFqtmhpj9Z/Fp6z1WBw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+            integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.js"
+            integrity="sha512-5cguXwRllb+6bcc2pogwIeQmQPXEzn2ddsqAexIBhh7FO1z5Hkek1J9mrK2+rmZCTU6b6pERxI7acnp1MpAg4Q=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+{% endblock %}
+{% block content %}
+    <div class="content">
+        <div id="content" class="colM">
+            <div class="page-inner">
+                <div class="page-header">
+                    <ul class="breadcrumbs m-0 p-0 text-uppercase">
+                        <li class="nav-home">
+                            <a href="/">
+                                <i class="fas fa-home"></i>
+                            </a>
+                        </li>
+                        <li class="separator">
+                            <i class="fas fa-chevron-right"></i>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/sca/scaproject">SCA Projects</a>
+                        </li>
+                        <li class="separator">
+                            <i class="fas fa-chevron-right"></i>
+                        </li>
+                        <li class="nav-item">{{ original.purl }}</li>
+                    </ul>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                {% block sca_content %}
+                                {% endblock sca_content %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -12,3 +12,12 @@ repos:
     rev: 'v0.0.261'
     hooks:
       - id: ruff
+        args: ["--fix"]
+  - repo: local
+    hooks:
+      - id: migration-check
+        name: migration-check
+        entry: python surface/manage.py makemigrations --check --dry-run
+        language: system
+        files: models.*\.py$
+        pass_filenames: false

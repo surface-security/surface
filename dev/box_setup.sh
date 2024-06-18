@@ -27,4 +27,11 @@ models.ScannerImage.objects.update_or_create(name='httpx', defaults={'image': 'g
 models.ScannerImage.objects.update_or_create(name='nmap', defaults={'image': 'ghcr.io/surface-security/scanner-nmap'})
 EOF
 
+# create default tags used by default scanner Input
+cat <<EOF | dexec -T surface ./manage.py shell
+from dns_ips.models import Tag
+Tag.objects.update_or_create(name="is_external", defaults={"notes": "Tag used for external DNS and IP assets"})
+Tag.objects.update_or_create(name="is_external", defaults={"notes": "Tag used for internal DNS and IP assets"})
+EOF
+
 echo done

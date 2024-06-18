@@ -1,0 +1,19 @@
+name: integration testing
+
+on:
+  workflow_call:
+
+jobs:
+  doit:
+    runs-on: ubuntu-latest
+    services:
+      selenium:
+        image: selenium/standalone-chrome
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set-up environment
+        run: pip install -r surface/requirements_test.txt
+
+      - name: Run test suite
+        run: pytest -v e2e
