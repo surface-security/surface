@@ -60,17 +60,10 @@ class Organisation(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
     owned_by_us = models.BooleanField(default=False, db_index=True)
     whitelisted_to_be_scanned = models.BooleanField(default=False, db_index=True)
-    point_of_contact = models.CharField(max_length=1024, null=True, blank=True)
 
     country = models.CharField(max_length=255, null=True, blank=True)
     email = models.CharField(max_length=255, null=True, blank=True)
-    website = models.CharField(max_length=512, null=True, blank=True)
     owner = models.CharField(max_length=255, null=True, blank=True)
-    key_supplier = models.CharField(max_length=255, null=True, blank=True)
-    manufacturer = models.CharField(max_length=255, null=True, blank=True)
-    customer = models.CharField(max_length=255, null=True, blank=True)
-
-    notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return str(self.name)
@@ -91,6 +84,9 @@ class IPRange(RangeModel):
     description = models.TextField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField("dns_ips.Tag", blank=True)
+    application = models.ForeignKey(
+        'inventory.Application', blank=True, null=True, on_delete=models.SET_NULL, verbose_name="Application"
+    )
 
     def __str__(self):
         return self.range
@@ -164,8 +160,6 @@ class DNSDomain(models.Model):
     # Options for Domain
     register_management_status = models.BooleanField(default=False, db_index=True)
     register_dns_managed = models.BooleanField(default=False, db_index=True)
-    register_csc_lock = models.BooleanField(default=False, db_index=True)
-    register_masking = models.BooleanField(default=False, db_index=True)
     # Registrant
     register_registrant_name = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     register_registrant_organisation = models.CharField(max_length=255, null=True, blank=True, db_index=True)
@@ -200,18 +194,12 @@ class DNSDomain(models.Model):
     register_technical_fax = models.CharField(max_length=255, null=True, blank=True)
     register_technical_email = models.CharField(max_length=255, null=True, blank=True)
     # Other
-    register_portfolio_sections = models.CharField(max_length=255, null=True, blank=True)
     register_account_name = models.CharField(max_length=255, null=True, blank=True)
     register_nameservers = models.TextField(
         blank=True, default="", help_text='list of nameservers associated, separated by comma'
     )
-    register_tld_region = models.CharField(max_length=255, null=True, blank=True)
-    register_tld_country = models.CharField(max_length=255, null=True, blank=True)
     register_email = models.CharField(max_length=255, null=True, blank=True)
-    register_puny_code = models.CharField(max_length=255, null=True, blank=True)
-    register_comment = models.TextField(null=True, blank=True)
     register_registrar = models.CharField(max_length=255, null=True, blank=True)
-    register_cost_center = models.CharField(max_length=255, null=True, blank=True)
     register_website = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):

@@ -1,0 +1,119 @@
+{% extends 'views/layout.html' %}
+{% load sca_templatetags %}
+{% block sca_content %}
+    <div class="ui secondary pointing menu">
+        <a class="item" href="/sca/scaproject/{{ original.pk }}/change/">Dependencies</a>
+        <a class="active item"
+           href="/sca/scaproject/{{ original.pk }}/change?view=vulnerabilities">Vulnerabilities</a>
+    </div>
+    <div class="ui hidden divider"></div>
+    <form method="get" class="ui form">
+        <div class="fields">
+            {% for field in vulns_filter.form %}
+                <div class="{% if field.name == "dependency" %}six wide{% endif %} field">
+                    {{ field.label_tag }}
+                    {% if field.field.widget.input_type == 'select' %}
+                        <select name="{{ field.name }}" class="ui fluid search clearable dropdown">
+                            {% for choice in field.field.widget.choices %}
+                                <option {% if choice.0|to_str == field.data|to_str %}selected="selected"{% endif %}
+                                        value="{{ choice.0 }}">{{ choice.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="field">
+                <label>&nbsp;</label>
+                <button type="submit" class="ui inline primary button">Filter</button>
+            </div>
+        </div>
+        <input name="view" type="hidden" value="vulnerabilities">
+    </form>
+    {% if current_object.is_project and vulns_filter.qs %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="run_renovate_dependencies">
+            <div class="ui vertical labeled icon buttons">
+                <button title="Update vulnerable dependencies" type="submit" class="positive ui button">
+                    <i class="ui recycle icon"></i>
+                    Renovate Vulnerable
+                </button>
+            </div>
+        </form>
+    {% endif %}
+    <div class="ui hidden divider"></div>
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>Vulnerability ID</th>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Aliases</th>
+                <th>CVSS</th>
+                <th>Published</th>
+                <th>Fixed In</th>
+                <th>Type</th>
+                <th>Dependency</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vuln in vulns_filter.qs %}
+                <tr class="left {% if vuln.get_severity_display|lower == 'critical' %}red{% elif vuln.get_severity_display|lower == 'high' %}orange{% elif vuln.get_severity_display|lower == 'medium' %}yellow{% endif %} marked expandable-row">
+                    <td>
+                        <a target="_blank" href="/sca/scafinding/{{ vuln.pk }}/change/">{{ vuln }}</a>
+                    </td>
+                    <td>{{ vuln.title }}</td>
+                    <td class="{% if vuln.get_severity_display|lower == 'critical' %}red{% elif vuln.get_severity_display|lower == 'high' %}orange{% elif vuln.get_severity_display|lower == 'medium' %}yellow{% endif %} collored">
+                        {{ vuln.get_severity_display }}
+                    </td>
+                    <td>{{ vuln.aliases }}</td>
+                    {% if vuln.cvss_vector %}
+                        <td>
+                            <a target="_blank"
+                               href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector={{ vuln.cvss_vector|cvss_vector }}&version={{ vuln.cvss_vector|cvss_version }}">{{ vuln.cvss_score }}</a>
+                        </td>
+                    {% else %}
+                        <td>{{ cvss_score }}</td>
+                    {% endif %}
+                    <td>{{ vuln.published }}</td>
+                    <td>{{ vuln.fixed_in|default_if_none:"" }}</td>
+                    <td>{{ vuln.get_finding_type_display }}</td>
+                    <td>{{ vuln.dependency }}</td>
+                    <td class="center aligned">
+                        <div class="ui fluid buttons">
+                            <a target="_blank"
+                               href="/sca/suppressedscafinding/add/?dependency_id={{ vuln.dependency.pk }}&vuln_id={{ vuln.vuln_id }}"
+                               class="ui circular icon basic tertiary orange button"
+                               title="Suppress">
+                               <i class="microphone slash icon"></i>
+                            </a>
+                        </div>
+                      </td>
+                </tr>
+                <tr class="expandable-content" style="display: none;">
+                    <td colspan="9">
+                        <p>{{ vuln.summary }}</p>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td class="center" colspan="9">No vulnerabilities found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        $('.ui.dropdown').dropdown();
+        $(document).ready(function() {
+            $('.expandable-row').click(function(event) {
+                if ($(event.target).is('a') || $(event.target).is('i')) {
+                return;
+            }
+                $(this).next('.expandable-content').toggle();
+            });
+        });
+    </script>
+{% endblock %}
