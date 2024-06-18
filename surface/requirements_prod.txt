@@ -1,4 +1,4 @@
 -r requirements.txt
 
-gunicorn==20.1.0
+gunicorn==22.0.0
 eventlet==0.35.2
