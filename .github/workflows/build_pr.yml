@@ -12,7 +12,7 @@ jobs:
     outputs:
       tag: ${{ steps.doit.outputs.new }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: doit
         env:
           FALLBACK_VERSION: "1.0.0"
@@ -39,6 +39,8 @@ jobs:
    uses: ./.github/workflows/run_tests.yml
    with:
     build-tag: ${{ needs.tag.outputs.tag }}-${{ github.run_id }}-dev
+   secrets:
+    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   testscleanup:
    needs: tests

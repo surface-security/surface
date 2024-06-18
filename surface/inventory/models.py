@@ -15,6 +15,9 @@ class Application(models.Model):
     director_direct = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
     dev_lead = models.ForeignKey('Person', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
 
+    def __str__(self) -> str:
+        return self.tla if self.tla else f"Application {self.pk}"
+
 
 class FindingInheritanceQS(models.QuerySet):
     def get_children(self) -> list:
@@ -98,3 +101,22 @@ class Finding(models.Model):
 
     def __str__(self):
         return f'{self.pk} [{self.cached_content_source.app_label}] - {self.title}'
+
+
+class GitSource(models.Model):
+    apps = models.ManyToManyField("inventory.Application", blank=True, verbose_name="Application")
+
+    repo_url = models.URLField(max_length=628)
+    branch = models.CharField(max_length=128, default="master")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True, db_index=True)
+    manually_inserted = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (("repo_url", "branch"),)
+        verbose_name = "Git Source"
+
+    def __str__(self) -> str:
+        return f"{self.repo_url} ({self.branch})"
