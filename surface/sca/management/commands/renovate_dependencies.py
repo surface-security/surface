@@ -30,7 +30,7 @@ class Command(LogBaseCommand):
         platform = platforms.pop()
         repo_urls = [self.parse_git_url(url)[1] for url in git_urls]
 
-        temp_config_path = self.create_temp_renovate_config(repo_urls, dependencies, is_local)
+        temp_config_path = self.create_temp_renovate_config(repo_urls, dependencies, is_local, platform)
         try:
             result = self.run_docker(platform, temp_config_path, is_local)
             if not result:
@@ -46,7 +46,7 @@ class Command(LogBaseCommand):
         repo_path = "/".join(repo_url.split("/")[1:])
         return platform, repo_path
 
-    def create_temp_renovate_config(self, repo_urls: list, dependencies=None, is_local=False):
+    def create_temp_renovate_config(self, repo_urls: list, dependencies=None, is_local=False, platform=None):
         if dependencies is None:
             dependencies = []
         current_script_dir = Path(__file__).parent
@@ -70,9 +70,12 @@ class Command(LogBaseCommand):
         else:
             raise ValueError("Dependencies must be a list or a string")
 
-        sorted_dependencies = sorted(unique_dependencies)
-        dep_pattern = f"^(?i)({'|'.join(sorted_dependencies)})$"
-        config["packageRules"][1]["matchPackagePatterns"] = [dep_pattern]
+        if unique_dependencies:
+            sorted_dependencies = sorted(unique_dependencies)
+            dep_pattern = f"^(?i)({'|'.join(sorted_dependencies)})$"
+            config["packageRules"][1]["matchPackagePatterns"] = [dep_pattern]
+            if platform == "github":
+                config["prTitle"] = "Update vulnerable dependencies"
 
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         temp_file_path = Path("/renovate") / f"renovate_config_{timestamp}.json"
