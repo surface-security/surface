@@ -1,4 +1,4 @@
 cffi==1.15.1
 packaging==23.1
-pyOpenSSL==23.2.0
+pyOpenSSL==24.1.0
 docker[tls]==6.1.3
