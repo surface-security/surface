@@ -1,7 +1,7 @@
 # Core Libraries
 
 Django==3.2.25
-django-admin-rangefilter==0.11.0
+django-admin-rangefilter==0.13.1
 django-after-response==0.2.2
 django-object-actions==4.2.0
 djangorestframework==3.14.0
