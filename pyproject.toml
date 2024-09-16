@@ -38,4 +38,4 @@ select = [
 src = ['surface', 'e2e']
 
 [tool.ruff.isort]
-known-first-party = ["theme", "dkron", "django_restful_admin", "slackbot", "dbcleanup", "olympus", "notifications", "ppbenviron", "logbasecommand", "impersonate", "apitokens"]
+known-first-party = ["theme", "dkron", "django_restful_admin", "slackbot", "dbcleanup", "olympus", "notifications", "ppbenviron", "logbasecommand", "impersonate", "apitokens", "sbomrepo"]
