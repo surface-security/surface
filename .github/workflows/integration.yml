@@ -12,9 +12,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
-      - name: install mysql dependencies
-        run: sudo apt-get install python3-dev libmysqlclient-dev build-essential pkg-config
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9' 
       
       - name: Set-up environment
         run: pip install -r surface/requirements_test.txt
