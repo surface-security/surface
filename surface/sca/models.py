@@ -2,7 +2,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Union
 
-from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 from django.db import models
 from django.db.models import Case, Count, Q, When
 
@@ -164,7 +163,7 @@ class SCADependency(models.Model):
     def update_vulnerability_counters(self) -> "SCAFindingCounter":
         severity_counters = (
             SCAFinding.objects.filter(
-                (Q(fixed_in__isnull=False) | Q(finding_type=SCAFinding.FindingType.EOL)),
+                (Q(fixed_in__gt="") | Q(finding_type=SCAFinding.FindingType.EOL)),
                 dependency__purl__in=self.dependencies,
                 state__in=(SCAFinding.State.NEW, SCAFinding.State.OPEN),
             )
@@ -247,7 +246,7 @@ class SCAFinding(vuln_models.Finding):
     vuln_id = models.CharField(max_length=128)
     published = models.DateTimeField()
     aliases = models.TextField(default="")
-    fixed_in = models.TextField(default=None, null=True)
+    fixed_in = models.TextField(default="")
     cvss_vector = models.CharField(max_length=128, default="")
     ecosystem = models.CharField(max_length=20)
     finding_type = models.IntegerField(choices=FindingType.choices, default=FindingType.VULN)

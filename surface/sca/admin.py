@@ -17,10 +17,10 @@ from jsoneditor.forms import JSONEditor
 from core_utils.admin_filters import DefaultFilterMixin
 from core_utils.utils import admin_reverse
 from dkron.utils import run_async
+from inventory.models import GitSource
 from sca import models
 from sca.utils import only_highest_version_dependencies
 from theme.filters import RelatedFieldAjaxListFilter
-from inventory.models import GitSource
 
 logger = logging.getLogger(__name__)
 
@@ -190,9 +190,9 @@ class SCAFindingFilter(django_filters.FilterSet):
 
     def filter_fixed_in(self, queryset, name, value):
         if value == "true":
-            return queryset.exclude(Q(fixed_in="") | Q(fixed_in__isnull=True))
+            return queryset.exclude(fixed_in="")
         elif value == "false":
-            return queryset.filter(Q(fixed_in="") | Q(fixed_in__isnull=True))
+            return queryset.filter(fixed_in="")
         return queryset
 
 

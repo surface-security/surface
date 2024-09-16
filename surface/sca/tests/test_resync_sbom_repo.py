@@ -50,7 +50,7 @@ class Test(TestCase):
         assert SCAFindingCounter.objects.filter(dependency=main_dependency).exists()
         counter = SCAFindingCounter.objects.filter(dependency=main_dependency).first()
         assert counter.critical == 1
-        assert counter.high == 4
+        assert counter.high == 3
         assert counter.medium == 3
 
         # Asserts  main dependency has only one git source  "https://github.com/test/repo"
