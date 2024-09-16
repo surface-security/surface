@@ -1,4 +1,4 @@
-![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/surface-security/surface/build.yml?branch=main)
+![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/surface-security/surface/release.yml)
 ![Python](https://img.shields.io/badge/python-%3E%3D3.8%2C%3C=3.11-blue)
 ![Django](https://img.shields.io/badge/Django-%3E%3D3.2%2C%3C4.0-blue)
 ![Codecov](https://img.shields.io/codecov/c/github/surface-security/surface)
