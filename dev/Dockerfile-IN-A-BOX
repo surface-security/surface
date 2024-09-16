@@ -7,6 +7,7 @@ RUN apt-get update \
         libldap2-dev \
         libsasl2-dev \
         git \
+        pkg-config \
  && rm -rf /var/lib/apt/lists/*
 
 RUN --mount=type=bind,target=/tmpapp \

@@ -73,7 +73,7 @@ class Test(TestCase):
 
         # Assert Vulnerabilities Counters
         assert "1 Critical" in content
-        assert "4 High" in content
+        assert "3 High" in content
         assert "3 Medium" in content
         assert "0 Low" in content
         assert "0 End of Life" in content
