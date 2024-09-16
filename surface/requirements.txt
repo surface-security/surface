@@ -1,6 +1,6 @@
 # Core Libraries
-Django==3.2.23
-django-admin-rangefilter==0.10.0
+Django==3.2.25
+django-admin-rangefilter==0.11.0
 django-after-response==0.2.2
 django-object-actions==4.2.0
 djangorestframework==3.14.0
@@ -24,7 +24,7 @@ django-olympus==0.0.5
 django-environ-ppb[vault]==1.0.1
 django-impersonator==0.0.2
 django-apitokens==0.0.2
-django-sbomrepo==0.0.4
+django-sbomrepo==0.0.6
 
 mysqlclient==2.2.4
 tqdm==4.65.0  # for core_utils that is not really a app/package ..?
