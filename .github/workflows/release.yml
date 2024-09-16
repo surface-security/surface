@@ -26,6 +26,8 @@ jobs:
     uses: ./.github/workflows/run_tests.yml
     with:
       build-tag: ${{ needs.tag.outputs.tag }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   testscleanup:
     needs: [tag, tests]
