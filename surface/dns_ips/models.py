@@ -152,7 +152,7 @@ class DNSDomain(models.Model):
     active = models.BooleanField(default=True, db_index=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
-    name = models.CharField(max_length=255, db_index=True, null=True)
+    name = models.CharField(max_length=255, db_index=True)
     notes = models.TextField(null=True, blank=True)
     registration_date = models.DateTimeField(null=True, blank=True, db_index=True)
     expire_date = models.DateTimeField(null=True, blank=True, db_index=True)
@@ -223,7 +223,7 @@ class DNSRecord(models.Model):
     active = models.BooleanField(default=True, db_index=True)
     last_seen = models.DateTimeField(default=timezone.now, editable=False, null=True, blank=True, db_index=True)
 
-    name = models.CharField(max_length=255, db_index=True, null=True)
+    name = models.CharField(max_length=255, db_index=True)
     domain = models.ForeignKey("dns_ips.DNSDomain", null=True, blank=True, on_delete=models.CASCADE)
 
     tla = models.ForeignKey(
