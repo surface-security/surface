@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "vulns",
     "sca",
     "sbomrepo",
+    "jsoneditor",
 ]
 
 MIDDLEWARE = [
@@ -113,6 +114,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+STATIC_ROOT = ENV_VAR("SURF_STATIC_ROOT", default=str(BASE_DIR.parent / "dev" / "static"))
 
 STATIC_URL = "/static/"
 
