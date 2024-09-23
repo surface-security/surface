@@ -52,7 +52,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    #"django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -190,8 +190,8 @@ SCA_SOURCE_PURL_TYPES = ["github.com"]
 SCA_INTERNAL_RENOVATE = ENV_VAR("SURF_SCA_INTERNAL_RENOVATE", default=None)
 SCA_INTERNAL_GITLAB_API = ENV_VAR("SURF_SCA_INTERNAL_GITLAB_API", default=None)
 
-SURFACE_GITHUB_TOKEN = ENV_VAR("SURF_GITLAB_TOKEN", default=None)
-SURFACE_GITLAB_TOKEN = ENV_VAR("SURF_GITHUB_TOKEN", default=None)
+SURFACE_GITHUB_TOKEN = ENV_VAR("SURF_GITHUB_TOKEN", default=None)
+SURFACE_GITLAB_TOKEN = ENV_VAR("SURF_GITLAB_TOKEN", default=None)
 
 
 SURFACE_LINKS_ITEMS = None
