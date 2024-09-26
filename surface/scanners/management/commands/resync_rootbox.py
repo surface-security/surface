@@ -76,7 +76,26 @@ class Command(LogBaseCommand):
                     if not _x.isdir():
                         files_to_delete.write(f'/{_x.name}\n')
                 # TODO: trust docker API to not add the / prefix? or inspect beforehand?
-                outfile.extractall(tempdir)
+                def is_within_directory(directory, target):
+                    
+                    abs_directory = os.path.abspath(directory)
+                    abs_target = os.path.abspath(target)
+                
+                    prefix = os.path.commonprefix([abs_directory, abs_target])
+                    
+                    return prefix == abs_directory
+                
+                def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+                
+                    for member in tar.getmembers():
+                        member_path = os.path.join(path, member.name)
+                        if not is_within_directory(path, member_path):
+                            raise Exception("Attempted Path Traversal in Tar File")
+                
+                    tar.extractall(path, members, numeric_owner=numeric_owner) 
+                    
+                
+                safe_extract(outfile, tempdir)
 
         # remove files from docker host
         c = docker.containers.create(
