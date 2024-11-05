@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.crypto import get_random_string
 import hashlib
 
 class Secret(models.Model):
@@ -22,8 +21,7 @@ class Secret(models.Model):
     source = models.CharField(max_length=255)
     kind = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=SECRET_STATUS_CHOICES, default='new')
-    locations = models.JSONField()  # Store as JSON: [{"repo": "repo1", "file": "file1"}, ...]
-    sources = models.JSONField()  # Store as JSON if multiple sources
+    git_source = models.ForeignKey("inventory.GitSource", null=True, on_delete=models.SET_NULL)
     environment = models.CharField(max_length=255)
     criticality = models.CharField(max_length=20, choices=CRITICALITY_CHOICES, default='low')
     short_notes = models.TextField(blank=True)
@@ -35,7 +33,7 @@ class Secret(models.Model):
     version = models.IntegerField(default=1)
 
     class Meta:
-        unique_together = ('secret_hash', 'source', 'locations')
+        unique_together = ('secret_hash', 'source', 'git_source')
 
     def __str__(self):
         return f"{self.kind} secret in {self.source}"
@@ -44,6 +42,23 @@ class Secret(models.Model):
         if not self.secret_hash:
             self.secret_hash = hashlib.sha256(self.secret.encode()).hexdigest()
         super().save(*args, **kwargs)
+
+    def get_source_links(self):
+        if isinstance(self.sources, dict):
+            source_data = self.sources.get('SourceMetadata', {}).get('Data', {}).get('Git', {})
+            if source_data:
+                repo = source_data.get('repository', '')
+                commit = source_data.get('commit', '')
+                file = source_data.get('file', '')
+                line = source_data.get('line', '')
+                if all([repo, commit, file, line]):
+                    # Convert repo URL if needed (e.g., remove .git suffix)
+                    repo = repo.rstrip('.git')
+                    return f"{repo}/blob/{commit}/{file}#L{line}"
+        return None
+
+    def get_locations(self):
+        return SecretLocation.objects.filter(secret=self)
 
 class SecretHistory(models.Model):
     secret = models.ForeignKey(Secret, on_delete=models.CASCADE, related_name='history')
@@ -54,3 +69,33 @@ class SecretHistory(models.Model):
 
     def __str__(self):
         return f"Version {self.version} of {self.secret}"
+
+class SecretLocation(models.Model):
+    secret = models.ForeignKey(Secret, on_delete=models.CASCADE, related_name='locations')
+    file_path = models.CharField(max_length=255)
+    commit = models.CharField(max_length=40)
+    repository = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+    author = models.CharField(max_length=255)
+    line = models.CharField(max_length=10, default="1")
+
+    class Meta:
+        unique_together = ('secret', 'file_path', 'commit')
+
+    def __str__(self):
+        return f"{self.file_path} @ {self.commit[:8]}"
+
+    def clean_repository_url(self):
+        """Clean and standardize repository URL"""
+        if self.repository:
+            # Remove .git extension
+            clean_url = self.repository.replace('.git', '')
+            # Fix known issues
+            if 'truffleho/' in clean_url:
+                clean_url = clean_url.replace('truffleho/', 'trufflehog/')
+            return clean_url
+        return self.repository
+
+    def save(self, *args, **kwargs):
+        self.repository = self.clean_repository_url()
+        super().save(*args, **kwargs)
