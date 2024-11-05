@@ -22,5 +22,6 @@
             "enabled": true
         }
     ],
-    "prHourlyLimit": 0
+    "prHourlyLimit": 0,
+    "prTitle": "Update vulnerable dependencies"
 }
