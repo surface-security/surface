@@ -10,11 +10,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('json_file', type=str, help='Path to the JSON file containing secrets')
-        parser.add_argument('--repo-url', type=str, help='Repository URL for Git scans')
 
     def handle(self, *args, **options):
         json_file = options['json_file']
-        repo_url = options.get('repo-url')
 
         with open(json_file, 'r') as file:
             for line in file:
@@ -33,7 +31,7 @@ class Command(BaseCommand):
                 kind = secret_data['DetectorName']
 
                 file_info = secret_data['SourceMetadata']['Data']['Git']
-                repo_url = file_info.get('repository', repo_url)
+                repo_url = file_info['repository']
 
                 git_source, _ = GitSource.objects.get_or_create(
                     repo_url=repo_url,

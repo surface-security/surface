@@ -37,7 +37,7 @@ Maintains audit trail of changes to secrets:
 Imports secrets from TruffleHog JSON output:
 
 """
-python manage.py import_secrets path/to/trufflehog.json --repo-url https://github.com/your-org/your-repo
+python manage.py import_secrets path/to/secrets.json
 """
 
 
