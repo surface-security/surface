@@ -1,4 +1,3 @@
-"""
 # Secrets Manager
 
 A Django app for managing and tracking secrets discovered in source code and git repositories.
