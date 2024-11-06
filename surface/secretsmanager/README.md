@@ -35,18 +35,12 @@ Maintains audit trail of changes to secrets:
 ### import_secrets.py
 Imports secrets from TruffleHog JSON output:
 
-"""
-python manage.py import_secrets path/to/secrets.json
-"""
-
+```python manage.py import_secrets path/to/secrets.json```
 
 ### import_git_secrets.py
 Scans git repositories for sensitive files (certificates, keystores, etc.):
 
-"""
-python manage.py import_git_secrets path/to/git/repo --org your-org
-"""
-
+```python manage.py import_git_secrets path/to/git/repo --org your-org```
 
 Supported sensitive file extensions:
 
@@ -96,10 +90,6 @@ The app provides a Django admin interface with:
 ## Usage
 
 1. Run migrations:
-
-"""
-python manage.py migrate
-"""
 
 2. Import secrets using either:
    - TruffleHog JSON output via `import_secrets`
