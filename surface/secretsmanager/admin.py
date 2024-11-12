@@ -18,7 +18,7 @@ class SecretAdmin(admin.ModelAdmin):
         'updated_at'
     )
     list_editable = ('status', 'criticality')
-    list_filter = ('status', 'criticality', 'verified', 'team', 'git_source', 'secret_hash')
+    list_filter = ('source', 'status', 'criticality', 'verified', 'team', 'git_source', 'secret_hash')
     search_fields = ('secret', 'source', 'kind', 'team', 'git_source__repo_url', 'secret_hash')
     readonly_fields = ('created_at', 'updated_at', 'updated_by', 'version', 'secret_hash')
     
