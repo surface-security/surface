@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "dns_ips",
     "scanners",
     "scanner_baseline",
+    "secretsmanager",
     "knox",
     "apitokens",
     "vulns",

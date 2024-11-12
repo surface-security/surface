@@ -2,7 +2,8 @@
 
 set -e
 
-cd $(dirname $0)
+PROJECT_ROOT=$(dirname $(dirname $(dirname $0)))
 
-surface/manage.py createsuperuser --noinput --username admin --email admin@localhost && surface/manage.py changepassword admin
- 
+cd "${PROJECT_ROOT}"
+python surface/manage.py createsuperuser --noinput --username admin --email admin@localhost && \
+python surface/manage.py changepassword admin

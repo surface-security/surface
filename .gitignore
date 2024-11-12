@@ -18,7 +18,7 @@
 /build
 /dist
 /env
-*local.env
+surface/local.env
 *.retry
 *.sqlite3-journal
 *.swp
