@@ -17,7 +17,7 @@ netaddr==0.8.0
 django-surface-theme==0.0.11
 django-dbcleanup==0.1.4
 django-logbasecommand==0.0.2
-django-notification-sender[slack]==0.0.6
+django-notification-sender[slack]==0.1.0
 django-dkron==1.1.1
 django-slack-processor==0.0.5
 django-olympus==0.0.5
