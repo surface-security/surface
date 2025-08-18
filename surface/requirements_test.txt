@@ -4,7 +4,7 @@ pytest==7.4.0
 pytest-cov==4.1.0
 pytest-django==4.5.2
 pytest-xdist==3.3.1
-pytest-socket==0.6.0
+pytest-socket==0.7.0
 responses==0.23.3
 
 # for integration testing
