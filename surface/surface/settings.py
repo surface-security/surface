@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 
+import yaml
+
 import ppbenviron
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,6 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ENV_VAR = ppbenviron.CustomEnv()
 ENV_VAR.read_env(BASE_DIR / "local.env")
+
+from surface.sidebar import SIDEBAR
 
 # Application definition
 
@@ -35,8 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.db.migrations",
     "impersonate",
-    "surfapp",
     "dkron",
     "notifications",
     "slackbot",
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
     "sca",
     "sbomrepo",
     "jsoneditor",
+    "surfapp",
 ]
 
 MIDDLEWARE = [
@@ -197,8 +202,8 @@ SURFACE_GITHUB_TOKEN = ENV_VAR("SURF_GITHUB_TOKEN", default=None)
 SURFACE_GITLAB_TOKEN = ENV_VAR("SURF_GITLAB_TOKEN", default=None)
 
 
-SURFACE_LINKS_ITEMS = None
-SURFACE_MENU_ITEMS = None
+with open(BASE_DIR / "surface" / "links.yml") as f:
+    SURFACE_LINKS_ITEMS = yaml.safe_load(f)
 
 LOGBASECOMMAND_PREFIX = "surface.command"
 
@@ -301,5 +306,5 @@ UNFOLD = {
             "950": "23, 37, 84",
         },
     },
-    # "SIDEBAR": SIDEBAR,
+    "SIDEBAR": SIDEBAR,
 }
