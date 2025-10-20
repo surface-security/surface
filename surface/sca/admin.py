@@ -21,6 +21,7 @@ from core_utils.admin import DefaultModelAdmin
 from core_utils.admin_filters import DefaultFilterMixin, DropdownFilter, RelatedFieldAjaxListFilter
 from core_utils.utils import admin_reverse
 from dkron.utils import run_async
+from inventory.models import GitSource
 from sca import models
 from sca.utils import only_highest_version_dependencies
 
@@ -121,7 +122,6 @@ class SCADependencyAdmin(DefaultFilterMixin, DefaultModelAdmin):
         "name",
         "git_source__repo_url",
         "git_source__apps__tla",
-        "git_source__excluded",
         "is_public",
         "is_project",
     ]
@@ -182,9 +182,6 @@ class SCADependencyAdmin(DefaultFilterMixin, DefaultModelAdmin):
             },
         ),
     )
-
-    def get_default_filters(self, request):
-        return {"git_source__excluded__exact": 0}
 
 
 class SCAFindingFilter(django_filters.FilterSet):
@@ -249,8 +246,6 @@ class SCAProjectAdmin(DefaultFilterMixin, DefaultModelAdmin):
         "name",
         "git_source",
         ("git_source__apps", RelatedFieldAjaxListFilter),
-        "git_source__excluded",
-        BlockedBoolFilter,
     ]
     search_fields = ["name", "purl", "depends_on__name", "depends_on__purl", "git_source__repo_url"]
 
@@ -496,7 +491,6 @@ class SCAFindingAdmin(DjangoObjectActions, DefaultModelAdmin):
         "published",
         "ecosystem",
         "finding_type",
-        HighEPSSFilter,
     ]
     search_fields = ["vuln_id", "ecosystem", "title", "summary", "aliases"]
     list_select_related = ["dependency"]
