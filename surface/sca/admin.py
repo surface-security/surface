@@ -1,31 +1,33 @@
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 import django_filters
 from django import forms
 from django.contrib import admin, messages
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
+from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.defaultfilters import truncatechars
+from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django_object_actions import DjangoObjectActions
 from jsoneditor.forms import JSONEditor
 
 from core_utils.admin import DefaultModelAdmin
-from core_utils.admin_filters import DefaultFilterMixin, RelatedFieldAjaxListFilter
+from core_utils.admin_filters import DefaultFilterMixin, DropdownFilter, RelatedFieldAjaxListFilter
 from core_utils.utils import admin_reverse
 from dkron.utils import run_async
-from inventory.models import GitSource
 from sca import models
 from sca.utils import only_highest_version_dependencies
 
 logger = logging.getLogger(__name__)
 
 
-class EndOfLifeDependencyBoolFilter(admin.SimpleListFilter):
+class EndOfLifeDependencyBoolFilter(DropdownFilter):
     title = "EoL"
     parameter_name = "eol_filter"
     field = "eol"
@@ -86,8 +88,12 @@ class SCADependencyForm(forms.ModelForm):
         fields = ("dependency_tree", "parent_tree")
 
     # Custom field
-    dependency_tree = forms.JSONField(widget=JSONEditor, label="Dependency Tree")
-    parent_tree = forms.JSONField(widget=JSONEditor, label="Parent Tree")
+    dependency_tree = forms.JSONField(
+        widget=JSONEditor(attrs={"style": "background-color: white !important;"}), label="Dependency Tree"
+    )
+    parent_tree = forms.JSONField(
+        widget=JSONEditor(attrs={"style": "background-color: white !important;"}), label="Parent Tree"
+    )
 
     def __init__(self, *args, **kwargs):
         instance = kwargs.get("instance", None)
@@ -100,7 +106,7 @@ class SCADependencyForm(forms.ModelForm):
 
 
 @admin.register(models.SCADependency)
-class SCADependencyAdmin(DefaultModelAdmin, DefaultFilterMixin):
+class SCADependencyAdmin(DefaultFilterMixin, DefaultModelAdmin):
     form = SCADependencyForm
     list_display = [
         "purl",
@@ -115,6 +121,7 @@ class SCADependencyAdmin(DefaultModelAdmin, DefaultFilterMixin):
         "name",
         "git_source__repo_url",
         "git_source__apps__tla",
+        "git_source__excluded",
         "is_public",
         "is_project",
     ]
@@ -133,7 +140,7 @@ class SCADependencyAdmin(DefaultModelAdmin, DefaultFilterMixin):
     def get_git_source(self, obj):
         if obj.git_source:
             return format_html(
-                f'<a target="_blank" href="/inventory/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
+                f'<a target="_blank" href="/tlaconfig/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
             )
 
     @admin.display(description="Depends On")
@@ -150,28 +157,34 @@ class SCADependencyAdmin(DefaultModelAdmin, DefaultFilterMixin):
         (
             "General Info",
             {
+                "classes": ["tab"],
                 "fields": (
                     "purl",
                     "name",
                     "version",
                     "dependency_type",
                     "git_source",
-                )
+                ),
             },
         ),
         (
             "Dependency Tree",
             {
+                "classes": ["tab"],
                 "fields": ("dependency_tree",),
             },
         ),
         (
             "Parent Tree",
             {
+                "classes": ["tab"],
                 "fields": ("parent_tree",),
             },
         ),
     )
+
+    def get_default_filters(self, request):
+        return {"git_source__excluded__exact": 0}
 
 
 class SCAFindingFilter(django_filters.FilterSet):
@@ -230,9 +243,15 @@ class SCADependencyFilter(django_filters.FilterSet):
 
 
 @admin.register(models.SCAProject)
-class SCAProjectAdmin(DefaultModelAdmin):
-    list_display = ["purl", "get_vulns", "get_git_source", "name", "last_scan", "created_at"]
-    list_filter = ["name", "git_source", "git_source__apps__tla"]
+class SCAProjectAdmin(DefaultFilterMixin, DefaultModelAdmin):
+    list_display = ["purl", "get_vulns", "get_git_source", "get_sbom_link", "name", "last_scan", "created_at"]
+    list_filter = [
+        "name",
+        "git_source",
+        ("git_source__apps", RelatedFieldAjaxListFilter),
+        "git_source__excluded",
+        BlockedBoolFilter,
+    ]
     search_fields = ["name", "purl", "depends_on__name", "depends_on__purl", "git_source__repo_url"]
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
@@ -260,45 +279,85 @@ class SCAProjectAdmin(DefaultModelAdmin):
             }
 
             vulnerabilities = self.get_vulnerabilities(obj)
+            # set fixed_in as True by default if not passed in the request
+            if "fixed_in" not in request.GET:
+                request.GET = request.GET.copy()
+                request.GET["fixed_in"] = "true"
             extra_context["vulns_filter"] = SCAFindingFilter(request.GET, queryset=vulnerabilities)
 
         if request.method == "POST":
+            git_source = obj.git_source if hasattr(obj, "git_source") else None
             if request.POST.get("action") == "run_renovate_dependencies":
                 vulnerabilities = self.get_vulnerabilities(obj)
                 dependencies = [vuln.dependency.purl for vuln in vulnerabilities]
-                git_source = obj.git_source if hasattr(obj, "git_source") else []
                 self.renovate(request, git_source, dependencies)
                 return HttpResponseRedirect(request.get_full_path())
 
             elif request.POST.get("action") == "run_renovate_dependencies_no_deps":
-                git_source = obj.git_source if hasattr(obj, "git_source") else []
                 self.renovate(request, git_source)
                 return HttpResponseRedirect(request.get_full_path())
 
             elif request.POST.get("action") == "run_renovate_dependency":
                 dependency_id = request.POST.get("dependency_id")
                 dependency = models.SCADependency.objects.get(pk=dependency_id).purl
-                git_source = obj.git_source if hasattr(obj, "git_source") else []
                 self.renovate(request, git_source, dependency)
                 return HttpResponseRedirect(request.get_full_path())
 
+            elif request.POST.get("jira_project"):
+                jira_project_value = request.POST.get("jira_project", "")
+                obj.jira_project = jira_project_value.upper()
+                obj.save()
+                messages.success(request, "Jira Support Team updated Successfully.")
+            elif request.POST.get("renovate_periodicity"):
+                obj.renovate_periodicity = int(
+                    request.POST.get("renovate_periodicity", models.SCAProject.RenovatePeriodicity.NEVER)
+                )
+                obj.save()
+                try:
+                    if create_renovate_job(obj):
+                        messages.success(request, f"Renovate job created for {obj.git_source.repo_url}")
+                    else:
+                        messages.error(request, f"Failed to create Renovate job for {obj.git_source.repo_url}")
+                except Exception as e:
+                    messages.error(request, f"Failed to create Renovate job for {obj.git_source.repo_url}: {e}")
+                    logger.exception("Failed to create Renovate job for %s", obj.git_source.repo_url)
+
+            return HttpResponseRedirect(request.get_full_path())
         else:
+            # Get only the highest version dependencies as those should be the ones actually installed
+            project_deps = only_highest_version_dependencies(obj.dependencies)
+
             dependencies = (
-                models.SCADependency.objects.filter(purl__in=obj.dependencies)
+                models.SCADependency.objects.filter(purl__in=project_deps)
                 .prefetch_related("depends_on", "git_source__apps")
                 .exclude(purl=obj.purl)
             )
 
-            extra_context["deps_filter"] = SCADependencyFilter(request.GET, queryset=dependencies)
+            filtered_dependencies = []
+            for dep in SCADependencyFilter(request.GET, queryset=dependencies).qs:
+                dep_dict = model_to_dict(dep)
+                dep_dict["created_at"] = dep.created_at
+                dep_dict["vulns_counters"] = dep.get_vulns_counter(obj)
+                filtered_dependencies.append(dep_dict)
+
+            extra_context["deps_filter"] = SCADependencyFilter(request.GET, queryset=dependencies).form
+            extra_context["dependencies"] = filtered_dependencies
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
     def get_vulnerabilities(self, obj):
         """Retrieve and filter vulnerabilities."""
-        vulnerabilities = models.SCAFinding.objects.filter(
-            dependency__purl__in=obj.dependencies,
-            state__in=(models.SCAFinding.State.NEW, models.SCAFinding.State.OPEN),
-        ).prefetch_related("dependency")
+        suppressed_findings = models.SuppressedSCAFinding.objects.filter(
+            Q(sca_project=obj) | Q(sca_project__isnull=True)
+        ).values_list("vuln_id", flat=True)
+        vulnerabilities = (
+            models.SCAFinding.objects.filter(
+                dependency__purl__in=obj.dependencies,
+                state__in=(models.SCAFinding.State.NEW, models.SCAFinding.State.OPEN),
+            )
+            .prefetch_related("dependency")
+            .exclude(vuln_id__in=suppressed_findings)
+        )
 
         highest_version_vulns_purls = only_highest_version_dependencies(
             vulnerabilities.values_list("dependency__purl", flat=True).distinct()
@@ -306,7 +365,7 @@ class SCAProjectAdmin(DefaultModelAdmin):
 
         return vulnerabilities.filter(dependency__purl__in=highest_version_vulns_purls)
 
-    def renovate(self, request, git_source: GitSource, dependencies=None):
+    def renovate(self, request, git_source: Optional[GitSource], dependencies=None):
         """Helper method to process sources for renovation."""
         if not git_source:
             messages.error(request, "No sources found for the project.")
@@ -329,7 +388,15 @@ class SCAProjectAdmin(DefaultModelAdmin):
     def get_git_source(self, obj):
         if obj.git_source:
             return format_html(
-                f'<a target="_blank" href="/inventory/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
+                f'<a target="_blank" href="/tlaconfig/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
+            )
+
+    @admin.display(description="SBOM")
+    def get_sbom_link(self, obj):
+        if obj.sbom_uuid:
+            return format_html(
+                '<a href="{}" target="_blank">Download sbom json</a>',
+                reverse("sca:download_sbom_as_json", args=[obj.sbom_uuid, obj.name]),
             )
 
     @admin.display(description="Vulnerabilities")
@@ -368,25 +435,41 @@ class SCAProjectAdmin(DefaultModelAdmin):
                 severity=vuln["severity"],
                 color=vuln["color"],
                 criticality=criticality if criticality != "eol" else None,
-                finding_type=(
-                    models.SCAFinding.FindingType.VULN if criticality != "eol" else models.SCAFinding.FindingType.EOL
-                ),
+                finding_type=models.SCAFinding.FindingType.VULN
+                if criticality != "eol"
+                else models.SCAFinding.FindingType.EOL,
             )
             for criticality, vuln in severity_mapping.items()
         ]
 
-        return format_html(" ".join(formatted_items))
+        return format_html(
+            '<div style="display: flex; gap: 4px; flex-wrap: nowrap;">{}</div>',
+            mark_safe("".join(formatted_items)),
+        )
 
     def get_queryset(self, request):
         if request.resolver_match.view_name == "admin:sca_scaproject_change":
             return super().get_queryset(request).prefetch_related("depends_on")
-        return super().get_queryset(request).filter(is_project=True).prefetch_related("depends_on")
+        return (
+            super()
+            .get_queryset(request)
+            .filter(is_project=True)
+            .prefetch_related("depends_on", "git_source", "git_source__apps")
+        )
+
+    def get_default_filters(self, request):
+        return {"git_source__excluded__exact": 0}
 
     def has_delete_permission(self, request, obj=None):
         return False
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return False
+
+    def lookup_allowed(self, lookup, value):
+        if lookup == "git_source__apps__tla":  # not covered by list_filter
+            return True
+        return super().lookup_allowed(lookup, value)
 
 
 @admin.register(models.SCAFinding)
@@ -413,6 +496,7 @@ class SCAFindingAdmin(DjangoObjectActions, DefaultModelAdmin):
         "published",
         "ecosystem",
         "finding_type",
+        HighEPSSFilter,
     ]
     search_fields = ["vuln_id", "ecosystem", "title", "summary", "aliases"]
     list_select_related = ["dependency"]
@@ -458,6 +542,7 @@ class SCAFindingAdmin(DjangoObjectActions, DefaultModelAdmin):
                 obj.cvss_vector.split(":")[1].split("/")[0],
                 obj.cvss_score,
             )
+
         return "N/A"
 
     def has_add_permission(self, request):
@@ -475,6 +560,7 @@ class SuppressedSCAFindingAdmin(DefaultModelAdmin):
     list_display = [
         "vuln_id",
         "get_dependency",
+        "get_sca_project",
         "suppress_reason",
         "created_by",
         "updated_by",
@@ -484,10 +570,12 @@ class SuppressedSCAFindingAdmin(DefaultModelAdmin):
     list_filter = [
         "vuln_id",
         ("dependency", RelatedFieldAjaxListFilter),
+        ("sca_project", RelatedFieldAjaxListFilter),
     ]
     search_fields = [
         "vuln_id",
         "dependency__purl",
+        "sca_project",
     ]
     list_select_related = ["dependency", "created_by", "updated_by"]
     readonly_fields = ["created_by", "updated_by"]
@@ -499,6 +587,21 @@ class SuppressedSCAFindingAdmin(DefaultModelAdmin):
             admin_reverse(obj.dependency, "changelist", relative=True, query_kwargs={"purl": obj.dependency.purl}),
             obj.dependency.purl,
         )
+
+    @admin.display(description="SCA Project")
+    def get_sca_project(self, obj):
+        if obj.sca_project:
+            return format_html(
+                '<a target="_blank" href="{}">{}</a>',
+                admin_reverse(
+                    obj.sca_project,
+                    "changelist",
+                    relative=True,
+                    query_kwargs={"name": obj.sca_project.name},
+                ),
+                obj.sca_project.name,
+            )
+        return None
 
     def get_changeform_initial_data(self, request):
         initial = super().get_changeform_initial_data(request)
@@ -521,45 +624,99 @@ class SuppressedSCAFindingAdmin(DefaultModelAdmin):
 
         return initial
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj is None:  # Only for new objects
+            dependency_id = request.GET.get("dependency_id")
+            project_id = request.GET.get("project_id")
+            if dependency_id and project_id:
+                form.base_fields["vuln_id"].initial = request.GET.get("vuln_id")
+                form.base_fields["vuln_id"].disabled = True
+                try:
+                    dependency_instance = models.SCADependency.objects.get(pk=int(dependency_id))
+                    project_instance = models.SCAProject.objects.get(pk=int(project_id))
+                    form.base_fields["dependency"].queryset = models.SCADependency.objects.filter(
+                        pk=dependency_instance.pk
+                    )
+                    form.base_fields["sca_project"].queryset = models.SCAProject.objects.filter(pk=project_instance.pk)
+                    form.base_fields["dependency"].initial = dependency_instance
+                    form.base_fields["dependency"].disabled = True
+                    form.base_fields["dependency"].widget.can_add_related = False
+                    form.base_fields["dependency"].widget.can_change_related = False
+                    form.base_fields["dependency"].widget.can_delete_related = False
+                    form.base_fields["sca_project"].initial = project_instance
+                    form.base_fields["sca_project"].disabled = True
+                    form.base_fields["sca_project"].widget.can_add_related = False
+                    form.base_fields["sca_project"].widget.can_change_related = False
+                    form.base_fields["sca_project"].widget.can_delete_related = False
+                except (models.SCADependency.DoesNotExist, models.SCAProject.DoesNotExist):
+                    pass  # Handle the case when the Dependency does not exist
+        return form
+
     def save_model(self, request, obj, form, change):
         obj.updated_by = request.user
         if not obj.created_by:
             obj.created_by = request.user
-
         # Close SCA Finding
-        closed_sca_findings = models.SCAFinding.objects.filter(
-            dependency=obj.dependency,
-            vuln_id=obj.vuln_id,
-            state__in=(models.SCAFinding.State.NEW, models.SCAFinding.State.OPEN),
-        ).update(state=models.SCAFinding.State.CLOSED)
+        if not obj.sca_project:
+            closed_sca_findings = models.SCAFinding.objects.filter(
+                dependency=obj.dependency,
+                vuln_id=obj.vuln_id,
+                state__in=(models.SCAFinding.State.NEW, models.SCAFinding.State.OPEN),
+            ).update(state=models.SCAFinding.State.CLOSED)
+            if closed_sca_findings:
+                messages.success(
+                    request,
+                    format_html(
+                        "{} Findings Closed!",
+                        closed_sca_findings,
+                    ),
+                )
+        else:
+            messages.success(
+                request,
+                format_html(
+                    "{} Suppressed!",
+                    obj.vuln_id,
+                ),
+            )
 
-        for project in obj.dependency.projects:
-            project.update_vulnerability_counters()
-
-        messages.success(
-            request,
-            format_html(
-                "{} Findings Suppressed!",
-                closed_sca_findings,
-            ),
-        )
         return super().save_model(request, obj, form, change)
 
     def delete_queryset(self, request, queryset: QuerySet[Any]) -> None:
-        reopened_sca_findings = []
+        reopened_sca_findings = 0
         for obj in queryset:
-            reopened_sca_findings = models.SCAFinding.objects.filter(
-                dependency=obj.dependency, vuln_id=obj.vuln_id, state=models.SCAFinding.State.CLOSED
-            ).update(state=models.SCAFinding.State.OPEN)
+            if not obj.sca_project:
+                reopened_sca_findings = models.SCAFinding.objects.filter(
+                    dependency=obj.dependency, vuln_id=obj.vuln_id, state=models.SCAFinding.State.CLOSED
+                ).update(state=models.SCAFinding.State.OPEN)
 
-            for project in obj.dependency.projects:
-                project.update_vulnerability_counters()
-
-        messages.success(
-            request,
-            format_html(
-                "{} Findings Re-Opened!",
-                reopened_sca_findings,
-            ),
-        )
+        if reopened_sca_findings:
+            messages.success(
+                request,
+                format_html(
+                    "{} Findings Re-Opened!",
+                    reopened_sca_findings,
+                ),
+            )
         return super().delete_queryset(request, queryset)
+
+
+@admin.register(models.SCAFindingCounter)
+class SCAFindingCounterAdmin(DefaultModelAdmin):
+    list_display = ["get_purl", "critical", "high", "medium", "low", "eol", "last_sync"]
+    list_filter = ["dependency__purl"]
+    list_select_related = ["dependency"]
+
+    @admin.display(description="Dependency")
+    def get_purl(self, obj):
+        return obj.dependency.purl
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
