@@ -6,7 +6,7 @@ class FindingInheritanceQS(models.QuerySet):
     def get_children(self) -> list:
         return [
             getattr(m, m.content_source.model)
-            for m in self.prefetch_related("content_source__model__finding_ptr").select_related('content_source')
+            for m in self.prefetch_related("content_source__model__finding_ptr").select_related("content_source")
         ]
 
 
@@ -48,7 +48,7 @@ class Finding(models.Model):
     last_seen_date = models.DateTimeField(blank=True, null=True)
 
     application = models.ForeignKey(
-        'inventory.Application',
+        "inventory.Application",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -56,13 +56,13 @@ class Finding(models.Model):
         related_name="application",
     )
 
-    related_to = models.ManyToManyField('self', blank=True, help_text='Other findings related to this one')
+    related_to = models.ManyToManyField("self", blank=True, help_text="Other findings related to this one")
 
     objects = FindingInheritanceQS.as_manager()
 
     def __init__(self, *args, **kwargs):
-        if 'content_source' not in kwargs:
-            kwargs['content_source'] = self.content_type()
+        if not args and "content_source" not in kwargs:
+            kwargs["content_source"] = self.content_type()
         super().__init__(*args, **kwargs)
 
     @classmethod
@@ -76,4 +76,4 @@ class Finding(models.Model):
         return self.content_source
 
     def __str__(self):
-        return f'{self.pk} [{self.cached_content_source.app_label}] - {self.title}'
+        return f"{self.pk} [{self.cached_content_source.app_label}] - {self.title}"
