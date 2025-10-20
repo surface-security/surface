@@ -1,50 +1,81 @@
-{% extends "admin/base.html" %}
-{% load i18n admin_urls static admin_list %}
+{% extends "admin/base_site.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% load i18n admin_urls static admin_modify unfold %}
 
-{% block content %}
+{% block extrahead %}{{ block.super }}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+    {{ media }}
+{% endblock %}
 
-<div class="page-inner">
-    <div class="page-header">
-        {% include 'includes/breadcrumbs.html' %}
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex align-items-center">
-                        <h4 class="card-title">{{ title }}</h4>
-                    </div>
-                </div>
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
 
-                <div class="card-body">
-                    <div class="inner text-center">
-                        <em>
-                            markdown is readable but you can always render this message in 
-                            <a target="_blank" href="https://app.slack.com/block-kit-builder/{{ slack_team }}#{{ message_blocks|urlencode }}">
-                                block-kit-builder
-                            </a>
-                        </em>
-                    </div>
-                    <div>&nbsp;</div>
-                    <pre>{{ message }}</pre>
-                    {% for attachment in attachments %}
-                    <div>&nbsp;</div>
-                    <div class="inner text-center">
-                        <em>
-                            markdown is readable but you can always render this attachment in 
-                            <a target="_blank" href="https://app.slack.com/block-kit-builder/{{ slack_team }}#{{ attachment.1|urlencode }}">
-                                block-kit-builder
-                            </a>
-                        </em>
-                    </div>
-                    <pre>{{ attachment.0 }}</pre>
-                    {% endfor %}
-                </div>
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="px-4">
+            <div class="container mb-6 mx-auto -my-3 lg:mb-12">
+                <ul class="flex flex-wrap">
+                    {% url 'admin:index' as link %}
+                    {% trans 'Home' as name %}
+                    {% include 'unfold/helpers/breadcrumb_item.html' with link=link name=name %}
+
+                    {% url 'admin:app_list' app_label=opts.app_label as link %}
+                    {% include 'unfold/helpers/breadcrumb_item.html' with link=link name=opts.app_config.verbose_name %}
+
+                    {% if has_view_permission %}
+                        {% url opts|admin_urlname:'changelist' as link %}
+                        {% include 'unfold/helpers/breadcrumb_item.html' with link=link  name=opts.verbose_name_plural|capfirst %}
+                    {% else %}
+                        {% include 'unfold/helpers/breadcrumb_item.html' with link='' name=opts.verbose_name_plural|capfirst %}
+                    {% endif %}
+
+                    {% if add %}
+                        {% blocktranslate trimmed with name=opts.verbose_name asvar breadcrumb_name %}
+                            Add {{ name }}
+                        {% endblocktranslate %}
+
+                        {% include 'unfold/helpers/breadcrumb_item.html' with link='' name=breadcrumb_name %}
+                    {% else %}
+                        {% include 'unfold/helpers/breadcrumb_item.html' with link='' name=original|truncatewords:'18' %}
+                    {% endif %}
+                </ul>
             </div>
         </div>
-    </div>
+    {% endblock %}
+{% endif %}
+
+
+{% block nav-global-side %}
+    {% if has_add_permission %}
+        {% include "unfold/helpers/add_link.html" %}
+    {% endif %}
+{% endblock %}
+{% block content %}
+
+<div class="flex flex-col min-h-screen">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center">
+        <h1 class="text-xl font-bold">{{ title }}</h1>
+      </div>
+      <div class="px-6 py-6">
+        <div class="text-center mb-4">
+          <em>
+            markdown is readable but you can always render this message in
+            <a target="_blank" class="underline blue" href="https://app.slack.com/block-kit-builder/{{ slack_team }}#{{ message_blocks|urlencode }}">
+              block-kit-builder
+            </a>
+          </em>
+        </div>
+        <pre class="rounded p-4 text-sm overflow-x-auto">{{ message }}</pre>
+        {% for attachment in attachments %}
+        <div class="my-6 text-center">
+          <em>
+            markdown is readable but you can always render this attachment in
+            <a target="_blank" class="text-blue-600 underline" href="https://app.slack.com/block-kit-builder/{{ slack_team }}#{{ attachment.1|urlencode }}">
+              block-kit-builder
+            </a>
+          </em>
+        </div>
+        <pre class="bg-gray-100 rounded p-4 text-sm text-gray-800 overflow-x-auto">{{ attachment.0 }}</pre>
+        {% endfor %}
 </div>
 
 {% endblock %}

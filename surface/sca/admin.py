@@ -14,13 +14,13 @@ from django.utils.html import format_html
 from django_object_actions import DjangoObjectActions
 from jsoneditor.forms import JSONEditor
 
-from core_utils.admin_filters import DefaultFilterMixin
+from core_utils.admin import DefaultModelAdmin
+from core_utils.admin_filters import DefaultFilterMixin, RelatedFieldAjaxListFilter
 from core_utils.utils import admin_reverse
 from dkron.utils import run_async
 from inventory.models import GitSource
 from sca import models
 from sca.utils import only_highest_version_dependencies
-from theme.filters import RelatedFieldAjaxListFilter
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ class SupportFilter(EndOfLifeDependencyBoolFilter):
 
 
 @admin.register(models.EndOfLifeDependency)
-class EndOfLifeDependencyAdmin(admin.ModelAdmin, DefaultFilterMixin, EndOfLifeDependencyBoolFilter):
+class EndOfLifeDependencyAdmin(DefaultModelAdmin, DefaultFilterMixin, EndOfLifeDependencyBoolFilter):
     list_display = [
         "product",
         "cycle",
@@ -100,7 +100,7 @@ class SCADependencyForm(forms.ModelForm):
 
 
 @admin.register(models.SCADependency)
-class SCADependencyAdmin(admin.ModelAdmin, DefaultFilterMixin):
+class SCADependencyAdmin(DefaultModelAdmin, DefaultFilterMixin):
     form = SCADependencyForm
     list_display = [
         "purl",
@@ -230,7 +230,7 @@ class SCADependencyFilter(django_filters.FilterSet):
 
 
 @admin.register(models.SCAProject)
-class SCAProjectAdmin(admin.ModelAdmin):
+class SCAProjectAdmin(DefaultModelAdmin):
     list_display = ["purl", "get_vulns", "get_git_source", "name", "last_scan", "created_at"]
     list_filter = ["name", "git_source", "git_source__apps__tla"]
     search_fields = ["name", "purl", "depends_on__name", "depends_on__purl", "git_source__repo_url"]
@@ -390,7 +390,7 @@ class SCAProjectAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.SCAFinding)
-class SCAFindingAdmin(DjangoObjectActions, admin.ModelAdmin):
+class SCAFindingAdmin(DjangoObjectActions, DefaultModelAdmin):
     list_display = [
         "vuln_id",
         "truncated_aliases",
@@ -471,7 +471,7 @@ class SCAFindingAdmin(DjangoObjectActions, admin.ModelAdmin):
 
 
 @admin.register(models.SuppressedSCAFinding)
-class SuppressedSCAFindingAdmin(admin.ModelAdmin):
+class SuppressedSCAFindingAdmin(DefaultModelAdmin):
     list_display = [
         "vuln_id",
         "get_dependency",

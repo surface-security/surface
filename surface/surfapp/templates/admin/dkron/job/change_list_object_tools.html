@@ -1,23 +1,22 @@
-{% extends "admin/change_list_object_tools.html" %}
-{% load i18n admin_urls dkron %}
+{% load unfold dkron admin_urls i18n %}
 
 {% block object-tools-items %}
-{% if has_dashboard_permission %}
-<li class="d-inline-block">
-    <a href="{% dkron_path %}" target="_blank">
-        <button class="btn btn-primary-outline btn-round ml-1">
-            <i class="fas fa-th-large mr-1"></i>
-            Open dashboard
-        </button>
-    </a>
-    {% url cl.opts|admin_urlname:'resync' as resync_url %}
-    <a href="{% add_preserved_filters resync_url is_popup to_field %}">
-        <button class="btn btn-primary-outline btn-round ml-1">
-            <i class="fas fa-sync mr-1"></i>
-            Resync jobs
-        </button>
-    </a>
-</li>
-{% endif %}
-{{ block.super }}
+    <div style="display: flex; gap: 8px; align-items: center;">
+        {% if has_add_permission %}
+            {% include "unfold/helpers/add_link.html" %}
+        {% endif %}
+        {% if has_dashboard_permission %}
+            {% dkron_path as dashboard_url %}
+            {% url cl.opts|admin_urlname:'resync' as resync_url %}
+            {% add_preserved_filters resync_url is_popup to_field as resync_href %}
+            {% component "unfold/components/flex.html" with class="flex-col gap-4 lg:flex-row" %}
+                {% component "unfold/components/button.html" with href=dashboard_url %}
+                    Dashboard
+                {% endcomponent %}
+                {% component "unfold/components/button.html" with href=resync_href variant="default"%}
+                    Resync jobs
+                {% endcomponent %}
+            {% endcomponent %}
+        {% endif %}
+    </div>
 {% endblock %}

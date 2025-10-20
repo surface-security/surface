@@ -1,5 +1,9 @@
 {% extends "includes/navigation.html" %}
 
+{% block top_bar_authenticated %}
+{{ block.super }}
+{% endblock %}
+
 {% block menu_options %}
 <div class="dropdown-divider"></div>
 <a class="dropdown-item" href="{% url 'admin:auth_user_change' request.user.pk %}">Profile</a>

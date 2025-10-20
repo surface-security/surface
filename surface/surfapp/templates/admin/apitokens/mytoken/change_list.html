@@ -1,0 +1,31 @@
+{% extends "admin/change_list.html" %}
+{% load unfold %}
+
+{% block messages %}
+<div class="px-4">
+    <div class="{% if not cl.model_admin.list_fullwidth %}container{% endif %} mx-auto">
+        {% if messages %}
+            <ul class="flex flex-col gap-4 mb-8">
+                {% for message in messages %}
+                    <li class="*:mb-0!">
+                        {% if message.tags == "token info" %}
+                    <div class="mb-3 px-3 py-3 rounded-default text-sm last:mb-8 bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400">
+                        {{ message }}
+                        Token generated - save it before it is gone!
+                    </div>
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                        {% include "unfold/helpers/messages/success.html" with message=message %}
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                        {% include "unfold/helpers/messages/warning.html" with message=message %}
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                        {% include "unfold/helpers/messages/error.html" with message=message %}
+                    {% else %}
+                        {% include "unfold/helpers/messages/debug.html" with message=message %}
+                    {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>  
+{% endblock %}  

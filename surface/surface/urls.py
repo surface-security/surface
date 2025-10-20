@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("", include(("theme.urls", "theme"), namespace="surface_theme")),
     path("dkron/", include("dkron.urls")),
     path("sbomrepo/", include("sbomrepo.urls")),
     path("", admin.site.urls),
