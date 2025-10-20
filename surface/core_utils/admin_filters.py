@@ -10,7 +10,6 @@ from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.widgets import AdminDateWidget
 from django.core.validators import EMPTY_VALUES
 from django.db.models import Model, QuerySet
-from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.forms import ValidationError
 from django.http import HttpRequest

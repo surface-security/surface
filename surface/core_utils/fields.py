@@ -1,5 +1,4 @@
 import netaddr
-
 from django.conf import settings
 from django.core import exceptions, validators
 from django.db import models
@@ -11,19 +10,19 @@ class UnsignedIntegerField(fields.IntegerField):
 
     def db_type(self, connection=None):
         # connection not used, types hardcoded
-        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
+        if settings.DATABASES["default"]["ENGINE"] == "django.db.backends.mysql":
             return "integer UNSIGNED"
-        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
-            return 'integer'
-        if settings.DATABASES['default']['ENGINE'] in (
-            'django.db.backends.postgresql_psycopg2',
-            'django.db.backends.postgresql',
+        if settings.DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+            return "integer"
+        if settings.DATABASES["default"]["ENGINE"] in (
+            "django.db.backends.postgresql_psycopg2",
+            "django.db.backends.postgresql",
         ):
-            return 'bigint'
-        raise NotImplementedError(settings.DATABASES['default']['ENGINE'])
+            return "bigint"
+        raise NotImplementedError(settings.DATABASES["default"]["ENGINE"])
 
     def get_internal_type(self):
-        return "UnsignedIntegerField"
+        return "PositiveIntegerField"
 
     def to_python(self, value):
         if value is None:
@@ -41,8 +40,8 @@ class RangeModel(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         try:
-            if '-' in self.range:
-                first, second = self.range.split('-')
+            if "-" in self.range:
+                first, second = self.range.split("-")
                 _x = netaddr.IPRange(first, second)
             else:
                 _x = netaddr.IPNetwork(self.range)
@@ -59,7 +58,7 @@ class RangeModel(models.Model):
 
 class TruncatingCharField(models.CharField):
     def __init__(self, *args, **kwargs):
-        self._dotdotdot = kwargs.pop('dotdotdot', True)
+        self._dotdotdot = kwargs.pop("dotdotdot", True)
         super().__init__(*args, **kwargs)
 
     def get_prep_value(self, value):
@@ -68,5 +67,5 @@ class TruncatingCharField(models.CharField):
 
     def trim_length(self, value):
         if value and len(value) > self.max_length:
-            return value[: self.max_length - 3] + '...'
+            return value[: self.max_length - 3] + "..."
         return value

@@ -128,6 +128,22 @@ class SCADependency(models.Model):
         _, parent_projects = SCADependency.get_parents_recursively(self, parsed_parents)
         return parent_projects
 
+    def get_vulns_counter(self, project):
+        suppressed_findings = (
+            SuppressedSCAFinding.objects.filter(dependency=self)
+            .filter(Q(sca_project__isnull=True) | Q(sca_project=project))
+            .values_list("vuln_id", flat=True)
+        )
+
+        findings = (
+            SCAFinding.objects.filter(dependency=self)
+            .select_related("dependency")
+            .values("severity", "finding_type")
+            .annotate(count=Count("severity"), eol=Count(Case(When(finding_type=1, then=1))))
+            .order_by("-severity")
+        ).exclude(vuln_id__in=suppressed_findings)
+        return {item["severity"]: {"count": item["count"], "eol": item["eol"]} for item in findings}
+
     @property
     def vulns(self):
         findings = (
@@ -272,6 +288,9 @@ class SuppressedSCAFinding(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey("auth.User", null=True, on_delete=models.SET_NULL, related_name="+")
     updated_by = models.ForeignKey("auth.User", null=True, on_delete=models.SET_NULL, related_name="+")
+    sca_project = models.ForeignKey(
+        SCAProject, null=True, blank=True, on_delete=models.CASCADE, related_name="suppressed_findings_project"
+    )
 
     class Meta:
         verbose_name = "Suppressed Dependency Finding (SCA)"

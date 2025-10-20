@@ -9,12 +9,9 @@ from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponseRedirect
-from django.shortcuts import redirect
-from django.template.defaultfilters import truncatechars
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django_object_actions import DjangoObjectActions
 from jsoneditor.forms import JSONEditor
 
 from core_utils.admin import DefaultModelAdmin
@@ -107,7 +104,7 @@ class SCADependencyForm(forms.ModelForm):
 
 
 @admin.register(models.SCADependency)
-class SCADependencyAdmin(DefaultFilterMixin, DefaultModelAdmin):
+class SCADependencyAdmin(DefaultModelAdmin):
     form = SCADependencyForm
     list_display = [
         "purl",
@@ -240,7 +237,7 @@ class SCADependencyFilter(django_filters.FilterSet):
 
 
 @admin.register(models.SCAProject)
-class SCAProjectAdmin(DefaultFilterMixin, DefaultModelAdmin):
+class SCAProjectAdmin(DefaultModelAdmin):
     list_display = ["purl", "get_vulns", "get_git_source", "get_sbom_link", "name", "last_scan", "created_at"]
     list_filter = [
         "name",
@@ -297,25 +294,6 @@ class SCAProjectAdmin(DefaultFilterMixin, DefaultModelAdmin):
                 dependency = models.SCADependency.objects.get(pk=dependency_id).purl
                 self.renovate(request, git_source, dependency)
                 return HttpResponseRedirect(request.get_full_path())
-
-            elif request.POST.get("jira_project"):
-                jira_project_value = request.POST.get("jira_project", "")
-                obj.jira_project = jira_project_value.upper()
-                obj.save()
-                messages.success(request, "Jira Support Team updated Successfully.")
-            elif request.POST.get("renovate_periodicity"):
-                obj.renovate_periodicity = int(
-                    request.POST.get("renovate_periodicity", models.SCAProject.RenovatePeriodicity.NEVER)
-                )
-                obj.save()
-                try:
-                    if create_renovate_job(obj):
-                        messages.success(request, f"Renovate job created for {obj.git_source.repo_url}")
-                    else:
-                        messages.error(request, f"Failed to create Renovate job for {obj.git_source.repo_url}")
-                except Exception as e:
-                    messages.error(request, f"Failed to create Renovate job for {obj.git_source.repo_url}: {e}")
-                    logger.exception("Failed to create Renovate job for %s", obj.git_source.repo_url)
 
             return HttpResponseRedirect(request.get_full_path())
         else:
@@ -452,9 +430,6 @@ class SCAProjectAdmin(DefaultFilterMixin, DefaultModelAdmin):
             .prefetch_related("depends_on", "git_source", "git_source__apps")
         )
 
-    def get_default_filters(self, request):
-        return {"git_source__excluded__exact": 0}
-
     def has_delete_permission(self, request, obj=None):
         return False
 
@@ -468,85 +443,45 @@ class SCAProjectAdmin(DefaultFilterMixin, DefaultModelAdmin):
 
 
 @admin.register(models.SCAFinding)
-class SCAFindingAdmin(DjangoObjectActions, DefaultModelAdmin):
+class SCAFindingAdmin(DefaultModelAdmin):
     list_display = [
         "vuln_id",
-        "truncated_aliases",
-        "get_dependency",
+        # "truncated_aliases",
         "title",
         "severity",
         "state",
         "published",
-        "get_cvss_score",
-        "truncated_fixed_in",
+        # "truncated_fixed_in",
         "ecosystem",
         "finding_type",
         "first_seen",
         "last_seen_date",
     ]
-    list_filter = [
-        ("dependency", RelatedFieldAjaxListFilter),
-        "severity",
-        "state",
-        "published",
-        "ecosystem",
-        "finding_type",
-    ]
-    search_fields = ["vuln_id", "ecosystem", "title", "summary", "aliases"]
-    list_select_related = ["dependency"]
 
-    @admin.display(description="Aliases")
-    def truncated_aliases(self, obj):
-        return truncatechars(obj.aliases, 50)
+    # search_fields = ["vuln_id", "ecosystem", "title", "summary", "aliases"]
+    # list_select_related = ["dependency"]
 
-    @admin.display(description="Fixed In")
-    def truncated_fixed_in(self, obj):
-        return truncatechars(obj.fixed_in, 50)
+    # @admin.display(description="Aliases")
+    # def truncated_aliases(self, obj):
+    #     return truncatechars(obj.aliases, 50)
 
-    def suppress_finding(self, request, obj):
-        return redirect(
-            admin_reverse(
-                models.SuppressedSCAFinding,
-                "add",
-                request=request,
-                query_kwargs={"dependency": obj.dependency_id, "vuln_id": obj.vuln_id},
-            )
-        )
+    # @admin.display(description="Fixed In")
+    # def truncated_fixed_in(self, obj):
+    #     return truncatechars(obj.fixed_in, 50)
 
-    suppress_finding.label = "Suppress Finding"
-    suppress_finding.attrs = {"class": "btn btn-round ml-auto btn-warning"}
-    suppress_finding.short_description = "This button will Suppress this finding"
+    # def suppress_finding(self, request, obj):
+    #     return redirect(
+    #         admin_reverse(
+    #             models.SuppressedSCAFinding,
+    #             "add",
+    #             request=request,
+    #             query_kwargs={"dependency": obj.dependency_id, "vuln_id": obj.vuln_id},
+    #         )
+    #     )
 
-    change_actions = ("suppress_finding",)
-
-    @admin.display(description="Dependency")
-    def get_dependency(self, obj):
-        return format_html(
-            '<a target="_blank" href="{}">{}</a>',
-            admin_reverse(obj.dependency, "changelist", relative=True, query_kwargs={"purl": obj.dependency.purl}),
-            obj.dependency.purl,
-        )
-
-    @admin.display(description="CVSS", ordering="cvss_vector")
-    def get_cvss_score(self, obj):
-        if obj.cvss_vector:
-            return format_html(
-                '<a target="_blank" href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector={}&version={}">{}</a>',
-                "/".join(obj.cvss_vector.split("/")[1:]),
-                obj.cvss_vector.split(":")[1].split("/")[0],
-                obj.cvss_score,
-            )
-
-        return "N/A"
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
+    # suppress_finding.label = "Suppress Finding"
+    # suppress_finding.attrs = {"class": "btn btn-round ml-auto btn-warning"}
+    # suppress_finding.short_description = "This button will Suppress this finding"
 
 
 @admin.register(models.SuppressedSCAFinding)
@@ -554,7 +489,6 @@ class SuppressedSCAFindingAdmin(DefaultModelAdmin):
     list_display = [
         "vuln_id",
         "get_dependency",
-        "get_sca_project",
         "suppress_reason",
         "created_by",
         "updated_by",
@@ -610,7 +544,7 @@ class SuppressedSCAFindingAdmin(DefaultModelAdmin):
                 # Assuming Dependency is the related model
                 dependency_instance = models.SCADependency.objects.get(pk=int(dependency))
                 initial["dependency"] = dependency_instance
-            except models.Dependency.DoesNotExist:
+            except models.SCADependency.DoesNotExist:
                 pass  # Handle the case when the Dependency does not exist
 
         if vuln_id:

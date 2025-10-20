@@ -48,34 +48,6 @@
                         </div>
                     </form>
                 </div>
-                <div class="three wide column">
-                    <form method="post" class="ui form">
-                        {% csrf_token %}
-                        <div class="field">
-                            <label for="renovate_periodicity"> Auto Update:</label>
-                            <div class="ui action input">
-                                <select id="renovate_periodicity" name="renovate_periodicity" class="ui selection fluid dropdown">
-                                    {% for choice in current_object.RenovatePeriodicity.choices %}
-                                        <option value="{{ choice.0 }}" {% if choice.0 == current_object.renovate_periodicity %}selected{% endif %}>{{ choice.1 }}</option>
-                                    {% endfor %}
-                                </select>
-                                <button class="ui icon inverted button" style="margin-left: 1px;" data-tooltip="Periodically run Renovate" data-position="top right"><i class="save icon"></i></button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="three wide fixed column" style="max-width: 80%;">
-                    <form method="post" class="ui form">
-                        {% csrf_token %}
-                        <div class="field">
-                            <label for="jira_project">JIRA Project:</label>
-                            <div class="ui action input">
-                                <input type="text" id="jira_project" name="jira_project" placeholder="{{ current_object.jira_project }}" value="{{ current_object.jira_project }}">
-                                <button class="ui icon inverted button" data-tooltip="Add a Jira Team for which stories for Renovate PRs review will be created." data-position="top right"><i class="save icon"></i></button>
-                            </div>
-                        </div>                   
-                    </form>
-                </div>
             </div>
             <input name="view" type="hidden" value="dependencies">
         </form>

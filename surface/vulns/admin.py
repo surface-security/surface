@@ -50,4 +50,4 @@ class FindingAdmin(DefaultModelAdmin):
         ak = self.admin_site._registry.get(k)
         if ak is None or not ak.ALLOW_DELETE:
             return False
-        return DefaultModelAdmin.has_delete_permission(self, request, obj)
+        return admin.ModelAdmin.has_delete_permission(self, request, obj)
