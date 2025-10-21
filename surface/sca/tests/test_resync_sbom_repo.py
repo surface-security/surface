@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+import datetime
 from unittest import mock
 
 import responses
@@ -17,7 +17,7 @@ from . import data
 
 class Test(TestCase):
     @responses.activate
-    @mock.patch("django.utils.timezone.now", return_value=datetime(2023, 9, 7, tzinfo=timezone.utc))
+    @mock.patch("django.utils.timezone.now", return_value=datetime.datetime(2023, 9, 7, tzinfo=datetime.timezone.utc))
     def test_resync_sbom_repo(self, now):
         responses.add(
             responses.GET,
@@ -29,7 +29,7 @@ class Test(TestCase):
 
         responses.add(
             responses.GET,
-            f"{settings.SCA_SBOM_REPO_URL}/all?since={datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')}",
+            f"{settings.SCA_SBOM_REPO_URL}/all?since={datetime.datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')}",
             status=200,
             content_type="application/json",
             json=["urn:uuid:46d764e2-aae1-4f82-b9f1-c616308e921d"],
@@ -93,14 +93,14 @@ class Test(TestCase):
         assert counter.critical == 0
 
     def test_handle_eol_dependency(self):
-        eol_date = timezone.now().date() - timedelta(days=1)
+        eol_date = timezone.now().date() - datetime.timedelta(days=1)
         purl_str = "pkg:pypi/django@3.2.0"
         purl = PackageURL.from_string(purl_str)
 
         eol_dependency = EndOfLifeDependency.objects.create(
             product="django",
             cycle="3.2.0",
-            release_date=timezone.now().date() - timedelta(days=10),
+            release_date=timezone.now().date() - datetime.timedelta(days=10),
             eol=eol_date,
             latest_version="3.2.8",
         )

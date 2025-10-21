@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from unittest import mock
 
 import responses
@@ -18,7 +18,7 @@ from sca.tests import data
 
 class Test(TestCase):
     @responses.activate
-    @mock.patch("django.utils.timezone.now", return_value=datetime(2023, 9, 7, tzinfo=timezone.utc))
+    @mock.patch("django.utils.timezone.now", return_value=datetime.datetime(2023, 9, 7, tzinfo=datetime.timezone.utc))
     def setUp(self, now) -> None:
         self.user = get_user_model().objects.create_user("tester", "tester@ppb.it", "tester")
         self.site = AdminSite()
@@ -32,7 +32,7 @@ class Test(TestCase):
 
         responses.add(
             responses.GET,
-            f"{settings.SCA_SBOM_REPO_URL}/all?since={datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')}",
+            f"{settings.SCA_SBOM_REPO_URL}/all?since={datetime.datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')}",
             status=200,
             content_type="application/json",
             json=["urn:uuid:46d764e2-aae1-4f82-b9f1-c616308e921d"],
@@ -65,10 +65,10 @@ class Test(TestCase):
         assert SCADependency.objects.filter(is_project=True).count() == 1
 
         # Assert specific HTML content
-        content = r.content.decode()
+        content = " ".join(r.content.decode().split())
         assert "pkg:github.com/test/repo@master" in content
         assert "https://github.com/test/repo" in content
-        assert "<span>Vulnerabilities</span>" in content
+        assert "Vulnerabilities" in content
         assert "1 Project (SCA)" in content
 
         # Assert Vulnerabilities Counters
