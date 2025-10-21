@@ -14,7 +14,7 @@ from django.db.models.fields import Field
 from django.forms import ValidationError
 from django.http import HttpRequest
 from django.shortcuts import redirect
-from rangefilter.filter import DateRangeFilter as OriginalDateRangeFilter
+from rangefilter.filters import DateRangeFilter as OriginalDateRangeFilter
 from unfold.admin import ModelAdmin
 from unfold.contrib.filters.admin import DropdownFilter as UnfoldDropdownFilter
 from unfold.contrib.filters.admin.dropdown_filters import RelatedDropdownFilter
