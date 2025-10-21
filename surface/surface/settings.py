@@ -258,6 +258,7 @@ LOGGING = {
 TITLE = "Surface"
 VERSION = "dev"
 
+LOGIN_REDIRECT_URL = "/"
 
 ######################################################################
 # Unfold
