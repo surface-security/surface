@@ -2,3 +2,4 @@ cffi==1.15.1
 packaging==23.1
 pyOpenSSL==23.2.0
 docker[tls]==6.1.3
+hvac==2.3.0
