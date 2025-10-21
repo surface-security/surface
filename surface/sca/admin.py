@@ -9,6 +9,7 @@ from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponseRedirect
+from django.template.defaultfilters import truncatechars
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -444,44 +445,32 @@ class SCAProjectAdmin(DefaultModelAdmin):
 
 @admin.register(models.SCAFinding)
 class SCAFindingAdmin(DefaultModelAdmin):
+    ALLOW_DELETE = True
+
     list_display = [
         "vuln_id",
-        # "truncated_aliases",
+        "truncated_aliases",
         "title",
         "severity",
         "state",
         "published",
-        # "truncated_fixed_in",
+        "truncated_fixed_in",
         "ecosystem",
         "finding_type",
         "first_seen",
         "last_seen_date",
     ]
 
-    # search_fields = ["vuln_id", "ecosystem", "title", "summary", "aliases"]
-    # list_select_related = ["dependency"]
+    search_fields = ["vuln_id", "ecosystem", "title", "summary", "aliases"]
+    list_select_related = ["dependency"]
 
-    # @admin.display(description="Aliases")
-    # def truncated_aliases(self, obj):
-    #     return truncatechars(obj.aliases, 50)
+    @admin.display(description="Aliases")
+    def truncated_aliases(self, obj):
+        return truncatechars(obj.aliases, 50)
 
-    # @admin.display(description="Fixed In")
-    # def truncated_fixed_in(self, obj):
-    #     return truncatechars(obj.fixed_in, 50)
-
-    # def suppress_finding(self, request, obj):
-    #     return redirect(
-    #         admin_reverse(
-    #             models.SuppressedSCAFinding,
-    #             "add",
-    #             request=request,
-    #             query_kwargs={"dependency": obj.dependency_id, "vuln_id": obj.vuln_id},
-    #         )
-    #     )
-
-    # suppress_finding.label = "Suppress Finding"
-    # suppress_finding.attrs = {"class": "btn btn-round ml-auto btn-warning"}
-    # suppress_finding.short_description = "This button will Suppress this finding"
+    @admin.display(description="Fixed In")
+    def truncated_fixed_in(self, obj):
+        return truncatechars(obj.fixed_in, 50)
 
 
 @admin.register(models.SuppressedSCAFinding)

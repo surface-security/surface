@@ -8,8 +8,8 @@
             <a class="item"
             href="/sca/scaproject/{{ original.pk }}/change/?view=vulnerabilities">Vulnerabilities</a>
         </div>
-            <div class="ui grid" style="max-width: 80%;">
-                <div class="eight wide column">
+            <div class="ui grid" style="max-width: 100%;">
+                <div class="fourteen wide column">
                     <form method="get" class="ui form">
                     <div class="fields">
                         {% for field in deps_filter %}
@@ -40,10 +40,8 @@
                     <form method="get" class="ui form">
                         <div class="field">
                             <label>Vulnerable</label>
-                            <p></p>
-                            <div class="ui toggle right aligned checkbox">
+                            <div class="ui toggle checkbox">
                                 <input type="checkbox" name="show_vulnerable" id="show_vulnerable_toggle" {% if show_vulnerable %}checked="checked"{% endif %}>
-                                <label for="show_vulnerable_toggle"></label>
                             </div>
                         </div>
                     </form>
