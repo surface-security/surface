@@ -19,10 +19,10 @@ def test_dkron_admin_views(prep_dkron, test_cfg, live_server):
     test_cfg.driver.find_element(by=By.ID, value="id_password").send_keys(f"{test_cfg.password}")
     test_cfg.driver.find_element(by=By.XPATH, value='//button[contains(., "Log in")]').click()
 
-    assert "Home | Surface" == test_cfg.driver.title
+    assert "Dashboard | Surface Security" == test_cfg.driver.title
 
     test_cfg.driver.get(f"{live_server.url}/dkron/job/add/")
-    assert "Add job | Surface" == test_cfg.driver.title
+    assert "Add job | Surface Security" == test_cfg.driver.title
 
     test_cfg.driver.find_element(by=By.ID, value="id_name").send_keys(TEST_IO["name"])
     test_cfg.driver.find_element(by=By.ID, value="id_schedule").send_keys(TEST_IO["schedule"])
@@ -34,7 +34,7 @@ def test_dkron_admin_views(prep_dkron, test_cfg, live_server):
     test_cfg.driver.find_element(by=By.NAME, value="_save").send_keys(Keys.ENTER)
 
     test_cfg.driver.get(f"{live_server.url}/dkron/job")
-    assert "Select job to change | Surface" == test_cfg.driver.title
+    assert "Select job to change | Surface Security" == test_cfg.driver.title
 
     for k, v in TEST_IO.items():
         assert v == test_cfg.driver.find_element(by=By.CLASS_NAME, value=f"field-{k}").text
