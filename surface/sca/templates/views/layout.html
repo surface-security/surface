@@ -136,7 +136,11 @@
             .ui.dropdown > .text {
                 color: var(--unfold-foreground, inherit) !important;
             }
-        </style>
+
+            td a:not(.ui.label):not(.ui.label *) {
+                  color: #3366CC !important;
+            }
+      </style>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}

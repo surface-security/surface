@@ -14,7 +14,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from jsoneditor.forms import JSONEditor
 
-from core_utils.admin import DefaultModelAdmin
+from core_utils.admin import DefaultModelAdmin, ReverseReadonlyMixin
 from core_utils.admin_filters import DefaultFilterMixin, DropdownFilter, RelatedFieldAjaxListFilter
 from core_utils.utils import admin_reverse
 from dkron.utils import run_async
@@ -104,7 +104,7 @@ class SCADependencyForm(forms.ModelForm):
 
 
 @admin.register(models.SCADependency)
-class SCADependencyAdmin(DefaultModelAdmin):
+class SCADependencyAdmin(ReverseReadonlyMixin, DefaultModelAdmin):
     form = SCADependencyForm
     list_display = [
         "purl",
