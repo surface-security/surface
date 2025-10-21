@@ -90,5 +90,129 @@ SIDEBAR = {
                 },
             ],
         },
+        {
+            "title": "CMDB",
+            "icon": "map",
+            "collapsible": True,
+            "items": [
+                {
+                    "title": "Applications (TLAs) (All)",
+                    "icon": "apps",
+                    "link": reverse_lazy("admin:inventory_application_changelist"),
+                    "permission": check_permission("inventory.view_application"),
+                },
+                {
+                    "title": "Git (Repos) Sources",
+                    "icon": "code",
+                    "link": reverse_lazy("admin:inventory_gitsource_changelist"),
+                    "permission": check_permission("inventory.view_gitsource"),
+                },
+            ],
+        },
+        {
+            "title": "DNS & IPs",
+            "icon": "dns",
+            "collapsible": True,
+            "items": [
+                {
+                    "title": "Sources",
+                    "icon": "source",
+                    "link": reverse_lazy("admin:dns_ips_source_changelist"),
+                    "permission": check_permission("dns_ips.view_source"),
+                },
+                {
+                    "title": "Tags",
+                    "icon": "label",
+                    "link": reverse_lazy("admin:dns_ips_tag_changelist"),
+                    "permission": check_permission("dns_ips.view_tag"),
+                },
+                {
+                    "title": "IP Addresses",
+                    "icon": "pin_drop",
+                    "link": reverse_lazy("admin:dns_ips_ipaddress_changelist"),
+                    "permission": check_permission("dns_ips.view_ipaddress"),
+                },
+                {
+                    "title": "IP Ranges",
+                    "icon": "swap_horiz",
+                    "link": reverse_lazy("admin:dns_ips_iprange_changelist"),
+                    "permission": check_permission("dns_ips.view_iprange"),
+                },
+                {
+                    "title": "DNS Domains",
+                    "icon": "domain",
+                    "link": reverse_lazy("admin:dns_ips_dnsdomain_changelist"),
+                    "permission": check_permission("dns_ips.view_dnsdomain"),
+                },
+                {
+                    "title": "DNS Records",
+                    "icon": "dns",
+                    "link": reverse_lazy("admin:dns_ips_dnsrecord_changelist"),
+                    "permission": check_permission("dns_ips.view_dnsrecord"),
+                },
+                {
+                    "title": "DNS Record Values",
+                    "icon": "fact_check",
+                    "link": reverse_lazy("admin:dns_ips_dnsrecordvalue_changelist"),
+                    "permission": check_permission("dns_ips.view_dnsrecordvalue"),
+                },
+            ],
+        },
+        {
+            "title": "Security Testing & VM",
+            "icon": "search",
+            "collapsible": True,
+            "items": [
+                {
+                    "title": "Findings (All)",
+                    "icon": "find_in_page",
+                    "link": reverse_lazy("admin:vulns_finding_changelist"),
+                    "permission": check_permission("vulns.view_finding"),
+                },
+            ],
+        },
+        {
+            "title": "Rootboxes & Scanners",
+            "icon": "host",
+            "collapsible": True,
+            "items": [
+                {
+                    "title": "Scanners Logs",
+                    "icon": "list_alt",
+                    "link": reverse_lazy("admin:scanners_scanlog_changelist"),
+                    "permission": check_permission("scanners.view_scanlog"),
+                },
+                {
+                    "title": "Rootboxes",
+                    "icon": "dns",
+                    "link": reverse_lazy("admin:scanners_rootbox_changelist"),
+                    "permission": check_permission("scanners.view_rootbox"),
+                },
+                {
+                    "title": "Scanners",
+                    "icon": "search",
+                    "link": reverse_lazy("admin:scanners_scanner_changelist"),
+                    "permission": check_permission("scanners.view_scanner"),
+                },
+                {
+                    "title": "Scanners Images",
+                    "icon": "image",
+                    "link": reverse_lazy("admin:scanners_scannerimage_changelist"),
+                    "permission": check_permission("scanners.view_scannerimage"),
+                },
+                {
+                    "title": "Live Webservers",
+                    "icon": "public",
+                    "link": reverse_lazy("admin:scanners_livehost_changelist"),
+                    "permission": check_permission("scanners.view_livehost"),
+                },
+                {
+                    "title": "Raw Results",
+                    "icon": "description",
+                    "link": reverse_lazy("admin:scanners_rawresult_changelist"),
+                    "permission": check_permission("scanners.view_rawresult"),
+                },
+            ],
+        },
     ],
 }
