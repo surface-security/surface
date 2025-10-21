@@ -7,7 +7,7 @@ RUN --mount=type=bind,target=/tmpapp \
     python /run.py /tmpapp/surface/requirements_prod.txt \
                    /tmpapp/surface/requirements_psql.txt > /requirements_full.txt
 
-FROM python:3.9-slim-buster as builder
+FROM python:3.11-slim-buster as builder
 
 RUN apt-get update \
  && apt-get install --no-install-recommends -y \
@@ -27,7 +27,7 @@ RUN pip wheel -w /wheels -r requirements_full.txt
 
 ############################################################################
 
-FROM python:3.9-slim-buster as main
+FROM python:3.11-slim-buster as main
 
 RUN apt-get update \
  && apt-get install --no-install-recommends -y \
