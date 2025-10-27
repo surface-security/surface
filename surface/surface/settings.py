@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.db.migrations",
     "impersonate",
-    "import_export", 
+    "import_export",
     "dkron",
     "notifications",
     "slackbot",

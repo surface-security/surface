@@ -133,7 +133,7 @@ class SCADependencyAdmin(ReverseReadonlyMixin, DefaultModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("depends_on", "git_source__apps")
-    
+
     def has_add_permission(self, request: HttpRequest) -> bool:
         return False
 
@@ -412,9 +412,9 @@ class SCAProjectAdmin(DefaultModelAdmin):
                 severity=vuln["severity"],
                 color=vuln["color"],
                 criticality=criticality if criticality != "eol" else None,
-                finding_type=models.SCAFinding.FindingType.VULN
-                if criticality != "eol"
-                else models.SCAFinding.FindingType.EOL,
+                finding_type=(
+                    models.SCAFinding.FindingType.VULN if criticality != "eol" else models.SCAFinding.FindingType.EOL
+                ),
             )
             for criticality, vuln in severity_mapping.items()
         ]
