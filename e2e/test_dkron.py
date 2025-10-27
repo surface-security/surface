@@ -17,8 +17,7 @@ def test_dkron_admin_views(prep_dkron, test_cfg, live_server):
 
     test_cfg.driver.find_element(by=By.ID, value="id_username").send_keys(test_cfg.username)
     test_cfg.driver.find_element(by=By.ID, value="id_password").send_keys(f"{test_cfg.password}")
-  test_cfg.driver.find_element(By.TAG_NAME, "form").submit()
-
+    test_cfg.driver.find_element(by=By.ID, value="login-form").submit()
 
     assert "Dashboard | Surface Security" == test_cfg.driver.title
 
