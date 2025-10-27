@@ -133,6 +133,9 @@ class SCADependencyAdmin(ReverseReadonlyMixin, DefaultModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("depends_on", "git_source__apps")
+    
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return False
 
     @admin.display(description="Repository")
     def get_git_source(self, obj):

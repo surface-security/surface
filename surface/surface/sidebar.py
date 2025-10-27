@@ -172,6 +172,37 @@ SIDEBAR = {
             ],
         },
         {
+            "title": "Secure SDLC / AppSec",
+            "icon": "security",
+            "collapsible": True,
+            "items": [
+                {
+                    "title": "SCA - Dependencies",
+                    "icon": "extension",
+                    "link": reverse_lazy("admin:sca_scadependency_changelist"),
+                    "permission": check_permission("sca.view_scadependency"),
+                },
+                {
+                    "title": "SCA - Projects",
+                    "icon": "workspaces",
+                    "link": reverse_lazy("admin:sca_scaproject_changelist"),
+                    "permission": check_permission("sca.view_scaproject"),
+                },
+                {
+                    "title": "SCA - Dependencies (EoL)",
+                    "icon": "event_busy",
+                    "link": reverse_lazy("admin:sca_endoflifedependency_changelist"),
+                    "permission": check_permission("sca.view_endoflifedependency"),
+                },
+                {
+                    "title": "SCA - Findings (Suppressed)",
+                    "icon": "block",
+                    "link": reverse_lazy("admin:sca_suppressedscafinding_changelist"),
+                    "permission": check_permission("sca.view_suppressedscafinding"),
+                },
+            ],
+        },
+        {
             "title": "Rootboxes & Scanners",
             "icon": "host",
             "collapsible": True,

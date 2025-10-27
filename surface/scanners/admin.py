@@ -3,7 +3,6 @@ from datetime import datetime
 
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.admin import SimpleListFilter
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied
@@ -14,6 +13,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
+from core_utils.admin_filters import DropdownFilter
 
 from core_utils.admin import DefaultModelAdmin
 from core_utils.admin_filters import DefaultFilterMixin
@@ -21,7 +21,7 @@ from dkron.utils import run_async
 from scanners import models, utils
 
 
-class FinalHTTPFilter(SimpleListFilter):
+class FinalHTTPFilter(DropdownFilter):
     title = "Final HTTP"
     parameter_name = "final_http"
 
@@ -36,7 +36,7 @@ class FinalHTTPFilter(SimpleListFilter):
         return queryset
 
 
-class NoLBie1ie2Filter(SimpleListFilter):
+class NoLBie1ie2Filter(DropdownFilter):
     title = "No LB or IE1/IE2"
     parameter_name = "no_lb_ie1ie2"
 
@@ -55,7 +55,7 @@ class NoLBie1ie2Filter(SimpleListFilter):
         return queryset
 
 
-class TypeRecordFilter(SimpleListFilter):
+class TypeRecordFilter(DropdownFilter):
     title = "Type Record"
     parameter_name = "type_record"
 
@@ -70,7 +70,7 @@ class TypeRecordFilter(SimpleListFilter):
         return queryset
 
 
-class ExitCodeFilter(SimpleListFilter):
+class ExitCodeFilter(DropdownFilter):
     title = "Success"
     parameter_name = "success_exit"
 
