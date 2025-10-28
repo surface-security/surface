@@ -70,7 +70,7 @@
             {% for vuln in vulns_filter.qs %}
                 <tr class="left {% if vuln.get_severity_display|lower == 'critical' %}red{% elif vuln.get_severity_display|lower == 'high' %}orange{% elif vuln.get_severity_display|lower == 'medium' %}yellow{% endif %} marked expandable-row">
                     <td>
-                        <a target="_blank" href="/sca/scafinding/{{ vuln.pk }}/change/">{{ vuln }}</a>
+                        <a class="text-font-important-light dark:text-font-important-dark" target="_blank" href="/sca/scafinding/{{ vuln.pk }}/change/">{{ vuln }}</a>
                     </td>
                     <td>{{ vuln.title }}</td>
                     <td class="{% if vuln.get_severity_display|lower == 'critical' %}red{% elif vuln.get_severity_display|lower == 'high' %}orange{% elif vuln.get_severity_display|lower == 'medium' %}yellow{% endif %} collored">
@@ -80,6 +80,7 @@
                     {% if vuln.cvss_vector %}
                         <td>
                             <a target="_blank"
+                            class="text-font-important-light dark:text-font-important-dark"
                             href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector={{ vuln.cvss_vector|cvss_vector }}&version={{ vuln.cvss_vector|cvss_version }}">{{ vuln.cvss_score }}</a>
                         </td>
                     {% else %}
@@ -94,7 +95,7 @@
                             <div class="ui fluid buttons">
                                 <a target="_blank"
                                 href="/sca/suppressedscafinding/add/?dependency_id={{ vuln.dependency.pk }}&vuln_id={{ vuln.vuln_id }}&project_id={{current_object.id}}"
-                                class="ui circular icon basic tertiary orange button"
+                                class="ui circular icon basic tertiary orange button text-font-important-light dark:text-font-important-dark"
                                 title="Suppress">
                                 <i class="microphone slash icon"></i>
                                 </a>

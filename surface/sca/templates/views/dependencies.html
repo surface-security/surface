@@ -90,7 +90,7 @@
             {% for dep in dependencies %}
                 <tr>
                     <td>
-                        <i class="{{ dep.purl|purl_icon }} icon"></i> <a target="_blank" href="/sca/scaproject/{{ dep.id }}/change/">{{ dep.purl }}</a>
+                        <i class="{{ dep.purl|purl_icon }} icon text-font-important-light dark:text-font-important-dark"></i> <a target="_blank"  class="text-font-important-light dark:text-font-important-dark"href="/sca/scaproject/{{ dep.id }}/change/">{{ dep.purl }}</a>
                         {% for k, v in dep.vulns_counters.items %}
                             {% if k %}
                                 <a target="_blank"
@@ -121,7 +121,7 @@
                     <td>
                         {% if dep.depends_on %}
                             {% for d in dep.depends_on %}
-                                <i class="{{ dep.purl|purl_icon }} icon"></i> <a target="_blank" href="/sca/scaproject/{{ d.pk }}/change/">{{ d }}</a>
+                                <i class="{{ dep.purl|purl_icon }} icon text-font-important-light dark:text-font-important-dark"></i> <a class="text-font-important-light dark:text-font-important-dark"target="_blank" href="/sca/scaproject/{{ d.pk }}/change/">{{ d }}</a>
                                 <br>
                             {% endfor %}
                         {% else %}

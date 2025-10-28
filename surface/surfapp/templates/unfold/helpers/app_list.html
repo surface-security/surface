@@ -11,7 +11,7 @@
                         <hr class="border-t border-base-200 mx-6 my-2 dark:border-base-800" />
                     {% endif %}
                     {% if group.title %}
-                        <h2 class="font-semibold flex flex-row items-center mb-1 mx-3 py-1.5 px-3 select-none text-font-important-light text-sm dark:text-font-important-dark {% if group.collapsible %}cursor-pointer hover:text-primary-600 dark:hover:text-primary-500{% endif %}"
+                        <h2 class="font-semibold flex flex-row items-center mb-1 mx-3 py-1.5 px-3 select-none text-font-base-light text-sm dark:text-font-base-dark {% if group.collapsible %}cursor-pointer hover:text-primary-600 dark:hover:text-primary-500{% endif %}"
                             {% if group.collapsible %}
                                 x-on:click="navigationOpen = !navigationOpen"
                                 x-bind:class="navigationOpen ? 'text-primary-600 dark:text-primary-500' : ''"
@@ -84,7 +84,7 @@
                 <div class="bg-white flex flex-col h-full overflow-x-hidden overflow-y-auto py-5 px-8 relative text-sm w-80 z-20 dark:bg-base-900 dark:border-r dark:border-base-800" x-on:click.outside="openAllApplications = false" x-on:keydown.escape.window="openAllApplications = false">
                     {% for app in app_list %}
                         <div class="mb-6 last:mb-0">
-                            <h2 class="mb-4 font-semibold text-font-important-light truncate dark:text-font-important-dark">
+                            <h2 class="mb-4 font-semibold text-font-base-light truncate dark:text-font-base-dark">
                                 {{ app.name }}
                             </h2>
 

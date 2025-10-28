@@ -11,11 +11,7 @@
     <script src="{% static 'admin/js/vendor/select2/select2.full.js' %}"></script>
     <script src="{% static 'admin/js/jquery.init.js' %}"></script>
     <script src="{% static 'unfold/js/select2.init.js' %}"></script>
-    <style>
-        #result_list tbody a:not(.label) {
-            color:#3366CC;
-        }
-    </style>
+
     {{ media.css }}
 
     {% if not actions_on_top and not actions_on_bottom %}
@@ -44,7 +40,8 @@
                     {% url 'admin:app_list' app_label=cl.opts.app_label as link %}
                     {% include 'unfold/helpers/breadcrumb_item.html' with link=link name=cl.opts.app_config.verbose_name %}
 
-                    {% include 'unfold/helpers/breadcrumb_item.html' with link='' name=cl.opts.verbose_name_plural|capfirst %}
+                    {% url opts|admin_urlname:'changelist' as link %}
+                    {% include 'unfold/helpers/breadcrumb_item.html' with link=link name=cl.opts.verbose_name_plural|capfirst no_separator=True %}
                 </ul>
             </div>
         </div>

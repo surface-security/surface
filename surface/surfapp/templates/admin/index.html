@@ -11,9 +11,6 @@
 {% block extrahead %}
     {{ block.super }}
 
-    {% if plausible_domain %}
-        <script defer data-domain="{{ plausible_domain }}" src="https://plausible.io/js/script.js"></script>
-    {% endif %}
 {% endblock %}
 
 {% block branding %}
@@ -35,10 +32,10 @@
                                     <div data-app-card data-app-name="{{ app.name|escapejs }}">
                                         <div class="flex items-center gap-3 px-6 pt-6 pb-2">
                                             <div>
-                                                <a href="{% url 'admin:app_list' app.app_label %}" class="text-link font-semibold text-lg text-blue-700 dark:text-blue-400 hover:underline focus:underline transition-colors">
+                                                <a href="{% url 'admin:app_list' app.app_label %}" class="text-link font-semibold text-lg text-primary-700 dark:text-primary-400 hover:underline focus:underline transition-colors">
                                                     {{ app.name }}
                                                 </a>
-                                                <div class="text-xs text-blue-400 mt-0.5">{{ app.models|length }} models</div>
+                                                <div class="text-xs text-primary-400 mt-0.5">{{ app.models|length }} models</div>
                                             </div>
                                         </div>
                                         <div class="flex flex-col gap-1 px-6 pb-4" data-model-list>
@@ -48,7 +45,7 @@
                                         </div>
                                     </div>
                                     {% if not forloop.last %}
-                                        <hr class="my-2 border-blue-200 dark:border-blue-700">
+                                        <hr class="my-2 border-primary-200 dark:border-primary-700">
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
@@ -66,7 +63,7 @@
                                         <ul class="space-y-1 pl-3 border-l border-gray-200 dark:border-gray-700">
                                             {% for item in link.items %}
                                                 <li>
-                                                    <a href="{{ item.url }}" target="_blank" rel="noopener" class="text-blue-600 hover:underline dark:text-blue-400">
+                                                    <a href="{{ item.url }}" target="_blank" rel="noopener" class="text-primary-600 hover:underline dark:text-primary-400">
                                                         {{ item.name }}
                                                     </a>
                                                 </li>
@@ -127,7 +124,7 @@
                                                     {% if entry.is_deletion or not entry.get_admin_url %}
                                                         <span class="font-semibold">{{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}</span>
                                                     {% else %}
-                                                        <a href="{{ entry.get_admin_url }}" class="font-semibold text-blue-600 hover:underline dark:text-blue-400 underline-offset-2 hover:text-blue-900">
+                                                        <a href="{{ entry.get_admin_url }}" class="font-semibold text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900">
                                                             {{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}
                                                         </a>
                                                     {% endif %}
@@ -185,7 +182,7 @@
                                                         {% if entry.is_deletion or not entry.get_admin_url %}
                                                             <span class="font-semibold">{{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}</span>
                                                         {% else %}
-                                                            <a href="{{ entry.get_admin_url }}" class="font-semibold text-blue-600 hover:underline dark:text-blue-400 underline-offset-2 hover:text-blue-900">
+                                                            <a href="{{ entry.get_admin_url }}" class="font-semibold text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900">
                                                                 {{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}
                                                             </a>
                                                         {% endif %}
@@ -207,9 +204,9 @@
 {% block footer %}
     <footer class="w-full mx-auto relative bottom-0 left-0 py-4 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 bg-transparent pl-64"></footer>
         <div class="container mx-auto flex flex-col sm:flex-row items-center justify-center">
-            <a href="https://github.com/surface-security/surface" class="text-blue-600 hover:underline dark:text-blue-400 underline-offset-2 hover:text-blue-900 mr-2">Surface Security</a>
+            <a href="https://github.com/surface-security/surface" class="text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900 mr-2">Surface Security</a>
             <span class="sm:ml-2 sm:mx-2">&</span>
-            <a href="https://unfoldadmin.com/" target="_blank" rel="noopener" class="text-blue-600 hover:underline dark:text-blue-400 underline-offset-2 hover:text-blue-900 ml-2">Django Unfold</a>
+            <a href="https://unfoldadmin.com/" target="_blank" rel="noopener" class="text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900 ml-2">Django Unfold</a>
         </div>
     </footer>
 {% endblock %}
