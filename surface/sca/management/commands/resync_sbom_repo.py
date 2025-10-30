@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import requests
 import semver
@@ -31,16 +31,16 @@ class Command(LogBaseCommand):
 
     def get_sboms(self, since: datetime) -> list[str]:
         since_str = datetime.strftime(since, "%Y-%m-%dT%H:%M:%S.%f")
-        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/all", params={"since": since_str})
+        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/all", params={"since": since_str})
         res.raise_for_status()
         return res.json()
 
     def get_sbom_details(self, serial_number: str) -> dict[str, Any]:
-        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/{serial_number}", params={"vuln_data": True})
+        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/{serial_number}", params={"vuln_data": True})
         res.raise_for_status()
         return res.json()
 
-    def create_dependency(self, purl: str, scan_date: str) -> tuple[Optional[PackageURL], Optional[SCADependency]]:
+    def create_dependency(self, purl: str, scan_date: str) -> tuple[PackageURL | None, SCADependency | None]:
         if not purl:
             return None, None
         try:
@@ -86,11 +86,11 @@ class Command(LogBaseCommand):
                         "finding_type": SCAFinding.FindingType.EOL,
                         "published": eol.eol,
                         "ecosystem": purl.type,
-                        "state": (
-                            SCAFinding.State.NEW
-                            if not suppressed_findings.filter(vuln_id=eol.pk)
-                            else SCAFinding.State.CLOSED
-                        ),
+                        "state": SCAFinding.State.CLOSED
+                        if suppressed_findings.filter(
+                            vuln_id=eol.pk, sca_project__isnull=True
+                        )  # Closed if global suppression
+                        else SCAFinding.State.NEW,
                         "last_seen_date": self.sync_time,
                     },
                 )
@@ -123,17 +123,18 @@ class Command(LogBaseCommand):
             dependency=pkg_obj,
             vuln_id=vuln["id"],
             defaults={
+                "application": None,  # a finding / dependency can have multiple Applications, we link to Applications through
                 # the dependency tree instead
                 "published": vuln["published"],
                 "cvss_vector": cvss3[0] if cvss3 else "",
                 "finding_type": SCAFinding.FindingType.VULN,
                 "title": vuln.get("summary", "").capitalize(),
                 "summary": vuln["details"],
-                "state": (
-                    SCAFinding.State.NEW
-                    if not suppressed_findings.filter(vuln_id=vuln["id"])
-                    else SCAFinding.State.CLOSED
-                ),
+                "state": SCAFinding.State.CLOSED
+                if suppressed_findings.filter(
+                    vuln_id=vuln["id"], sca_project__isnull=True
+                )  # Closed if global suppression
+                else SCAFinding.State.NEW,
                 "aliases": ", ".join(vuln.get("aliases", [])),
                 "fixed_in": ", ".join(fixed_in) if fixed_in else "",
                 "last_seen_date": self.sync_time,
@@ -153,7 +154,7 @@ class Command(LogBaseCommand):
         secondary_dependencies = set()
 
         if branch != main_branch:
-            self.log_warning(f'{sbom} skiped for repo: {sbom_data["sbomrepo"]["metadata"]["repo"]}, branch: {branch}')
+            self.log_warning(f"{sbom} skiped for repo: {sbom_data['sbomrepo']['metadata']['repo']}, branch: {branch}")
             self.exited_earlier_not_master += 1
             return False
 
@@ -191,6 +192,7 @@ class Command(LogBaseCommand):
             if purl.type in settings.SCA_SOURCE_PURL_TYPES and f"{purl.namespace}/{purl.name}" in repo:
                 dep_object.git_source = git_source
                 dep_object.is_project = True
+                dep_object.sbom_uuid = sbom
                 dep_object.save()
 
                 project = dep_object

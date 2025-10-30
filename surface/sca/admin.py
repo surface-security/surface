@@ -141,7 +141,7 @@ class SCADependencyAdmin(ReverseReadonlyMixin, DefaultModelAdmin):
     def get_git_source(self, obj):
         if obj.git_source:
             return format_html(
-                f'<a target="_blank" href="/tlaconfig/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
+                f'<a target="_blank" href="/inventory/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
             )
 
     @admin.display(description="Depends On")
@@ -365,7 +365,7 @@ class SCAProjectAdmin(DefaultModelAdmin):
     def get_git_source(self, obj):
         if obj.git_source:
             return format_html(
-                f'<a target="_blank" href="/tlaconfig/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
+                f'<a target="_blank" href="/inventory/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
             )
 
     @admin.display(description="SBOM")

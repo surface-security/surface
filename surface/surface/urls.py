@@ -20,5 +20,6 @@ from django.urls import include, path
 urlpatterns = [
     path("dkron/", include("dkron.urls")),
     path("sbomrepo/", include("sbomrepo.urls")),
+    path("sca/", include(("sca.urls", "sca"), namespace="sca")),
     path("", admin.site.urls),
 ]
