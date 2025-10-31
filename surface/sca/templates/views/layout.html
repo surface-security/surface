@@ -102,39 +102,48 @@
             crossorigin="anonymous" 
             referrerpolicy="no-referrer"></script>
       <style>
-            .ui.segment, .ui.segment * {
-                color: var(--unfold-foreground, inherit) !important;
+            :root {
+                --ui-control-background: var(--color-base-0, #ffffff);
+                --ui-control-foreground: var(--color-base-900, #0f172a);
+                --ui-control-border: var(--color-base-200, #cbd5f5);
             }
-            /* Transparent background, themed text and border for form fields */
+
+            .dark {
+                --ui-control-background: var(--color-base-900, #0f172a);
+                --ui-control-foreground: var(--color-base-0, #f8fafc);
+                --ui-control-border: var(--color-base-700, #475569);
+            }
+
             .ui.form input,
             .ui.form select,
             .ui.form textarea {
-                background: transparent !important;
-                color: var(--unfold-foreground, inherit) !important;
-                border: 1px solid var(--unfold-foreground, #ccc) !important;
+                background: var(--ui-control-background) !important;
+                color: var(--ui-control-foreground) !important;
+                border: 1px solid var(--ui-control-border) !important;
             }
-            /* Semantic UI dropdowns: themed border and text, translucent when expanded */
+
             .ui.selection.dropdown,
             .ui.selection.dropdown .menu {
-                border: 1px solid var(--unfold-foreground, #ccc) !important;
-                background: transparent !important;
-                color: var(--unfold-foreground, inherit) !important;
+                border: 1px solid var(--ui-control-border) !important;
+                background: var(--ui-control-background) !important;
+                color: var(--ui-control-foreground) !important;
                 transition: background 0.2s;
             }
-            .ui.selection.active.dropdown .menu {
-                background: rgba(197, 202, 210, 0.5) !important;/* Subtle translucent color when expanded */
-                color: var(--unfold-foreground, inherit) !important;
+
+            .ui.selection.dropdown .menu .item {
+                background: var(--ui-control-background) !important;
+                color: var(--ui-control-foreground) !important;
             }
-        
-            .ui.selection.active.dropdown .menu .item:hover,
-            .ui.selection.active.dropdown .menu .selected.item,
+
+            .ui.selection.dropdown .menu .item:hover,
             .ui.selection.dropdown .menu .item:active {
-                background: rgba(50, 130, 246, 0.75) !important; /* Subtle blue highlight on hover/active */
-                color: var(--unfold-foreground, inherit) !important;
+                background: var(--color-primary-500) !important;
+                color: #f8fafc !important;
             }
+
             .ui.selection.dropdown > .text,
             .ui.dropdown > .text {
-                color: var(--unfold-foreground, inherit) !important;
+                color: var(--ui-control-foreground) !important;
             }
       </style>
 {% endblock %}
