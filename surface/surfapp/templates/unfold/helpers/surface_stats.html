@@ -1,0 +1,25 @@
+{% load i18n unfold surface_templatetags log %}
+{% component "unfold/components/container.html" %}
+    <div class="flex gap-6 mt-8 w-full">
+        {% component "unfold/components/card.html" with class="p-4 text-center flex-[2]" %}
+            <span class="material-symbols-outlined text-3xl mb-2">groups</span>
+            <div class="text-xs text-font-default-light dark:text-font-default-dark">Last 24 Hours</div>
+            <div class="text-2xl font-bold text-font-important-light dark:text-font-important-dark">{% surface_stats 'last_24_hours' %}</div>
+        {% endcomponent %}
+        {% component "unfold/components/card.html" with class="p-4 text-center flex-1" %}
+            <span class="material-symbols-outlined text-3xl mb-2">groups</span>
+            <div class="text-xs text-font-default-light dark:text-font-default-dark">Last 2 Weeks</div>
+            <div class="text-2xl font-bold text-font-important-light dark:text-font-important-dark">{% surface_stats 'last_2_weeks' %}</div>
+        {% endcomponent %}
+        {% component "unfold/components/card.html" with class="p-4 text-center flex-1" %}
+            <span class="material-symbols-outlined text-3xl mb-2">groups</span>
+            <div class="text-xs text-font-default-light dark:text-font-default-dark">Total</div>
+            <div class="text-2xl font-bold text-font-important-light dark:text-font-important-dark">{% surface_stats 'total' %}</div>
+        {% endcomponent %}
+        {% component "unfold/components/card.html" with class="p-4 text-center flex-1" %}
+            <span class="material-symbols-outlined text-3xl mb-2">commit</span>
+            <div class="text-xs text-font-default-light dark:text-font-default-dark">Code Contributors</div>
+            <div class="text-2xl font-bold text-font-important-light dark:text-font-important-dark">+30</div>
+        {% endcomponent %}
+    </div>
+{% endcomponent %}

@@ -67,6 +67,7 @@ class SCADependency(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_scan = models.DateTimeField()
+    sbom_uuid = models.CharField(max_length=255, default=None, null=True)
 
     @staticmethod
     def get_dependencies_recursively(
@@ -127,15 +128,20 @@ class SCADependency(models.Model):
         _, parent_projects = SCADependency.get_parents_recursively(self, parsed_parents)
         return parent_projects
 
-    @property
-    def vulns(self):
+    def get_vulns_counter(self, project):
+        suppressed_findings = (
+            SuppressedSCAFinding.objects.filter(dependency=self)
+            .filter(Q(sca_project__isnull=True) | Q(sca_project=project))
+            .values_list("vuln_id", flat=True)
+        )
+
         findings = (
             SCAFinding.objects.filter(dependency=self)
             .select_related("dependency")
             .values("severity", "finding_type")
             .annotate(count=Count("severity"), eol=Count(Case(When(finding_type=1, then=1))))
             .order_by("-severity")
-        )
+        ).exclude(vuln_id__in=suppressed_findings)
         return {item["severity"]: {"count": item["count"], "eol": item["eol"]} for item in findings}
 
     @staticmethod
@@ -151,22 +157,24 @@ class SCADependency(models.Model):
             current_dep = stack.pop()
 
             # Add the current dependency's purl to the set of dependencies
-            dependencies.add(current_dep.purl)
+            dependencies.add(str(current_dep.purl))
 
             # Iterate over the dependencies of the current dependency
             for dep in current_dep.depends_on.all():
-                if dep.purl not in dependencies:
+                if str(dep.purl) not in dependencies:
                     stack.append(dep)
 
         return list(dependencies)
 
     def update_vulnerability_counters(self) -> "SCAFindingCounter":
+        project_suppressed_findings = SuppressedSCAFinding.objects.filter(sca_project=self)
         severity_counters = (
             SCAFinding.objects.filter(
                 (Q(fixed_in__gt="") | Q(finding_type=SCAFinding.FindingType.EOL)),
                 dependency__purl__in=self.dependencies,
                 state__in=(SCAFinding.State.NEW, SCAFinding.State.OPEN),
             )
+            .exclude(vuln_id__in=project_suppressed_findings.values_list("vuln_id", flat=True))
             .prefetch_related("dependency")
             .values("severity")
             .annotate(
@@ -271,6 +279,9 @@ class SuppressedSCAFinding(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey("auth.User", null=True, on_delete=models.SET_NULL, related_name="+")
     updated_by = models.ForeignKey("auth.User", null=True, on_delete=models.SET_NULL, related_name="+")
+    sca_project = models.ForeignKey(
+        SCAProject, null=True, blank=True, on_delete=models.CASCADE, related_name="suppressed_findings_project"
+    )
 
     class Meta:
         verbose_name = "Suppressed Dependency Finding (SCA)"

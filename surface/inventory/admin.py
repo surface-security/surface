@@ -3,13 +3,14 @@ from django.contrib.admin.decorators import register
 from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html
 
-from theme.filters import RelatedFieldAjaxListFilter
+from core_utils.admin import DefaultModelAdmin
+from core_utils.admin_filters import RelatedFieldAjaxListFilter
 
 from . import models
 
 
 @register(models.Application)
-class ApplicationAdmin(admin.ModelAdmin):
+class ApplicationAdmin(DefaultModelAdmin):
     list_display = [
         "tla",
         "managed_by",
@@ -38,7 +39,7 @@ class ApplicationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.GitSource)
-class GitSourceAdmin(admin.ModelAdmin):
+class GitSourceAdmin(DefaultModelAdmin):
     filter_vertical = ("apps",)
     list_display = (
         "id",

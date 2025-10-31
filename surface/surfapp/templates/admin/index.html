@@ -1,19 +1,212 @@
-{% extends "admin/index.html" %}
+{% extends 'admin/base.html' %}
 
-{% block index-top-panel %}
-    <div class="panel-header bg-primary-gradient">
-      <div class="page-inner py-5">
-        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
-          <div>
-            <h2 class="text-white pb-2 fw-bold">{{ site_title|default:_('Django site admin') }}</h2>
-			      <h5 class="text-white op-7 mb-2">Security Intelligence Automation Platform</h5>
-          </div>
-          <div class="ml-md-auto py-2 py-md-0">
-            <a href="https://github.com/surface-security/surface" class="btn btn-white btn-round btn-round mr-2" target="_blank" rel="noopener noreferrer">
-              Docs & Support
-            </a>
-          </div>
+{% load i18n unfold surface_templatetags log %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block title %}
+    {% trans 'Dashboard' %} | {{ site_title|default:_('Django site admin') }}
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+{% block content %}
+    {% include "unfold/helpers/messages.html" %}
+    {% component "unfold/components/container.html" with class="h-full min-h-screen overflow-y-auto" %}
+        <div class="flex flex-col gap-8 mb-12">
+            <div>
+                {% include "unfold/helpers/surface_stats.html" %}
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-h-[600px] overflow-y-auto">    
+                <!-- Apps & Models Section -->
+                <div class="col-span-1">
+                    {% component "unfold/components/card.html" with title="List of Modules" class="w-full" %}
+                            {% for app in app_list %}
+                                {% if app.models %}
+                                    <div data-app-card data-app-name="{{ app.name|escapejs }}">
+                                        <div class="flex items-center gap-3 px-6 pt-6 pb-2">
+                                            <div>
+                                                <a href="{% url 'admin:app_list' app.app_label %}" class="text-link font-semibold text-lg text-primary-700 dark:text-primary-400 hover:underline focus:underline transition-colors">
+                                                    {{ app.name }}
+                                                </a>
+                                                <div class="text-xs text-primary-400 mt-0.5">{{ app.models|length }} models</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col gap-1 px-6 pb-4" data-model-list>
+                                            {% for model in app.models %}
+                                                <a href="{{ model.admin_url }}" class="model-link">{{ model.name }}</a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% if not forloop.last %}
+                                        <hr class="my-2 border-primary-200 dark:border-primary-700">
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                    {% endcomponent %}
+                </div>
+                <!-- Useful Links Section -->
+                <div class="col-span-1 flex flex-col gap-8">
+                    {% component "unfold/components/card.html" with title="Useful Links" class="w-full" %}
+                        {% surface_get_links as surface_get_links_list %}
+                        {% if surface_get_links_list %}
+                            <ul class="space-y-4">
+                                {% for link in surface_get_links_list %}
+                                    <li>
+                                        <div class="font-semibold text-base mb-1">{{ link.label }}</div>
+                                        <ul class="space-y-1 pl-3 border-l border-gray-200 dark:border-gray-700">
+                                            {% for item in link.items %}
+                                                <li>
+                                                    <a href="{{ item.url }}" target="_blank" rel="noopener" class="text-primary-600 hover:underline dark:text-primary-400">
+                                                        {{ item.name }}
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="text-gray-500 text-sm">{% trans "No useful links available." %}</div>
+                        {% endif %}
+                    {% endcomponent %}
+                </div>
+                <!-- Recent Activity Section -->
+                <div class="col-span-1 flex flex-col gap-8">
+                    {% component "unfold/components/card.html" with title=_('Recent Actions') class="w-full" %}
+                        {% get_admin_log 10 as admin_log_user for_user user %}
+                        <div class="mb-6">
+                            <div class="font-semibold text-base mb-2">{% trans "Your Activity" %}</div>
+                            {% if admin_log_user %}
+                                <ol class="space-y-3 mb-6">
+                                    {% for entry in admin_log_user %}
+                                        <li class="flex items-start gap-3 py-2 border-b border-gray-100 last:border-b-0">
+                                            <div class="flex-shrink-0 mt-1">
+                                                {% if entry.is_addition %}
+                                                    <span title="{% trans 'Added' %}">
+                                                        <span class="material-symbols-outlined">add</span>
+                                                    </span>
+                                                {% elif entry.is_change %}
+                                                    <span title="{% trans 'Changed' %}">
+                                                        <span class="material-symbols-outlined">edit</span>
+                                                    </span>
+                                                {% elif entry.is_deletion %}
+                                                     <span title="{% trans 'Deleted' %}">
+                                                        <span class="material-symbols-outlined">delete</span>
+                                                    </span>
+                                                {% else %}
+                                                    <span title="{% trans 'Other' %}" >
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                   <span class="text-xs text-gray-400" title="{{ entry.action_time|date:'Y-m-d H:i' }}">
+                                                            <span class="material-symbols-outlined">
+                                                            calendar_clock
+                                                            </span>  
+                                                            {{ entry.action_time|date:'M d, H:i' }}                                                       
+                                                        </span>
+                                                    <span class="text-xs text-gray-400">
+                                                            <span class="material-symbols-outlined">
+                                                                person
+                                                            </span>
+                                                            {{ entry.user.get_username }}
+                                                        </span>
+                                                </div>
+                                                <div class="text-sm leading-snug">
+                                                    {% if entry.is_deletion or not entry.get_admin_url %}
+                                                        <span class="font-semibold">{{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}</span>
+                                                    {% else %}
+                                                        <a href="{{ entry.get_admin_url }}" class="font-semibold text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900">
+                                                            {{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            {% else %}
+                                <div class="text-gray-500 text-sm mb-6">{% trans "No recent actions available for you." %}</div>
+                            {% endif %}
+                        </div>
+                        {% if request.user.is_superuser %}
+                            {% get_admin_log 50 as admin_log_all %}
+                            <div>
+                                <div class="font-semibold text-base mb-2">{% trans "Everyone's Activity" %}</div>
+                                {% if admin_log_all %}
+                                    <ol class="space-y-3">
+                                        {% for entry in admin_log_all %}
+                                            <li class="flex items-start gap-3 py-2 border-b border-gray-100 last:border-b-0">
+                                                <div class="flex-shrink-0 mt-1">
+                                                    {% if entry.is_addition %}
+                                                    <span title="{% trans 'Added' %}">
+                                                        <span class="material-symbols-outlined">add</span>
+                                                    </span>
+                                                {% elif entry.is_change %}
+                                                    <span title="{% trans 'Changed' %}">
+                                                        <span class="material-symbols-outlined">edit</span>
+                                                    </span>
+                                                {% elif entry.is_deletion %}
+                                                     <span title="{% trans 'Deleted' %}">
+                                                        <span class="material-symbols-outlined">delete</span>
+                                                    </span>
+                                                {% else %}
+                                                    <span title="{% trans 'Other' %}" >
+                                                    </span>
+                                                {% endif %}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span class="text-xs text-gray-400" title="{{ entry.action_time|date:'Y-m-d H:i' }}">
+                                                            <span class="material-symbols-outlined">
+                                                            calendar_clock
+                                                            </span>  
+                                                            {{ entry.action_time|date:'M d, H:i' }}                                                       
+                                                        </span>
+                                                        <span class="text-xs text-gray-400">
+                                                            <span class="material-symbols-outlined">
+                                                                person
+                                                            </span>
+                                                            {{ entry.user.get_username }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="text-sm leading-snug">
+                                                        {% if entry.is_deletion or not entry.get_admin_url %}
+                                                            <span class="font-semibold">{{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}</span>
+                                                        {% else %}
+                                                            <a href="{{ entry.get_admin_url }}" class="font-semibold text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900">
+                                                                {{ entry.content_type }} <span class="text-gray-400">|</span> {{ entry.object_id }}
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% else %}
+                                    <div class="text-gray-500 text-sm">{% trans "No recent actions available for everyone." %}</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endcomponent %}
+                </div>
+            </div>
+    {% endcomponent %}
+{% endblock %}
+{% block footer %}
+    <footer class="w-full mx-auto relative bottom-0 left-0 py-4 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 bg-transparent pl-64"></footer>
+        <div class="container mx-auto flex flex-col sm:flex-row items-center justify-center">
+            <a href="https://github.com/surface-security/surface" class="text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900 mr-2">Surface Security</a>
+            <span class="sm:ml-2 sm:mx-2">&</span>
+            <a href="https://unfoldadmin.com/" target="_blank" rel="noopener" class="text-primary-600 hover:underline dark:text-primary-400 underline-offset-2 hover:text-primary-900 ml-2">Django Unfold</a>
         </div>
-      </div>
-    </div>
+    </footer>
 {% endblock %}

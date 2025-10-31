@@ -12,26 +12,35 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 
-import ppbenviron
+import environ
+import yaml
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ENV_VAR = ppbenviron.CustomEnv()
+ENV_VAR = environ.Env()
 ENV_VAR.read_env(BASE_DIR / "local.env")
+
+from surface.sidebar import SIDEBAR
 
 # Application definition
 
 INSTALLED_APPS = [
-    "theme",
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
+    "unfold.contrib.inlines",
+    "unfold.contrib.import_export",
+    "unfold.contrib.simple_history",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.db.migrations",
     "impersonate",
-    "surfapp",
+    "import_export",
     "dkron",
     "notifications",
     "slackbot",
@@ -46,6 +55,7 @@ INSTALLED_APPS = [
     "sca",
     "sbomrepo",
     "jsoneditor",
+    "surfapp",
 ]
 
 MIDDLEWARE = [
@@ -64,8 +74,6 @@ ROOT_URLCONF = "surface.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # surfapp templates required here as well to override `theme` ones,
-        # (as theme needs to come first in INSTALLED_APPS)
         "DIRS": [BASE_DIR / "surfapp" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -185,7 +193,7 @@ AVZONE = ENV_VAR("SURF_AVZONE", default="dev")
 DATABASE_LOCKS_STATUS_FILE = None
 DATABASE_LOCKS_ENABLED = False
 
-SCA_SBOM_REPO_URL = ENV_VAR("SURF_SCA_SBOM_REPO_URL", default="http://localhost:8000/sbomrepo/v1/sbom")
+SCA_SBOM_REPO_URL = ENV_VAR("SURF_SCA_SBOM_REPO_URL", default="http://localhost:8000/sbomrepo")
 SCA_SOURCE_PURL_TYPES = ["github.com"]
 SCA_INTERNAL_RENOVATE = ENV_VAR("SURF_SCA_INTERNAL_RENOVATE", default=None)
 SCA_INTERNAL_GITLAB_API = ENV_VAR("SURF_SCA_INTERNAL_GITLAB_API", default=None)
@@ -194,8 +202,8 @@ SURFACE_GITHUB_TOKEN = ENV_VAR("SURF_GITHUB_TOKEN", default=None)
 SURFACE_GITLAB_TOKEN = ENV_VAR("SURF_GITLAB_TOKEN", default=None)
 
 
-SURFACE_LINKS_ITEMS = None
-SURFACE_MENU_ITEMS = None
+with open(BASE_DIR / "surface" / "links.yml") as f:
+    SURFACE_LINKS_ITEMS = yaml.safe_load(f)
 
 LOGBASECOMMAND_PREFIX = "surface.command"
 
@@ -250,3 +258,62 @@ LOGGING = {
 
 TITLE = "Surface"
 VERSION = "dev"
+
+LOGIN_REDIRECT_URL = "/"
+
+######################################################################
+# Unfold
+######################################################################
+LOGO = "data:image/png;base64, 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"
+
+UNFOLD = {
+    "SITE_TITLE": "Surface Security",
+    "SITE_HEADER": "Surface",
+    "SITE_SUBHEADER": "Security Intelligence Automation Platform",
+    "ENVIRONMENT": [ENV_VAR("SURF_ENVIRONMENT", default="dev"), "primary"],
+    "SITE_ICON": LOGO,
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "href": LOGO,
+        },
+    ],
+    "SHOW_HISTORY": True,
+    "SIDEBAR": SIDEBAR,
+    "COLORS": {
+        "base": {
+            "50": "oklch(98.5% .002 247.839)",
+            "100": "oklch(96.7% .003 264.542)",
+            "200": "oklch(92.8% .006 264.531)",
+            "300": "oklch(87.2% .01 258.338)",
+            "400": "oklch(70.7% .022 261.325)",
+            "500": "oklch(55.1% .027 264.364)",
+            "600": "oklch(44.6% .03 256.802)",
+            "700": "oklch(37.3% .034 259.733)",
+            "800": "oklch(27.8% .033 256.848)",
+            "900": "oklch(21% .034 264.665)",
+            "950": "oklch(13% .028 261.692)",
+        },
+        "primary": {
+            "50": "oklch(97.7% .013 236.62)",
+            "100": "oklch(95.1% .026 236.824)",
+            "200": "oklch(90.1% .058 230.902)",
+            "300": "oklch(82.8% .111 230.318)",
+            "400": "oklch(74.6% .16 232.661)",
+            "500": "oklch(68.5% .169 237.323)",
+            "600": "oklch(58.8% .158 241.966)",
+            "700": "oklch(50% .134 242.749)",
+            "800": "oklch(44.3% .11 240.79)",
+            "900": "oklch(39.1% .09 240.876)",
+            "950": "oklch(29.3% .066 243.157)",
+        },
+        "font": {
+            "subtle-light": "var(--color-base-500)",  # text-base-500
+            "subtle-dark": "var(--color-base-400)",  # text-base-400
+            "default-light": "var(--color-base-600)",  # text-base-600
+            "default-dark": "var(--color-base-300)",  # text-base-300
+            "important-light": "var(--color-base-900)",  # text-base-900
+            "important-dark": "var(--color-primary-500)",  # text-base-100
+        },
+    },
+}

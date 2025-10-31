@@ -1,65 +1,79 @@
 {% extends 'views/layout.html' %}
 {% load sca_templatetags %}
-{% block sca_content %}
-    <div class="ui secondary pointing menu">
-        <a class="active item" href="/sca/scaproject/{{ original.pk }}/change/">Dependencies</a>
-        <a class="item"
-           href="/sca/scaproject/{{ original.pk }}/change/?view=vulnerabilities">Vulnerabilities</a>
-    </div>
-    <div class="ui hidden divider"></div>
-    <form method="get" class="ui form">
-        <div class="ui grid">
-            <div class="twelve wide column">
-                <div class="fields">
-                    {% for field in deps_filter.form %}
-                        {% if field.name != "show_vulnerable" %}
-                            <div class="four wide field">
-                                {{ field.label_tag }}
-                                {% if field.field.widget.input_type == 'select' %}
-                                    <select name="{{ field.name }}" class="ui fluid search clearable dropdown">
-                                        {% for choice in field.field.widget.choices %}
-                                            <option {% if choice.0 == field.data %}selected="selected"{% endif %}
-                                                    value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                        {% endfor %}
-                                    </select>
-                                {% else %}
-                                    {{ field }}
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    <div class="field">
-                        <label>&nbsp;</label>
-                        <button type="submit" class="ui primary button">Filter</button>
-                    </div>
-                </div>
-            </div>
-            <div class="four wide right aligned column">
-                <div class="field">
-                    <label>&nbsp;</label>
-                    <div class="ui toggle checkbox right aligned">
-                        <input type="checkbox" name="show_vulnerable" id="show_vulnerable_toggle" {% if show_vulnerable %}checked="checked"{% endif %}>
-                        <label><b>Show Vulnerable:</b></label>
-                    </div>
-                </div>
-            </div>
+{% block content %}
+
+    <div class="ui segment" style="background: transparent !important; box-shadow: none; color: var(--unfold-foreground, inherit);">
+        <div class="ui secondary pointing menu">
+            <a class="active item" href="/sca/scaproject/{{ original.pk }}/change/">Dependencies</a>
+            <a class="item"
+            href="/sca/scaproject/{{ original.pk }}/change/?view=vulnerabilities">Vulnerabilities</a>
         </div>
-        <input name="view" type="hidden" value="dependencies">
-    </form>
-    {% if current_object.is_project %}
-        <form method="post" action="">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="run_renovate_dependencies_no_deps">
-            <div class="ui vertical labeled icon buttons">
-                <button title="Update all dependencies" type="submit" class="positive ui button">
-                    <i class="ui recycle icon"></i>
-                    Renovate All
-                </button>
+            <div class="ui grid" style="max-width: 100%;">
+                <div class="fourteen wide column">
+                    <form method="get" class="ui form">
+                    <div class="fields">
+                        {% for field in deps_filter %}
+                            {% if field.name != "show_vulnerable" %}
+                                <div class="six wide field">
+                                    {{ field.label_tag }}
+                                    {% if field.field.widget.input_type == 'select' %}
+                                        <select name="{{ field.name }}" class="ui fluid search clearable dropdown">
+                                            {% for choice in field.field.widget.choices %}
+                                                <option {% if choice.0 == field.data %}selected="selected"{% endif %}
+                                                        value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <div class="field">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="ui primary button">Filter</button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                <div class="two wide right aligned column">
+                    <form method="get" class="ui form">
+                        <div class="field">
+                            <label>Vulnerable</label>
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" name="show_vulnerable" id="show_vulnerable_toggle" {% if show_vulnerable %}checked="checked"{% endif %}>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
+            <input name="view" type="hidden" value="dependencies">
         </form>
-    {% endif %}
-    <div class="ui hidden divider"></div>
-    <table class="ui celled fixed table">
+        {% if current_object.is_project %}
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="run_renovate_dependencies_no_deps">
+                <div class="ui vertical labeled icon buttons">
+                    <button title="Update all dependencies" type="submit" class="positive ui button">
+                        <i class="ui recycle icon"></i>
+                        Renovate All
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+    <table class="ui unstackable celled table" style="background: transparent !important; color: var(--unfold-foreground, inherit);">
+    <style>
+      .ui.segment, .ui.segment * { color: var(--unfold-foreground, inherit) !important; }
+      .ui.unstackable.celled.table thead, .ui.unstackable.celled.table thead * { background: transparent !important; color: var(--unfold-foreground, inherit) !important; }
+
+      /* Make vulnerable toggle more visible when untoggled */
+      .ui.toggle.checkbox input[type="checkbox"]:not(:checked) ~ label:before {
+        background: #d1d5db !important; /* Tailwind gray-300 */
+        border-color: #d1d5db !important;
+      }
+    </style>
+
         <thead>
             <tr>
                 <th>Dependency</th>
@@ -73,21 +87,21 @@
             </tr>
         </thead>
         <tbody>
-            {% for dep in deps_filter.qs %}
+            {% for dep in dependencies %}
                 <tr>
                     <td>
-                        <i class="{{ dep.purl|purl_icon }} icon"></i> <a target="_blank" href="/sca/scaproject/{{ dep.pk }}/change/">{{ dep }}</a>
-                        {% for k, v in dep.vulns.items %}
+                        <i class="{{ dep.purl|purl_icon }} icon text-font-important-light dark:text-font-important-dark"></i> <a target="_blank"  class="text-font-important-light dark:text-font-important-dark"href="/sca/scaproject/{{ dep.id }}/change/">{{ dep.purl }}</a>
+                        {% for k, v in dep.vulns_counters.items %}
                             {% if k %}
                                 <a target="_blank"
-                                   href="/sca/scaproject/{{ dep.pk }}/change/?view=vulnerabilities&severity={{ k }}&finding_type=0"
-                                   title="{{ v.count }} {{ k|criticality_to_str }}"
-                                   class="ui {{ k|severity_to_color }} circular label">{{ v.count }}</a>
+                                href="/sca/scaproject/{{ dep.id }}/change/?view=vulnerabilities&severity={{ k }}&finding_type=0"
+                                title="{{ v.count }} {{ k|criticality_to_str }}"
+                                class="ui {{ k|severity_to_color }} circular label">{{ v.count }}</a>
                             {% else %}
                                 <a target="_blank"
-                                   href="/sca/scaproject/{{ dep.pk }}/change/?view=vulnerabilities&finding_type=1"
-                                   title="{{ v.eol }} End of Life"
-                                   class="ui black circular label">{{ v.eol }}</a>
+                                href="/sca/scaproject/{{ dep.id }}/change/?view=vulnerabilities&finding_type=1"
+                                title="{{ v.eol }} End of Life"
+                                class="ui black circular label">{{ v.eol }}</a>
                             {% endif %}
                         {% endfor %}
                     </td>
@@ -106,12 +120,12 @@
                     <td>{{ dep.version }}</td>
                     <td>
                         {% if dep.depends_on %}
-                            {% for d in dep.depends_on.all %}
-                                <i class="{{ d.purl|purl_icon }} icon"></i> <a target="_blank" href="/sca/scaproject/{{ d.pk }}/change/">{{ d }}</a>
+                            {% for d in dep.depends_on %}
+                                <i class="{{ dep.purl|purl_icon }} icon text-font-important-light dark:text-font-important-dark"></i> <a class="text-font-important-light dark:text-font-important-dark"target="_blank" href="/sca/scaproject/{{ d.pk }}/change/">{{ d }}</a>
                                 <br>
                             {% endfor %}
                         {% else %}
-                            <td>N/A</td>
+                            N/A
                         {% endif %}
                     </td>
                     <td>{{ dep.last_scan }}</td>
@@ -138,4 +152,4 @@
             window.location.search = searchParams.toString();
         });
     </script>
-{% endblock sca_content %}
+{% endblock content %}

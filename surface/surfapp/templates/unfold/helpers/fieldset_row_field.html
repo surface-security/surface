@@ -1,0 +1,41 @@
+{% load surface_templatetags %}
+<div class="{% if adminform.model_admin.compressed_fields %}lg:min-w-56 lg:mt-2 lg:w-56{% endif %}">
+    {{ field.label_tag }}
+</div>
+
+<div class="grow relative">
+    {% if field.is_readonly %}
+    {% if value %}
+    <div class="readonly break-words max-w-2xlpy-2 text-sm *:rounded-default {% if not adminform.model_admin.compressed_fields and not field.is_image %}bg-base-50 border border-base-200 font-medium px-3 rounded-default shadow-xs dark:border-base-700 dark:bg-base-800{% endif %} {% if field.is_image %}inline-block [&_img]:rounded-default py-0!{% endif %}">
+        {{ value }}
+    </div>
+    {% elif field.contents %}
+        {% with content=original|get_field_content:field %}
+            {% if content.type == 'json' %}
+                {{ content.field }}
+            {% else %}
+                <div class="readonly break-words max-w-2xl py-2 text-sm *:rounded-default {% if not adminform.model_admin.compressed_fields and not field.is_image %}bg-base-50 border border-base-200 font-medium px-3 rounded-default shadow-xs dark:border-base-700 dark:bg-base-800{% endif %} {% if field.is_image %}inline-block [&_img]:rounded-default py-0!{% endif %}">
+                {{ field.contents }}
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% else %}
+        <div class="readonly break-words max-w-2xl py-2 text-sm *:rounded-default {% if not adminform.model_admin.compressed_fields and not field.is_image %}bg-base-50 border border-base-200 font-medium px-3 rounded-default shadow-xs dark:border-base-700 dark:bg-base-800{% endif %} {% if field.is_image %}inline-block [&_img]:rounded-default py-0!{% endif %}">
+         -
+        </div>
+    {% endif %}
+
+    {% else %}
+        {{ field.field }}
+    {% endif %}
+
+    {% if field.field.help_text and not field.is_checkbox %}
+        {% include "unfold/helpers/help_text.html" with help_text=field.field.help_text %}
+    {% endif %}
+
+    {% if field.errors %}
+        <div class="mt-2 text-red-600 text-xs dark:text-red-500">
+            {{ field.errors }}
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,10 @@
+{% extends "includes/sidenav.html" %}
+
+{% block side_menu_authenticated_extra %}
+<li class="nav-item">
+	<a href="{% url 'googlelike:search' %}">
+		<div><i class="fas fa-search mr-2"></i></div>
+		<p>Search (Beta)</p>
+	</a>
+</li>
+{% endblock %}

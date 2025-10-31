@@ -1,0 +1,11 @@
+
+<li class="text-xs">
+    {% if link %}
+        <a href="{{ link }}">{{ name }}</a>
+        {% if not no_separator %}
+          <span class="mx-2 text-base-200 dark:text-base-600">/</span>
+        {% endif %}
+    {% else %}
+        {{ name }}
+    {% endif %}
+</li>
