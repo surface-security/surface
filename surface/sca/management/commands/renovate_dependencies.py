@@ -99,17 +99,27 @@ class Command(LogBaseCommand):
 
         docker_image = settings.SCA_INTERNAL_RENOVATE if settings.SCA_INTERNAL_RENOVATE else "renovate/renovate"
 
+        _env = {
+            "RENOVATE_TOKEN": token,
+            "RENOVATE_PLATFORM": platform,
+            "RENOVATE_ENDPOINT": endpoint,
+        }
         if is_local:
             docker_temp_config_path = Path("/usr/src/app") / Path(temp_config_path).name
-            command = f"docker run --rm -v {Path.cwd()}:/usr/src/app -e LOG_LEVEL=debug -e RENOVATE_TOKEN={token} -e RENOVATE_CONFIG_FILE={docker_temp_config_path} -e RENOVATE_PLATFORM={platform} -e RENOVATE_ENDPOINT={endpoint} {docker_image}"
+            _env["RENOVATE_CONFIG_FILE"] = docker_temp_config_path
+            _env["LOG_LEVEL"] = "debug"
+            command = f"docker run --rm -v {Path.cwd()}:/usr/src/app -e RENOVATE_TOKEN -e RENOVATE_PLATFORM -e RENOVATE_ENDPOINT -e RENOVATE_CONFIG_FILE -e LOG_LEVEL {docker_image}"
         else:
-            command = f"/usr/bin/docker run --rm -v /renovate:/renovate -e RENOVATE_TOKEN={token} -e RENOVATE_CONFIG_FILE={temp_config_path} -e RENOVATE_PLATFORM={platform} -e RENOVATE_ENDPOINT={endpoint} {docker_image}"
+            _env["RENOVATE_CONFIG_FILE"] = temp_config_path
+            command = f"/usr/bin/docker run --rm -v /renovate:/renovate -e RENOVATE_TOKEN -e RENOVATE_PLATFORM -e RENOVATE_ENDPOINT -e RENOVATE_CONFIG_FILE {docker_image}"
 
         try:
-            result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True, env=_env)
             if result.stdout:
                 self.log("Docker output: %s", result.stdout)
+            if result.stderr:
+                self.log_error("Docker error: %s", result.stderr)
         except subprocess.CalledProcessError as ex:
-            self.log_exception("Failed to execute Docker command: %s", ex.stderr)
+            self.log_exception("Failed to execute Docker command: %s", ex.output)
             return False
         return True
