@@ -8,10 +8,29 @@ from django.db.models.query import QuerySet
 from . import _docker
 from scanners import models
 
+
+def settings_to_file(b64content, filepath, mode=0o600):
+    if b64content is None or not filepath:
+        raise Exception('missing file path')
+    if not os.path.isfile(filepath) or os.stat(filepath).st_size == 0:
+        with open(filepath, 'wb') as file:
+            file.write(base64.b64decode(b64content))
+            os.chmod(filepath, mode)
+        return True
+    return False
+
+
 def get_docker_client(ip, port=80, use_tls=True):
-    tlsconfig = docker.tls.TLSConfig(
-        verify=True,
-    )
+    if use_tls:
+        settings_to_file(settings.SCANNERS_DOCKER_CA_CERT, settings.SCANNERS_DOCKER_CA_CERT_PATH)
+        settings_to_file(settings.SCANNERS_DOCKER_CLIENT_KEY, settings.SCANNERS_DOCKER_CLIENT_KEY_PATH)
+        settings_to_file(settings.SCANNERS_DOCKER_CLIENT_CERT, settings.SCANNERS_DOCKER_CLIENT_CERT_PATH)
+        tlsconfig = docker.tls.TLSConfig(
+            ca_cert=settings.SCANNERS_DOCKER_CA_CERT_PATH,
+            client_cert=(settings.SCANNERS_DOCKER_CLIENT_CERT_PATH, settings.SCANNERS_DOCKER_CLIENT_KEY_PATH),
+            verify=settings.SCANNERS_DOCKER_CA_CERT_PATH,
+        )
+        #test commit
     else:
         tlsconfig = False
 
