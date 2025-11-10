@@ -13,10 +13,9 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
-from core_utils.admin_filters import DropdownFilter
 
 from core_utils.admin import DefaultModelAdmin
-from core_utils.admin_filters import DefaultFilterMixin
+from core_utils.admin_filters import DefaultFilterMixin, DropdownFilter
 from dkron.utils import run_async
 from scanners import models, utils
 

@@ -1,9 +1,8 @@
-from django.utils import timezone
 from django.test import TestCase
+from django.utils import timezone
 
-from scanners.tests import ScannerTestMixin
-from dns_ips import models as ip_models
 from scanners.inputs.base import query as input_query
+from scanners.tests import ScannerTestMixin
 
 
 class Base(ScannerTestMixin, TestCase):

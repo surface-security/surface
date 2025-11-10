@@ -1,4 +1,5 @@
 from django.db import models
+
 from core_utils.fields import TruncatingCharField
 
 

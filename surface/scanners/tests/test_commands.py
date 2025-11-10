@@ -1,9 +1,9 @@
 from io import StringIO
 from unittest import mock
-from docker.errors import APIError
 
 from django.core import management
 from django.test import TestCase
+from docker.errors import APIError
 
 from scanners import models
 from scanners.management.commands import run_scanners_continuously, run_squid_proxy
@@ -37,7 +37,7 @@ class TestRunScannersContinuously(ScannerTestMixin, TestCase):
         self.setUpScanner()
         self.scanner.continous_running = True
         self.scanner.save()
-        check_mock.return_value = [(f'scanner-test-999-whatever-9990', None)]
+        check_mock.return_value = [('scanner-test-999-whatever-9990', None)]
         self._cmd.handle_loop()
         self.assertEqual(self._out.getvalue(), '')
         self.assertEqual(self._err.getvalue(), '')
@@ -140,7 +140,7 @@ class TestRunScannersContinuously(ScannerTestMixin, TestCase):
         self.scanner.save()
         self.scanner.rootbox.active = False
         self.scanner.rootbox.save()
-        check_mock.return_value = [(f'scanner-test-999-whatever-9990', None)]
+        check_mock.return_value = [('scanner-test-999-whatever-9990', None)]
         self._cmd.handle_loop()
         self.assertEqual(self._out.getvalue(), '')
         self.assertEqual(self._err.getvalue(), '')

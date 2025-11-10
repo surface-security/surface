@@ -365,15 +365,30 @@ class SCAProjectAdmin(DefaultModelAdmin):
     def get_git_source(self, obj):
         if obj.git_source:
             return format_html(
-                f'<a target="_blank" href="/inventory/gitsource/{obj.git_source.pk}">{obj.git_source.repo_url}</a>'
+                '<a target="_blank" href="{}" '
+                'class="text-primary-600 hover:text-primary-700 '
+                'dark:text-primary-500 dark:hover:text-primary-400 '
+                'underline hover:no-underline transition-colors">'
+                '{}</a>',
+                f"/inventory/gitsource/{obj.git_source.pk}",
+                obj.git_source.repo_url,
             )
 
     @admin.display(description="SBOM")
     def get_sbom_link(self, obj):
         if obj.sbom_uuid:
+            download_url = reverse("sca:download_sbom_as_json", args=[obj.sbom_uuid, obj.name])
             return format_html(
-                '<a href="{}" target="_blank">Download sbom json</a>',
-                reverse("sca:download_sbom_as_json", args=[obj.sbom_uuid, obj.name]),
+                '<a href="{}" target="_blank" '
+                'class="inline-flex items-center justify-center w-8 h-8 '
+                'text-primary-600 hover:text-primary-700 '
+                'dark:text-primary-500 dark:hover:text-primary-400 '
+                'rounded-md hover:bg-primary-50 dark:hover:bg-primary-900/20 '
+                'transition-colors" '
+                'title="Download SBOM JSON" aria-label="Download SBOM JSON">'
+                '<span class="material-symbols-outlined text-lg">download</span>'
+                '</a>',
+                download_url,
             )
 
     @admin.display(description="Vulnerabilities")
@@ -405,8 +420,11 @@ class SCAProjectAdmin(DefaultModelAdmin):
         }
 
         formatted_items = [
-            '<a target="_blank" href="/sca/scaproject/{pk}/change/?view=vulnerabilities&severity={criticality}&finding_type={finding_type}" '
-            'title="{counter} {severity}" class="ui {color} circular label">{counter}</a>'.format(
+            '<a target="_blank" '
+            'href="/sca/scaproject/{pk}/change/?view=vulnerabilities'
+            '&severity={criticality}&finding_type={finding_type}" '
+            'title="{counter} {severity}" class="ui {color} circular label">'
+            '{counter}</a>'.format(
                 pk=obj.pk,
                 counter=vuln["counter"],
                 severity=vuln["severity"],

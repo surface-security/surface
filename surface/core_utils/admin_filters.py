@@ -5,7 +5,6 @@ from urllib.parse import urlencode
 
 from django import forms
 from django.contrib import admin
-from django.contrib.admin.options import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.widgets import AdminDateWidget
 from django.core.validators import EMPTY_VALUES

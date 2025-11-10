@@ -62,7 +62,8 @@
             </form>
         {% endif %}
     </div>
-    <table class="ui unstackable celled table" style="background: transparent !important; color: var(--unfold-foreground, inherit);">
+    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+    <table class="ui unstackable celled table" style="background: transparent !important; color: var(--unfold-foreground, inherit); min-width: 100%;">
     <style>
       .ui.segment, .ui.segment * { color: var(--unfold-foreground, inherit) !important; }
       .ui.unstackable.celled.table thead, .ui.unstackable.celled.table thead * { background: transparent !important; color: var(--unfold-foreground, inherit) !important; }
@@ -71,6 +72,25 @@
       .ui.toggle.checkbox input[type="checkbox"]:not(:checked) ~ label:before {
         background: #d1d5db !important; /* Tailwind gray-300 */
         border-color: #d1d5db !important;
+      }
+
+      @media (max-width: 768px) {
+        .ui.unstackable.celled.table {
+          display: table;
+          width: max-content;
+          min-width: 100%;
+        }
+        .ui.unstackable.celled.table th,
+        .ui.unstackable.celled.table td {
+          position: relative;
+        }
+        .ui.unstackable.celled.table td {
+          white-space: nowrap;
+        }
+        .ui.unstackable.celled.table td:first-child {
+          white-space: normal;
+          max-width: 250px;
+        }
       }
     </style>
 
@@ -121,7 +141,7 @@
                     <td>
                         {% if dep.depends_on %}
                             {% for d in dep.depends_on %}
-                                <i class="{{ dep.purl|purl_icon }} icon text-font-important-light dark:text-font-important-dark"></i> <a class="text-font-important-light dark:text-font-important-dark"target="_blank" href="/sca/scaproject/{{ d.pk }}/change/">{{ d }}</a>
+                                <i class="{{ d.purl|purl_icon }} icon text-font-important-light dark:text-font-important-dark"></i> <a class="text-font-important-light dark:text-font-important-dark" target="_blank" href="/sca/scaproject/{{ d.pk }}/change/">{{ d }}</a>
                                 <br>
                             {% endfor %}
                         {% else %}
@@ -138,6 +158,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     <script>
         $('.ui.dropdown').dropdown();
         $('.ui.checkbox').checkbox();

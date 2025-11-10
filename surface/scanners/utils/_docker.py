@@ -1,5 +1,6 @@
-import docker
 from datetime import datetime
+
+import docker
 
 
 class ContainerApiMonkeyMixin:
@@ -40,7 +41,8 @@ class ContainerApiMonkeyMixin:
         if since is not None:
             if isinstance(since, datetime):
                 # DA PATCH DA MONKEY MADE
-                # datetime.timestamp() already (py3.3+) provides timestamp (with microseconds) in UTC, no need for docker.utils
+                # datetime.timestamp() already (py3.3+) provides timestamp
+                # (with microseconds) in UTC, no need for docker.utils
                 params['since'] = since.timestamp()
             elif isinstance(since, (int, float)) and since > 0:
                 params['since'] = since
@@ -78,7 +80,7 @@ class OurDockerClient(docker.DockerClient):
         # also, version detection is done during __init__ so it fails due to the "trust_env"
         # issue mentioned below...
         # adjust if required (older dockerd or newer methods required)
-        if not 'version' in b:
+        if 'version' not in b:
             b['version'] = '1.41'
 
         self.api = OurAPIClient(*a, **b)

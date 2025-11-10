@@ -1,9 +1,10 @@
-from django.db import models
+from functools import lru_cache
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.query_utils import Q
-from functools import lru_cache
+from django.db import models
 from django.db.models.expressions import Exists
+from django.db.models.query_utils import Q
 
 from core_utils.fields import TruncatingCharField
 from dns_ips import models as dns_models
@@ -141,7 +142,8 @@ class LiveHostQS(models.QuerySet):
     as it is possible to query on normal FK, eg:
     .filter(host__record__name="betfair.com")
 
-    If the attribute is common to any of the ContentTypes supported (currently IPAddress and DNSRecord), it can also be filtered using "any", eg:
+    If the attribute is common to any of the ContentTypes supported
+    (currently IPAddress and DNSRecord), it can also be filtered using "any", eg:
     .filter(host__any__name="betfair.com")
     """
 
@@ -281,9 +283,9 @@ class LiveHostManager(models.Manager):
             if isinstance(m, models.base.ModelBase):
                 self.__cts.append((m._meta.app_label, m._meta.model_name))
             elif isinstance(m, str):
-                l = m.lower().split('.')
-                assert len(l) == 2
-                self.__cts.append(tuple(l))
+                parts = m.lower().split('.')
+                assert len(parts) == 2
+                self.__cts.append(tuple(parts))
             elif isinstance(m, tuple):
                 assert len(m) == 2
                 self.__cts.append(m)
@@ -294,17 +296,18 @@ class LiveHostManager(models.Manager):
     def limit_choices(self):
         if not self.__cts:
             raise ValueError('invalid choices')
-        l = self.__cts[0]
-        q = models.Q(app_label=l[0], model=l[1])
-        for l in self.__cts[1:]:
-            q |= models.Q(app_label=l[0], model=l[1])
+        first_ct = self.__cts[0]
+        q = models.Q(app_label=first_ct[0], model=first_ct[1])
+        for ct in self.__cts[1:]:
+            q |= models.Q(app_label=ct[0], model=ct[1])
         return q
 
 
 class CustomGFK(GenericForeignKey):
     def get_lookup(self, *a, **b):
         # FIXME: should the QS logic be moved into custom lookups?
-        # custom queryset solves admin direct search results on LiveHost but what about RelatedManager, can lookups solve it?
+        # custom queryset solves admin direct search results on LiveHost but
+        # what about RelatedManager, can lookups solve it?
         return None
 
 

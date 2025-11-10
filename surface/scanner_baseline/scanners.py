@@ -2,10 +2,9 @@ import json
 import logging
 from pathlib import Path
 
-from scanners.parsers.base import BaseParser
-
-from scanners import models
 from dns_ips import models as dns_models
+from scanners import models
+from scanners.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
 
@@ -19,16 +18,16 @@ class Baseline(BaseParser):
         cookies = []
         headers = []
         for c in data.get('chain', []):
-            for l in c['response'].splitlines():
-                if l.lower()[:9] == 'location:':
-                    redirects.append(l[9:].strip())
-                if l.lower()[:11] == 'set-cookie:':
-                    cookies.append(l[11:].strip())
-        for l in data.get('response-header', '').splitlines():
-            if l.lower()[:11] == 'set-cookie:':
-                cookies.append(l[11:].strip())
+            for line in c['response'].splitlines():
+                if line.lower()[:9] == 'location:':
+                    redirects.append(line[9:].strip())
+                if line.lower()[:11] == 'set-cookie:':
+                    cookies.append(line[11:].strip())
+        for line in data.get('response-header', '').splitlines():
+            if line.lower()[:11] == 'set-cookie:':
+                cookies.append(line[11:].strip())
             else:
-                headers.append(l)
+                headers.append(line)
         return redirects, cookies, headers
 
     def _find_host_record(self, hostname):

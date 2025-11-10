@@ -1,13 +1,13 @@
 from time import sleep
 
-from django import db
-from django.core.management import call_command
-from django.conf import settings
-
 from database_locks import locked
+from django import db
+from django.conf import settings
+from django.core.management import call_command
+
+from logbasecommand.base import LogBaseCommand
 from scanners import models, utils
 from scanners.management.commands import run_scanner
-from logbasecommand.base import LogBaseCommand
 
 
 @locked

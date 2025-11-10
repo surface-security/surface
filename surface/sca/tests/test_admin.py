@@ -30,9 +30,10 @@ class Test(TestCase):
             json=data.sbom_data,
         )
 
+        since_time = datetime.datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')
         responses.add(
             responses.GET,
-            f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/all?since={datetime.datetime.strftime(timezone.now() - timezone.timedelta(hours=1), '%Y-%m-%dT%H:%M:%S.%f')}",
+            f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/all?since={since_time}",
             status=200,
             content_type="application/json",
             json=["urn:uuid:46d764e2-aae1-4f82-b9f1-c616308e921d"],

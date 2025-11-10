@@ -1,7 +1,6 @@
 import json
 
 from logbasecommand.base import LogBaseCommand
-
 from scanners import utils
 
 

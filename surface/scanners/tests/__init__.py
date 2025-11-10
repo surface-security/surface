@@ -86,7 +86,7 @@ class ScannerTestMixin:
         with tarfile.open(fileobj=input_tar_bytes, mode='w') as input_tar:
             for content, path in content_and_path_tuples:
                 data = io.BytesIO()
-                if type(content) == str:
+                if isinstance(content, str):
                     data.write(content.encode())
                 else:
                     data.write(content)

@@ -40,10 +40,27 @@ class Command(LogBaseCommand):
             Path(temp_config_path).unlink()
 
     def parse_git_url(self, git_url: str):
-        repo_url = git_url.split("//")[1]
+        """Parse git URL to extract platform and repository path.
+
+        Args:
+            git_url: Git URL in format like https://github.com/owner/repo or https://gitlab.com/owner/repo
+
+        Returns:
+            tuple: (platform, repo_path) where platform is 'github' or 'gitlab'
+
+        Raises:
+            ValueError: If URL format is invalid
+        """
+        if "//" not in git_url:
+            raise ValueError(f"Invalid git URL format: {git_url}")
+        repo_url = git_url.split("//", 1)[1]
+        if "/" not in repo_url:
+            raise ValueError(f"Invalid git URL format: {git_url}")
         platform_domain = repo_url.split("/")[0]
         platform = "gitlab" if "gitlab" in platform_domain else "github"
         repo_path = "/".join(repo_url.split("/")[1:])
+        if not repo_path:
+            raise ValueError(f"Invalid git URL format: {git_url}")
         return platform, repo_path
 
     def create_temp_renovate_config(self, repo_urls: list, dependencies=None, is_local=False, platform=None):
@@ -108,18 +125,37 @@ class Command(LogBaseCommand):
             docker_temp_config_path = Path("/usr/src/app") / Path(temp_config_path).name
             _env["RENOVATE_CONFIG_FILE"] = docker_temp_config_path
             _env["LOG_LEVEL"] = "debug"
-            command = f"docker run --rm -v {Path.cwd()}:/usr/src/app -e RENOVATE_TOKEN -e RENOVATE_PLATFORM -e RENOVATE_ENDPOINT -e RENOVATE_CONFIG_FILE -e LOG_LEVEL {docker_image}"
+            command = (
+                f"docker run --rm -v {Path.cwd()}:/usr/src/app "
+                f"-e RENOVATE_TOKEN -e RENOVATE_PLATFORM -e RENOVATE_ENDPOINT "
+                f"-e RENOVATE_CONFIG_FILE -e LOG_LEVEL {docker_image}"
+            )
         else:
             _env["RENOVATE_CONFIG_FILE"] = temp_config_path
-            command = f"/usr/bin/docker run --rm -v /renovate:/renovate -e RENOVATE_TOKEN -e RENOVATE_PLATFORM -e RENOVATE_ENDPOINT -e RENOVATE_CONFIG_FILE {docker_image}"
+            command = (
+                f"/usr/bin/docker run --rm -v /renovate:/renovate "
+                f"-e RENOVATE_TOKEN -e RENOVATE_PLATFORM "
+                f"-e RENOVATE_ENDPOINT -e RENOVATE_CONFIG_FILE {docker_image}"
+            )
 
         try:
-            result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True, env=_env)
+            result = subprocess.run(
+                command,
+                shell=True,  # Required for docker volume mounts
+                check=True,
+                capture_output=True,
+                text=True,
+                env=_env,
+                timeout=3600,  # 1 hour timeout
+            )
             if result.stdout:
                 self.log("Docker output: %s", result.stdout)
             if result.stderr:
                 self.log_error("Docker error: %s", result.stderr)
+        except subprocess.TimeoutExpired:
+            self.log_error("Docker command timed out after 1 hour")
+            return False
         except subprocess.CalledProcessError as ex:
-            self.log_exception("Failed to execute Docker command: %s", ex.output)
+            self.log_exception("Failed to execute Docker command: %s", ex.output if hasattr(ex, 'output') else str(ex))
             return False
         return True

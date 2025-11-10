@@ -1,8 +1,15 @@
 from typing import Literal
 
+import requests
 from cvss import CVSS2, CVSS3
 from packageurl import PackageURL
 from packaging import version
+from requests.adapters import HTTPAdapter
+
+try:
+    from urllib3.util.retry import Retry
+except ImportError:
+    from requests.packages.urllib3.util.retry import Retry
 
 
 def cvss_to_severity(cvss_vector: str) -> Literal["None", "Low", "Medium", "High", "Critical"]:
@@ -73,6 +80,14 @@ def purl_type_to_fomantic_icon(purl_type: str) -> str:
         return "gem"
     elif purl_type == "git":
         return "git"
+    elif purl_type == "oci" or purl_type == "docker":
+        return "docker"
+    elif purl_type == "deb":
+        return "linux"
+    elif purl_type == "rpm":
+        return "linux"  
+    elif purl_type == "apk":
+        return "linux"
     elif "github" in purl_type:
         return "github"
     elif "gitlab" in purl_type:
@@ -104,3 +119,24 @@ def only_highest_version_dependencies(purls):
                     highest_versions[dependency] = (purl_version, purl_string)
 
     return [purl_string for _, purl_string in highest_versions.values()]
+
+
+def create_http_session() -> requests.Session:
+    """
+    Create a requests session with retry strategy and connection pooling.
+
+    Returns:
+        A configured requests.Session with retry logic for HTTP errors
+        and connection pooling for better performance.
+    """
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy, pool_connections=10, pool_maxsize=20)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session

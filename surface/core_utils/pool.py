@@ -1,5 +1,5 @@
-import multiprocessing.pool as mp
 import itertools
+import multiprocessing.pool as mp
 
 
 def subprocess_setup():

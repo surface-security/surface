@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from core_utils.tests.models import TruncateFieldModel
 
 

@@ -9,9 +9,9 @@ from django.utils.safestring import mark_safe
 from jsoneditor.forms import JSONEditor
 from unfold.admin import ModelAdmin
 
-logger = logging.getLogger(__name__)
-
 from django_restful_admin import site as rest
+
+logger = logging.getLogger(__name__)
 
 # Register all models for REST API except the registered ones
 for model in apps.get_models():

@@ -1,10 +1,8 @@
+from django.conf import settings
 from docker.errors import APIError
 
-from django.conf import settings
-
-from scanners import models
-from scanners import utils
 from logbasecommand.base import LogBaseCommand
+from scanners import models, utils
 
 
 class Command(LogBaseCommand):
