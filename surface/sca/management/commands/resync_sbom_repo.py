@@ -60,7 +60,7 @@ class Command(LogBaseCommand):
 
         return purl, dep_object
 
-    def is_version(self, version: str) -> bool:
+    def is_valid_version(self, version: str) -> bool:
         try:
             semver.Version.parse(version, optional_minor_and_patch=True)
             return True
@@ -123,7 +123,7 @@ class Command(LogBaseCommand):
             for version in vuln.get("affected", {})
             for version_range in version.get("ranges", {})
             for event in version_range.get("events", {})
-            if "fixed" in event and self.is_version(event["fixed"])
+            if "fixed" in event and self.is_valid_version(event["fixed"])
         ]
 
         SCAFinding.objects.update_or_create(
