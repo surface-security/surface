@@ -307,13 +307,5 @@ UNFOLD = {
             "900": "oklch(39.1% .09 240.876)",
             "950": "oklch(29.3% .066 243.157)",
         },
-        "font": {
-            "subtle-light": "var(--color-base-500)",  # text-base-500
-            "subtle-dark": "var(--color-base-400)",  # text-base-400
-            "default-light": "var(--color-base-600)",  # text-base-600
-            "default-dark": "var(--color-base-300)",  # text-base-300
-            "important-light": "var(--color-base-900)",  # text-base-900
-            "important-dark": "var(--color-primary-500)",  # text-base-100
-        },
     },
 }

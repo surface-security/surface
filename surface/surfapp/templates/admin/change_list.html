@@ -13,6 +13,11 @@
     <script src="{% static 'unfold/js/select2.init.js' %}"></script>
 
     {{ media.css }}
+    <style>
+        tbody a[href]:not(.ui.label) {
+            color: var(--color-primary-500) !important;
+        }
+    </style>
 
     {% if not actions_on_top and not actions_on_bottom %}
         <style>
