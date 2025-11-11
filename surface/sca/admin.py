@@ -391,7 +391,7 @@ class SCAProjectAdmin(DefaultModelAdmin):
     def get_sbom_link(self, obj):
         if obj.sbom_uuid:
             return format_html(
-                '<a href="{}" target="_blank">Download sbom json</a>',
+                '<a href="{}" target="_blank" title="Download SBOM JSON" aria-label="Download SBOM JSON"><span class="material-symbols-outlined text-lg">download</span></a>',
                 reverse("sca:download_sbom_as_json", args=[obj.sbom_uuid, obj.name]),
             )
 
