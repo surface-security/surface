@@ -75,10 +75,15 @@ class EndOfLifeDependencyAdmin(DefaultModelAdmin, DefaultFilterMixin, EndOfLifeD
         "no_support",
         "is_discontinued",
         "is_lts",
-        "link",
+        "get_link",
     ]
     list_filter = ["product", EndOfLifeDependencyBoolFilter, LTSFilter, DiscontinuedFilter, SupportFilter]
     search_fields = ["product"]
+
+    @admin.display(description="Link")
+    def get_link(self, obj):
+        if obj.link:
+            return format_html(f'<a target="_blank" href="{obj.link}">{obj.link}</a>')
 
 
 class SCADependencyForm(forms.ModelForm):
@@ -249,6 +254,17 @@ class SCAProjectAdmin(DefaultModelAdmin):
         ("git_source__apps", RelatedFieldAjaxListFilter),
     ]
     search_fields = ["name", "purl", "depends_on__name", "depends_on__purl", "git_source__repo_url"]
+
+    def get_search_results(self, request, queryset, search_term):
+        prop_ids = []
+        if search_term:
+            term = search_term.lower()
+            prop_ids = [obj.pk for obj in queryset.only("pk") if any(term in dep.lower() for dep in obj.dependencies)]
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        if prop_ids:
+            queryset |= queryset.model.objects.filter(pk__in=prop_ids)
+
+        return queryset, use_distinct
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
