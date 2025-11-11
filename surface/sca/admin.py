@@ -84,6 +84,7 @@ class EndOfLifeDependencyAdmin(DefaultModelAdmin, DefaultFilterMixin, EndOfLifeD
     def get_link(self, obj):
         if obj.link:
             return format_html(f'<a target="_blank" href="{obj.link}">{obj.link}</a>')
+        return ""
 
 
 class SCADependencyForm(forms.ModelForm):
