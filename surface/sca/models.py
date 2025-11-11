@@ -210,12 +210,6 @@ class SCADependency(models.Model):
     def dependencies(self) -> list:
         return SCADependency.get_dependencies(self)
 
-    def save(self, *args, **kwargs):
-        if hasattr(self, "dependencies"):
-            if self.is_project and self.is_project:
-                self.dependencies_list = self.dependencies
-        super().save(*args, **kwargs)
-
     def __str__(self) -> str:
         return self.purl
 
@@ -296,6 +290,13 @@ class SuppressedSCAFinding(models.Model):
         verbose_name = "Suppressed Dependency Finding (SCA)"
         verbose_name_plural = "Suppressed Dependency Findings (SCA)"
         unique_together = ["dependency", "vuln_id"]
+
+
+@receiver(post_save, sender=SCADependency)
+def sca_project_post_save(sender, instance, **kwargs):
+    deps = instance.dependencies
+    if instance.is_project:
+        sender.objects.filter(pk=instance.pk).update(dependencies_list=deps)
 
 
 @receiver([post_save, post_delete], sender=SuppressedSCAFinding)
