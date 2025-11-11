@@ -1,7 +1,7 @@
-import re
-from urllib.parse import urlencode
 import datetime
 import logging
+import re
+from urllib.parse import urlencode
 
 import netaddr
 from django.conf import settings
@@ -10,9 +10,7 @@ from django.db.models import Model
 from django.urls import reverse
 
 from dns_ips.models import DNSDomain, DNSRecord
-
 from slackbot.base import MessageProcessor
-
 
 logger = logging.getLogger(__name__)
 

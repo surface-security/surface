@@ -31,12 +31,14 @@ class Command(LogBaseCommand):
 
     def get_sboms(self, since: datetime) -> list[str]:
         since_str = datetime.strftime(since, "%Y-%m-%dT%H:%M:%S.%f")
-        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/all", params={"since": since_str})
+        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/all", params={"since": since_str}, timeout=30)
         res.raise_for_status()
         return res.json()
 
     def get_sbom_details(self, serial_number: str) -> dict[str, Any]:
-        res = requests.get(f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/{serial_number}", params={"vuln_data": True})
+        res = requests.get(
+            f"{settings.SCA_SBOM_REPO_URL}/v1/sbom/{serial_number}", params={"vuln_data": True}, timeout=60
+        )
         res.raise_for_status()
         return res.json()
 
@@ -71,7 +73,7 @@ class Command(LogBaseCommand):
     def handle_eol(self, purl: PackageURL, dependency: SCADependency):
         # Get Suppressed Findings for current dependency
         suppressed_findings = SuppressedSCAFinding.objects.filter(dependency=dependency)
-        eol_dependencies = EndOfLifeDependency.objects.filter(product=purl.name, eol__lt=datetime.now().date())
+        eol_dependencies = EndOfLifeDependency.objects.filter(product=purl.name, eol__lt=timezone.now().date())
 
         for eol in eol_dependencies:
             try:
@@ -93,11 +95,13 @@ class Command(LogBaseCommand):
                         "finding_type": SCAFinding.FindingType.EOL,
                         "published": eol.eol,
                         "ecosystem": purl.type,
-                        "state": SCAFinding.State.CLOSED
-                        if suppressed_findings.filter(
-                            vuln_id=eol.pk, sca_project__isnull=True
-                        )  # Closed if global suppression
-                        else SCAFinding.State.NEW,
+                        "state": (
+                            SCAFinding.State.CLOSED
+                            if suppressed_findings.filter(
+                                vuln_id=eol.pk, sca_project__isnull=True
+                            )  # Closed if global suppression
+                            else SCAFinding.State.NEW
+                        ),
                         "last_seen_date": self.sync_time,
                     },
                 )
@@ -130,18 +134,21 @@ class Command(LogBaseCommand):
             dependency=pkg_obj,
             vuln_id=vuln["id"],
             defaults={
-                "application": None,  # a finding / dependency can have multiple Applications, we link to Applications through
-                # the dependency tree instead
+                # A finding / dependency can have multiple Applications,
+                # we link to Applications through the dependency tree instead
+                "application": None,
                 "published": vuln["published"],
                 "cvss_vector": cvss3[0] if cvss3 else "",
                 "finding_type": SCAFinding.FindingType.VULN,
                 "title": vuln.get("summary", "").capitalize(),
                 "summary": vuln["details"],
-                "state": SCAFinding.State.CLOSED
-                if suppressed_findings.filter(
-                    vuln_id=vuln["id"], sca_project__isnull=True
-                )  # Closed if global suppression
-                else SCAFinding.State.NEW,
+                "state": (
+                    SCAFinding.State.CLOSED
+                    if suppressed_findings.filter(
+                        vuln_id=vuln["id"], sca_project__isnull=True
+                    )  # Closed if global suppression
+                    else SCAFinding.State.NEW
+                ),
                 "aliases": ", ".join(vuln.get("aliases", [])),
                 "fixed_in": ", ".join(fixed_in) if fixed_in else "",
                 "last_seen_date": self.sync_time,
@@ -152,39 +159,66 @@ class Command(LogBaseCommand):
     def handle_sbom(self, sbom: str) -> bool:
         sbom_data = self.get_sbom_details(sbom)
 
-        repo = sbom_data["sbomrepo"]["metadata"]["repo"]
-        branch = sbom_data["sbomrepo"]["metadata"].get("branch", "master")
-        main_branch = sbom_data["sbomrepo"]["metadata"].get("main_branch", "master")
+        sbom_metadata = sbom_data["sbomrepo"]["metadata"]
+
+        # Determine if this is a Docker/OCI image SBOM
+        is_image = "image" in sbom_metadata
+        if not is_image and "component" in sbom_data.get("metadata", {}):
+            component_purl = sbom_data["metadata"]["component"].get("purl", "")
+            if component_purl:
+                try:
+                    component_purl_obj = PackageURL.from_string(component_purl)
+                    is_image = component_purl_obj.type in settings.SCA_IMAGE_PURL_TYPES
+                except ValueError:
+                    pass
 
         project = None
         main_dependencies = set()
         secondary_dependencies = set()
 
-        if branch != main_branch:
-            self.log_warning(f"{sbom} skiped for repo: {sbom_data['sbomrepo']['metadata']['repo']}, branch: {branch}")
-            self.exited_earlier_not_master += 1
-            return False
+        if is_image:
+            # Handle Docker/OCI image SBOM
+            image_ref = sbom_metadata.get("image") or sbom_metadata.get("repo", "")
+            if not image_ref:
+                self.log_error(f"Image reference not found for {sbom_data['serialNumber']}")
+                self.exited_earlier_no_component += 1
+                return False
+
+            git_source = None
+
+        else:
+            repo = sbom_metadata.get("repo")
+            if not repo:
+                self.log_error(f"Repo not found for {sbom_data['serialNumber']}")
+                self.exited_earlier_no_component += 1
+                return False
+
+            branch = sbom_metadata.get("branch", "master")
+            main_branch = sbom_metadata.get("main_branch", "master")
+
+            if branch != main_branch:
+                self.log_warning(f"{sbom} skipped for repo: {repo}, branch: {branch}")
+                self.exited_earlier_not_master += 1
+                return False
+
+            existing_dependencies = SCADependency.objects.filter(git_source__repo_url=repo)
+            git_source = GitSource.objects.filter(repo_url=repo, branch=branch, active=True).first()
+            if git_source:
+                # Bulk update to avoid N+1 queries
+                existing_dependencies.update(git_source=None)
+            else:
+                git_source, _ = GitSource.objects.update_or_create(
+                    repo_url=repo,
+                    branch=branch,
+                    defaults={
+                        "active": True,
+                    },
+                )
 
         if "component" not in sbom_data["metadata"]:
             self.log_error(f"Component Not found for {sbom_data['serialNumber']}")
             self.exited_earlier_no_component += 1
             return False
-
-        # cleanup old dependencies because current ones will be added, no history needed
-        existing_dependencies = SCADependency.objects.filter(git_source__repo_url=repo)
-        git_source = GitSource.objects.filter(repo_url=repo, branch=branch, active=True).first()
-        if git_source:
-            for existing_dep in existing_dependencies:
-                existing_dep.git_source = None
-                existing_dep.save()
-        else:
-            git_source, _ = GitSource.objects.update_or_create(
-                repo_url=repo,
-                branch=branch,
-                defaults={
-                    "active": True,
-                },
-            )
 
         for component in sbom_data.get("components", []):
             purl, _ = self.create_dependency(component["purl"], sbom_data["metadata"]["timestamp"])
@@ -196,8 +230,26 @@ class Command(LogBaseCommand):
             if not purl:
                 continue
 
-            if purl.type in settings.SCA_SOURCE_PURL_TYPES and f"{purl.namespace}/{purl.name}" in repo:
-                dep_object.git_source = git_source
+            # Check if this dependency represents the project (either git repo or Docker image)
+            is_project_dep = False
+            if is_image:
+                # For Docker images, check if purl type matches image PURL types
+                if purl.type in settings.SCA_IMAGE_PURL_TYPES:
+                    image_ref = sbom_metadata.get("image") or sbom_metadata.get("repo", "")
+                    # Extract image name from purl (could be in namespace/name or just name)
+                    purl_image_ref = f"{purl.namespace}/{purl.name}" if purl.namespace else purl.name
+                    # Match if image reference contains the purl image reference or vice versa
+                    if purl_image_ref in image_ref or image_ref in purl_image_ref:
+                        is_project_dep = True
+            else:
+                # For Git repos, use existing logic
+                repo = sbom_metadata.get("repo", "")
+                if purl.type in settings.SCA_SOURCE_PURL_TYPES and f"{purl.namespace}/{purl.name}" in repo:
+                    is_project_dep = True
+
+            if is_project_dep:
+                if git_source:
+                    dep_object.git_source = git_source
                 dep_object.is_project = True
                 dep_object.sbom_uuid = sbom
                 dep_object.save()
@@ -222,7 +274,10 @@ class Command(LogBaseCommand):
             dep_object.depends_on.add(*depends_on)
 
         if project:
-            project.depends_on.add(*SCADependency.objects.filter(purl__in=main_dependencies - secondary_dependencies))
+            # Use bulk operations for better performance
+            missing_deps = main_dependencies - secondary_dependencies
+            if missing_deps:
+                project.depends_on.add(*SCADependency.objects.filter(purl__in=missing_deps))
 
         for pkg, vulns in sbom_data["sbomrepo"].get("vulnerabilities", {}).items():
             try:
@@ -241,7 +296,6 @@ class Command(LogBaseCommand):
 
         self.processed += 1
         return True
-        # delete dependencies that are not a dependency of others and don't have gitsource¯
 
     def handle(self, *args, **options):
         self.sync_time = timezone.now()

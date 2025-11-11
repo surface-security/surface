@@ -1,9 +1,8 @@
 import json
 import logging
 
+from scanners import models, utils
 from slackbot.base import MessageProcessor
-
-from scanners import utils, models
 
 logger = logging.getLogger(__name__)
 

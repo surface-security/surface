@@ -1,8 +1,8 @@
 import os
 
+from logbasecommand.base import LogBaseCommand
 from scanners import models
 from scanners.parsers.base import query
-from logbasecommand.base import LogBaseCommand
 
 
 class ParseException(Exception):

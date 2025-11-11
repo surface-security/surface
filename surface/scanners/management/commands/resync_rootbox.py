@@ -1,18 +1,18 @@
 import os
+import re
 import shutil
+import tarfile
 import tempfile
 import time
-import re
-import tarfile
 from datetime import datetime, timedelta
 
-from django.conf import settings
-from django import db
-
 from database_locks import locked
-from scanners import models, utils
+from django import db
+from django.conf import settings
+
 from logbasecommand.base import LogBaseCommand
-from scanners.management.commands.parse_scanner_results import parse_results, ParseException
+from scanners import models, utils
+from scanners.management.commands.parse_scanner_results import ParseException, parse_results
 
 
 @locked

@@ -229,12 +229,15 @@ def confirm_action(template=None, title="Are you sure?", short_description=None)
     """
     Decorator used for ModelAdmin actions that require a confirmation page.
     template:
-        Template to use. If None, the usual admin template lookup paths (global, per app, per model) are used.
-        If choosing one custom, check admin/custom_action_confirmation.html to see existing blocks or re-defined entirely.
+        Template to use. If None, the usual admin template lookup paths
+        (global, per app, per model) are used. If choosing one custom, check
+        admin/custom_action_confirmation.html to see existing blocks or
+        re-defined entirely.
     title:
         The <title> to be used in the page
     short_description:
-        This will be used by the default template as in "Are you sure you want to <SHORT_DESCRIPTION> for the following..."
+        This will be used by the default template as in
+        "Are you sure you want to <SHORT_DESCRIPTION> for the following..."
         This defaults to action method short_description.
     The wrapped method should just do the action as if it was already confirmed.
     Usage:

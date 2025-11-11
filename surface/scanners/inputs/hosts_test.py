@@ -1,5 +1,5 @@
-from scanners import models
 from dns_ips import models as dns_models
+from scanners import models
 
 from .base import BaseInput
 

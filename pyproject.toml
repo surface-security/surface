@@ -26,16 +26,29 @@ exclude = [
     '__pycache__',
     'venv',
     'venv3',
+    '**/migrations/**',
 ]
-ignore = []
 line-length = 120
+src = ['surface', 'e2e']
+
+[tool.ruff.lint]
+ignore = []
 select = [
     'E',
     'F',
     'W',
     "I001",
 ]
-src = ['surface', 'e2e']
 
-[tool.ruff.isort]
+[tool.ruff.lint.per-file-ignores]
+# Test data files contain long vulnerability description strings
+"**/tests/data.py" = ["E501"]
+# Test files with long cookie/header strings
+"**/tests/test_generic.py" = ["E501"]
+# Test settings commonly use star imports
+"**/settings_test.py" = ["F403"]
+# Settings file has long base64 encoded image and intentional import order
+"**/settings.py" = ["E501", "E402"]
+
+[tool.ruff.lint.isort]
 known-first-party = ["dkron", "django_restful_admin", "slackbot", "dbcleanup", "olympus", "notifications", "ppbenviron", "logbasecommand", "impersonate", "apitokens", "sbomrepo"]

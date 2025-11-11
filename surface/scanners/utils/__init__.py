@@ -1,12 +1,13 @@
 import base64
 import os
-import docker
 
+import docker
 from django.conf import settings
 from django.db.models.query import QuerySet
 
-from . import _docker
 from scanners import models
+
+from . import _docker
 
 
 def settings_to_file(b64content, filepath, mode=0o600):

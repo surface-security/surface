@@ -1,6 +1,6 @@
-from django.db import models
 from django.contrib.contenttypes import models as ct_models
 from django.core import checks
+from django.db import models
 
 
 class Person(models.Model):
@@ -85,7 +85,11 @@ class Finding(models.Model):
             [
                 checks.Warning(
                     'deprecated model',
-                    hint='Deprecation Warning: Migrate inventory.Finding data to vuln.Finding instead. inventory.Finding will be decommissioned in Surface 2.0',
+                    hint=(
+                        'Deprecation Warning: Migrate inventory.Finding data to '
+                        'vuln.Finding instead. inventory.Finding will be '
+                        'decommissioned in Surface 2.0'
+                    ),
                     obj=cls,
                     id='inventory.W001',
                 )

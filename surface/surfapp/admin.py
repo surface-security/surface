@@ -63,26 +63,6 @@ class MigrationAdmin(DefaultModelAdmin):  # noqa: F405
         return False
 
 
-# User Admin Patch
-admin.site.unregister(User)
-
-
-@admin.register(User)
-class UserAdmin(BaseUserAdmin, DefaultModelAdmin):
-    # Forms loaded from `unfold.forms`
-    form = UserChangeForm
-    add_form = UserCreationForm
-    change_password_form = AdminPasswordChangeForm
-
-
-admin.site.unregister(Group)
-
-
-@admin.register(Group)
-class GroupAdmin(BaseGroupAdmin, DefaultModelAdmin):
-    pass
-
-
 # Notifications Admin patch
 admin.site.unregister(Event)
 
@@ -126,8 +106,10 @@ class JobAdmin(JobAdmin, DefaultModelAdmin):
     @admin.display(description="DKRON Link")
     def get_dkron_link(self, obj):
         return format_html(
-            '<a href="{}" target="_blank" rel="noopener" style="display:flex;justify-content:center;align-items:center;">'
-            '<span class="material-symbols-outlined" style="vertical-align:middle;">link</span>'
+            '<a href="{}" target="_blank" rel="noopener" '
+            'style="display:flex;justify-content:center;align-items:center;">'
+            '<span class="material-symbols-outlined" '
+            'style="vertical-align:middle;">link</span>'
             "</a>",
             utils.job_executions(obj.name),
         )

@@ -1,6 +1,6 @@
+from django.contrib.contenttypes import models as ct_models
 from django.test import TestCase
 
-from django.contrib.contenttypes import models as ct_models
 from dns_ips import models as dns_models
 from scanners import models
 
@@ -31,14 +31,14 @@ class Test(TestCase):
             list(models.LiveHost.objects.prefetch_related('host').all())
 
         with self.assertNumQueries(3):
-            l = list(models.LiveHost.objects.prefetch_related('host').all())
+            livehosts = list(models.LiveHost.objects.prefetch_related('host').all())
             # as `host` was prefeteched, no extra queries
-            [str(ll) for ll in l]
+            [str(ll) for ll in livehosts]
 
         with self.assertNumQueries(4):
             # without prefetch, 1 extra query for each record instead (3 livehosts = 3 extra queries)
-            l = list(models.LiveHost.objects.all())
-            [str(ll) for ll in l]
+            livehosts = list(models.LiveHost.objects.all())
+            [str(ll) for ll in livehosts]
 
     def test_content_type_limit(self):
         # WTF!! only IPAddress and DNSRecord in limit_choices
@@ -123,8 +123,10 @@ class Test(TestCase):
         self.assertFalse(models.LiveHostQS.valid_ip('x'))
         self.assertFalse(models.LiveHostQS.valid_ip('127.0.0.1/244'))
 
-        # TODO: these should be false but is it worth making the regex more complex (and expensive)?
-        # using something like: re.compile(r'^[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d(\/\d{1,2})?$')
+        # TODO: these should be false but is it worth making the regex more
+        # complex (and expensive)? using something like:
+        # re.compile(r'^[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d\.'
+        #           r'[0-2]{0,1}[0-5]{0,1}\d\.[0-2]{0,1}[0-5]{0,1}\d(\/\d{1,2})?$')
         # costs 50% more and it's not even complete yet..
         # self.assertFalse(models.LiveHostQS.valid_ip('527.0.0.1/244'))
         # self.assertFalse(models.LiveHostQS.valid_ip('277.0.0.1/244'))

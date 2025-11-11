@@ -1,9 +1,9 @@
 from django.contrib.admin.sites import site
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.utils import DataError
 from django.test import TestCase
 from django.utils import timezone
-from django.db.utils import DataError
-from django.db import transaction
 
 
 def _clean_field(fieldname):
@@ -66,10 +66,12 @@ class Test(TestCase, metaclass=AdminMeta):
     Metaclass and dynamic test method generation is bad (in principle) for lack of test clarity.
     In this case, dynamic was already in place within a single method which prevent proper test result output:
     * print would always show up
-    * if we remove print, when method failed we didn't know which model_admin was bad
+    * if we remove print, when method failed we didn't know which
+      model_admin was bad
 
-    Creating a method per model_admin allows result output to be controlled by the testrunner (verbosity 1 displays only dots,
-    2 will display each model_admin as method) and parseable by test result tools
+    Creating a method per model_admin allows result output to be controlled
+    by the testrunner (verbosity 1 displays only dots, 2 will display each
+    model_admin as method) and parseable by test result tools
     """
 
     pass

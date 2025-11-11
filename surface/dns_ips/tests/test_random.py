@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from dns_ips.models import DNSRecord, DNSRecordValue, IPAddress
 from core_utils.db.models import GroupConcat
+from dns_ips.models import DNSRecord, DNSRecordValue, IPAddress
 
 
 class Test(TestCase):
@@ -42,19 +42,19 @@ class Test(TestCase):
         # prefetch_related works
         with self.assertNumQueries(3):
             # main query (1) + 1 value query per record (2) = 3
-            l = list(DNSRecord.objects.filter(dnsrecordvalue__rtype=DNSRecordValue.RecordType.A).distinct())
-            self.assertEqual(len(l), 2)
-            for r in l:
+            records = list(DNSRecord.objects.filter(dnsrecordvalue__rtype=DNSRecordValue.RecordType.A).distinct())
+            self.assertEqual(len(records), 2)
+            for r in records:
                 list(r.dnsrecordvalue_set.all())
         with self.assertNumQueries(2):
             # main query (1) + prefetch query (1) = 2
-            l = list(
+            records = list(
                 DNSRecord.objects.filter(dnsrecordvalue__rtype=DNSRecordValue.RecordType.A)
                 .distinct()
                 .prefetch_related('dnsrecordvalue_set')
             )
-            self.assertEqual(len(l), 2)
-            for r in l:
+            self.assertEqual(len(records), 2)
+            for r in records:
                 list(r.dnsrecordvalue_set.all())
 
     def test_concat(self):

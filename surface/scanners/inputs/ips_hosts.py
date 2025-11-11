@@ -15,7 +15,7 @@ class IPsHosts(BaseInput):
         return itertools.chain(ips.IPs().generate(**kwargs), hosts.Hosts().generate(**kwargs))
 
 
-class IPsHosts(BaseInput):
+class IPsHostsInternal(BaseInput):
     name = 'IPSHOSTSINT'
     label = 'Internal IPs and Hosts'
 

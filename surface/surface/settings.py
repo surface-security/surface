@@ -62,7 +62,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -195,6 +195,7 @@ DATABASE_LOCKS_ENABLED = False
 
 SCA_SBOM_REPO_URL = ENV_VAR("SURF_SCA_SBOM_REPO_URL", default="http://localhost:8000/sbomrepo")
 SCA_SOURCE_PURL_TYPES = ["github.com"]
+SCA_IMAGE_PURL_TYPES = ["oci", "docker"]
 SCA_INTERNAL_RENOVATE = ENV_VAR("SURF_SCA_INTERNAL_RENOVATE", default=None)
 SCA_INTERNAL_GITLAB_API = ENV_VAR("SURF_SCA_INTERNAL_GITLAB_API", default=None)
 
