@@ -292,13 +292,6 @@ class SuppressedSCAFinding(models.Model):
         unique_together = ["dependency", "vuln_id"]
 
 
-@receiver(post_save, sender=SCADependency)
-def sca_project_post_save(sender, instance, **kwargs):
-    deps = instance.dependencies
-    if instance.is_project:
-        sender.objects.filter(pk=instance.pk).update(dependencies_list=deps)
-
-
 @receiver([post_save, post_delete], sender=SuppressedSCAFinding)
 def suppressed_sca_finding_post_save_delete(sender, instance, **kwargs):
     if instance.sca_project:

@@ -6,7 +6,7 @@ from sca.models import SCADependency, SCAFindingCounter
 
 
 class Command(LogBaseCommand):
-    help = "Re-sync SCA Projects Vulnerabilities Counters"
+    help = "Re-sync SCA Projects Vulnerabilities Counters and dependencies list."
 
     processed_projects = 0
 
@@ -14,6 +14,8 @@ class Command(LogBaseCommand):
         self.sync_time = timezone.now()
         for project in tqdm.tqdm(SCADependency.objects.filter(is_project=True)):
             project.update_vulnerability_counters()
+            project.dependencies_list = project.dependencies
+            project.save()
             self.processed_projects += 1
 
         SCAFindingCounter.objects.filter(last_sync__lt=self.sync_time).update(

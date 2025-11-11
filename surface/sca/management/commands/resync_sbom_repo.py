@@ -238,6 +238,8 @@ class Command(LogBaseCommand):
 
         if project:
             project.update_vulnerability_counters()
+            project.dependencies_list = project.dependencies
+            project.save()
 
         self.processed += 1
         return True
