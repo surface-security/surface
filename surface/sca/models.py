@@ -4,6 +4,8 @@ from typing import Union
 
 from django.db import models
 from django.db.models import Case, Count, Q, When
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 
 from core_utils.decorators import lru_cache_time
 from sca.utils import cleanup_tree, cvss_to_score, invert_dict, only_highest_version_dependencies
@@ -294,3 +296,12 @@ class SuppressedSCAFinding(models.Model):
         verbose_name = "Suppressed Dependency Finding (SCA)"
         verbose_name_plural = "Suppressed Dependency Findings (SCA)"
         unique_together = ["dependency", "vuln_id"]
+
+
+@receiver([post_save, post_delete], sender=SuppressedSCAFinding)
+def suppressed_sca_finding_post_save_delete(sender, instance, **kwargs):
+    if instance.sca_project:
+        instance.sca_project.update_vulnerability_counters()
+    else:
+        for project in instance.dependency.projects:
+            project.update_vulnerability_counters()
