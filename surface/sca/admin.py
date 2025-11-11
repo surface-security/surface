@@ -254,18 +254,16 @@ class SCAProjectAdmin(DefaultModelAdmin):
         "git_source",
         ("git_source__apps", RelatedFieldAjaxListFilter),
     ]
-    search_fields = ["name", "purl", "depends_on__name", "depends_on__purl", "git_source__repo_url"]
+    search_fields = [
+        "name",
+        "purl",
+        "depends_on__name",
+        "depends_on__purl",
+        "git_source__repo_url",
+        "dependencies_list",
+    ]
 
-    def get_search_results(self, request, queryset, search_term):
-        prop_ids = []
-        if search_term:
-            term = search_term.lower()
-            prop_ids = [obj.pk for obj in queryset.only("pk") if any(term in dep.lower() for dep in obj.dependencies)]
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
-        if prop_ids:
-            queryset |= queryset.model.objects.filter(pk__in=prop_ids)
-
-        return queryset, use_distinct
+    readonly_fields = []
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
@@ -293,7 +291,11 @@ class SCAProjectAdmin(DefaultModelAdmin):
 
             vulnerabilities = self.get_vulnerabilities(obj)
             # set fixed_in as True by default if not passed in the request
-            if "fixed_in" not in request.GET:
+            if (
+                "fixed_in" not in request.GET
+                and int(request.GET.get("finding_type", models.SCAFinding.FindingType.VULN))
+                != models.SCAFinding.FindingType.EOL
+            ):
                 request.GET = request.GET.copy()
                 request.GET["fixed_in"] = "true"
             extra_context["vulns_filter"] = SCAFindingFilter(request.GET, queryset=vulnerabilities)
