@@ -15,7 +15,7 @@ class Command(LogBaseCommand):
         for project in tqdm.tqdm(SCADependency.objects.filter(is_project=True)):
             project.update_vulnerability_counters()
             project.dependencies_list = project.dependencies
-            project.save()
+            project.save(update_fields=["dependencies_list"])
             self.processed_projects += 1
 
         SCAFindingCounter.objects.filter(last_sync__lt=self.sync_time).update(
