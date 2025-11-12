@@ -70,6 +70,7 @@ class SCADependency(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     last_scan = models.DateTimeField()
     sbom_uuid = models.CharField(max_length=255, default=None, null=True)
+    dependencies_list = models.JSONField(default=list)
 
     @staticmethod
     def get_dependencies_recursively(

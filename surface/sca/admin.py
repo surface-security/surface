@@ -75,10 +75,16 @@ class EndOfLifeDependencyAdmin(DefaultModelAdmin, DefaultFilterMixin, EndOfLifeD
         "no_support",
         "is_discontinued",
         "is_lts",
-        "link",
+        "get_link",
     ]
     list_filter = ["product", EndOfLifeDependencyBoolFilter, LTSFilter, DiscontinuedFilter, SupportFilter]
     search_fields = ["product"]
+
+    @admin.display(description="Link")
+    def get_link(self, obj):
+        if obj.link:
+            return format_html(f'<a target="_blank" href="{obj.link}">{obj.link}</a>')
+        return ""
 
 
 class SCADependencyForm(forms.ModelForm):
@@ -248,7 +254,16 @@ class SCAProjectAdmin(DefaultModelAdmin):
         "git_source",
         ("git_source__apps", RelatedFieldAjaxListFilter),
     ]
-    search_fields = ["name", "purl", "depends_on__name", "depends_on__purl", "git_source__repo_url"]
+    search_fields = [
+        "name",
+        "purl",
+        "depends_on__name",
+        "depends_on__purl",
+        "git_source__repo_url",
+        "dependencies_list",
+    ]
+
+    readonly_fields = []
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
@@ -276,7 +291,11 @@ class SCAProjectAdmin(DefaultModelAdmin):
 
             vulnerabilities = self.get_vulnerabilities(obj)
             # set fixed_in as True by default if not passed in the request
-            if "fixed_in" not in request.GET:
+            if (
+                "fixed_in" not in request.GET
+                and int(request.GET.get("finding_type", models.SCAFinding.FindingType.VULN))
+                != models.SCAFinding.FindingType.EOL
+            ):
                 request.GET = request.GET.copy()
                 request.GET["fixed_in"] = "true"
             extra_context["vulns_filter"] = SCAFindingFilter(request.GET, queryset=vulnerabilities)
@@ -372,7 +391,7 @@ class SCAProjectAdmin(DefaultModelAdmin):
     def get_sbom_link(self, obj):
         if obj.sbom_uuid:
             return format_html(
-                '<a href="{}" target="_blank">Download sbom json</a>',
+                '<a href="{}" target="_blank" title="Download SBOM JSON" aria-label="Download SBOM JSON"><span class="material-symbols-outlined text-lg">download</span></a>',
                 reverse("sca:download_sbom_as_json", args=[obj.sbom_uuid, obj.name]),
             )
 
