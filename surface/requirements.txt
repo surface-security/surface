@@ -20,7 +20,7 @@ django-logbasecommand==0.0.5
 django-notification-sender==0.1.0
 django-dkron==1.2.2
 django-slack-processor==0.1.9
-django-olympus==0.0.6
+django-olympus==0.0.7
 django-environ==0.12.0
 django-impersonator==0.0.3
 django-apitokens==0.0.3
