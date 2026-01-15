@@ -30,6 +30,7 @@ def get_docker_client(ip, port=80, use_tls=True):
             client_cert=(settings.SCANNERS_DOCKER_CLIENT_CERT_PATH, settings.SCANNERS_DOCKER_CLIENT_KEY_PATH),
             verify=settings.SCANNERS_DOCKER_CA_CERT_PATH,
         )
+        #test commit
     else:
         tlsconfig = False
 
